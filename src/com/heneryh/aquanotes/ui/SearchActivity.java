@@ -20,7 +20,7 @@ import com.heneryh.aquanotes.R;
 import com.heneryh.aquanotes.provider.ScheduleContract.Sessions;
 import com.heneryh.aquanotes.provider.ScheduleContract.Vendors;
 import com.heneryh.aquanotes.ui.phone.SessionDetailActivity;
-import com.heneryh.aquanotes.ui.phone.VendorDetailActivity;
+import com.heneryh.aquanotes.ui.phone.ProbesDetailActivity;
 
 import android.app.SearchManager;
 import android.content.Intent;
@@ -50,7 +50,7 @@ public class SearchActivity extends BaseMultiPaneActivity {
     private TabWidget mTabWidget;
 
     private SessionsFragment mSessionsFragment;
-    private VendorsFragment mVendorsFragment;
+    private ProbesFragment mVendorsFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -141,9 +141,9 @@ public class SearchActivity extends BaseMultiPaneActivity {
         ((ViewGroup) findViewById(android.R.id.tabcontent)).addView(fragmentContainer);
 
         final FragmentManager fm = getSupportFragmentManager();
-        mVendorsFragment = (VendorsFragment) fm.findFragmentByTag("vendors");
+        mVendorsFragment = (ProbesFragment) fm.findFragmentByTag("vendors");
         if (mVendorsFragment == null) {
-            mVendorsFragment = new VendorsFragment();
+            mVendorsFragment = new ProbesFragment();
             mVendorsFragment.setArguments(getVendorsFragmentArguments());
             fm.beginTransaction()
                     .add(R.id.fragment_vendors, mVendorsFragment, "vendors")
@@ -191,10 +191,10 @@ public class SearchActivity extends BaseMultiPaneActivity {
                         SessionDetailFragment.class,
                         "session_detail",
                         R.id.fragment_container_search_detail);
-            } else if (VendorDetailActivity.class.getName().equals(activityClassName)) {
+            } else if (ProbesDetailActivity.class.getName().equals(activityClassName)) {
                 clearSelectedItems();
                 return new BaseMultiPaneActivity.FragmentReplaceInfo(
-                        VendorDetailFragment.class,
+                        ProbesDetailFragment.class,
                         "vendor_detail",
                         R.id.fragment_container_search_detail);
             }

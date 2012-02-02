@@ -21,7 +21,7 @@ import com.heneryh.aquanotes.provider.ScheduleContract;
 import com.heneryh.aquanotes.ui.BaseMultiPaneActivity;
 import com.heneryh.aquanotes.ui.SessionDetailFragment;
 import com.heneryh.aquanotes.ui.SessionsFragment;
-import com.heneryh.aquanotes.ui.TracksFragment;
+import com.heneryh.aquanotes.ui.OutletsFragment;
 import com.heneryh.aquanotes.ui.phone.SessionDetailActivity;
 import com.heneryh.aquanotes.ui.phone.SessionsActivity;
 
@@ -31,15 +31,15 @@ import android.support.v4.app.FragmentManager;
 import android.view.ViewGroup;
 
 /**
- * A multi-pane activity, consisting of a {@link TracksDropdownFragment}, a
+ * A multi-pane activity, consisting of a {@link OutletsDropdownFragment}, a
  * {@link SessionsFragment}, and {@link SessionDetailFragment}.
  *
- * This activity requires API level 11 or greater because {@link TracksDropdownFragment} requires
+ * This activity requires API level 11 or greater because {@link OutletsDropdownFragment} requires
  * API level 11.
  */
 public class SessionsMultiPaneActivity extends BaseMultiPaneActivity {
 
-    private TracksDropdownFragment mTracksDropdownFragment;
+    private OutletsDropdownFragment mTracksDropdownFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,10 +48,10 @@ public class SessionsMultiPaneActivity extends BaseMultiPaneActivity {
 
         Intent intent = new Intent();
         intent.setData(ScheduleContract.Tracks.CONTENT_URI);
-        intent.putExtra(TracksFragment.EXTRA_NEXT_TYPE, TracksFragment.NEXT_TYPE_SESSIONS);
+        intent.putExtra(OutletsFragment.EXTRA_NEXT_TYPE, OutletsFragment.NEXT_TYPE_SESSIONS);
 
         final FragmentManager fm = getSupportFragmentManager();
-        mTracksDropdownFragment = (TracksDropdownFragment) fm.findFragmentById(
+        mTracksDropdownFragment = (OutletsDropdownFragment) fm.findFragmentById(
                 R.id.fragment_tracks_dropdown);
         mTracksDropdownFragment.reloadFromArguments(intentToFragmentArguments(intent));
     }

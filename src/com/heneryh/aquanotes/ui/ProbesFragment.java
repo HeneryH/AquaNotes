@@ -44,7 +44,7 @@ import static com.heneryh.aquanotes.util.UIUtils.buildStyledSnippet;
 /**
  * A {@link ListFragment} showing a list of sandbox comapnies.
  */
-public class VendorsFragment extends ListFragment implements
+public class ProbesFragment extends ListFragment implements
         NotifyingAsyncQueryHandler.AsyncQueryListener {
 
     private static final String STATE_CHECKED_POSITION = "checkedPosition";
@@ -93,7 +93,7 @@ public class VendorsFragment extends ListFragment implements
             vendorQueryToken = VendorsQuery._TOKEN;
 
         } else {
-            Log.d("VendorsFragment/reloadFromArguments", "A search URL definitely gets passed in.");
+            Log.d("ProbesFragment/reloadFromArguments", "A search URL definitely gets passed in.");
             mAdapter = new SearchAdapter(getActivity());
             projection = SearchQuery.PROJECTION;
             vendorQueryToken = SearchQuery._TOKEN;
@@ -242,7 +242,7 @@ public class VendorsFragment extends ListFragment implements
         /** {@inheritDoc} */
         @Override
         public View newView(Context context, Cursor cursor, ViewGroup parent) {
-            return getActivity().getLayoutInflater().inflate(R.layout.list_item_vendor_oneline,
+            return getActivity().getLayoutInflater().inflate(R.layout.list_item_probe_oneline,
                     parent, false);
         }
 
@@ -269,7 +269,7 @@ public class VendorsFragment extends ListFragment implements
         /** {@inheritDoc} */
         @Override
         public View newView(Context context, Cursor cursor, ViewGroup parent) {
-            return getActivity().getLayoutInflater().inflate(R.layout.list_item_vendor, parent,
+            return getActivity().getLayoutInflater().inflate(R.layout.list_item_probe, parent,
                     false);
         }
 

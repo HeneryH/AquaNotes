@@ -21,12 +21,12 @@ import com.heneryh.aquanotes.ui.BaseMultiPaneActivity;
 import com.heneryh.aquanotes.ui.MapFragment;
 import com.heneryh.aquanotes.ui.SessionDetailFragment;
 import com.heneryh.aquanotes.ui.SessionsFragment;
-import com.heneryh.aquanotes.ui.VendorDetailFragment;
-import com.heneryh.aquanotes.ui.VendorsFragment;
+import com.heneryh.aquanotes.ui.ProbesDetailFragment;
+import com.heneryh.aquanotes.ui.ProbesFragment;
 import com.heneryh.aquanotes.ui.phone.SessionDetailActivity;
 import com.heneryh.aquanotes.ui.phone.SessionsActivity;
-import com.heneryh.aquanotes.ui.phone.VendorDetailActivity;
-import com.heneryh.aquanotes.ui.phone.VendorsActivity;
+import com.heneryh.aquanotes.ui.phone.ProbesDetailActivity;
+import com.heneryh.aquanotes.ui.phone.ProbesActivity;
 
 import android.app.FragmentBreadCrumbs;
 import android.os.Bundle;
@@ -37,8 +37,8 @@ import android.view.View;
 
 /**
  * A multi-pane activity, where the primary navigation pane is a {@link MapFragment}, that shows
- * {@link SessionsFragment}, {@link SessionDetailFragment}, {@link VendorsFragment}, and
- * {@link VendorDetailFragment} as popups.
+ * {@link SessionsFragment}, {@link SessionDetailFragment}, {@link ProbesFragment}, and
+ * {@link ProbesDetailFragment} as popups.
  *
  * This activity requires API level 11 or greater because of its use of {@link FragmentBreadCrumbs}.
  */
@@ -109,19 +109,19 @@ public class MapMultiPaneActivity extends BaseMultiPaneActivity implements
                     SessionDetailFragment.class,
                     "session_detail",
                     R.id.fragment_container_map_detail);
-        } else if (VendorsActivity.class.getName().equals(activityClassName)) {
+        } else if (ProbesActivity.class.getName().equals(activityClassName)) {
             clearBackStack(getSupportFragmentManager());
             mPopupType = POPUP_TYPE_VENDORS;
             showHideDetailAndPan(true);
             return new FragmentReplaceInfo(
-                    VendorsFragment.class,
+                    ProbesFragment.class,
                     "vendors",
                     R.id.fragment_container_map_detail);
-        } else if (VendorDetailActivity.class.getName().equals(activityClassName)) {
+        } else if (ProbesDetailActivity.class.getName().equals(activityClassName)) {
             mPopupType = POPUP_TYPE_VENDORS;
             showHideDetailAndPan(true);
             return new FragmentReplaceInfo(
-                    VendorDetailFragment.class,
+                    ProbesDetailFragment.class,
                     "vendor_detail",
                     R.id.fragment_container_map_detail);
         }
@@ -132,7 +132,7 @@ public class MapMultiPaneActivity extends BaseMultiPaneActivity implements
     protected void onBeforeCommitReplaceFragment(FragmentManager fm, FragmentTransaction ft,
             Fragment fragment) {
         super.onBeforeCommitReplaceFragment(fm, ft, fragment);
-        if (fragment instanceof SessionsFragment || fragment instanceof VendorsFragment) {
+        if (fragment instanceof SessionsFragment || fragment instanceof ProbesFragment) {
             mPauseBackStackWatcher = true;
             clearBackStack(fm);
             mPauseBackStackWatcher = false;

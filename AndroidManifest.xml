@@ -39,8 +39,8 @@
 
     <application
         android:label="@string/app_name"
-        android:icon="@drawable/ic_launcher"
-        android:logo="@drawable/title_logo"
+        android:icon="@drawable/ic_neptune_launcher"
+        android:logo="@drawable/title_neptune_logo"
         android:theme="@style/Theme.AquaNotes"
         android:hardwareAccelerated="true">
 
@@ -65,7 +65,7 @@
             android:label="@string/title_tagstream" />
 
         <activity
-            android:name=".ui.StarredActivity"
+            android:name=".ui.ControllersActivity"
             android:label="@string/title_starred" />
 
         <activity
@@ -86,7 +86,7 @@
             android:label="@string/title_schedule" />
 
         <activity
-            android:name=".ui.phone.TracksActivity"
+            android:name=".ui.phone.OutletsActivity"
             android:label="@string/title_tracks">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -115,7 +115,7 @@
         </activity>
 
         <activity
-            android:name=".ui.phone.VendorsActivity"
+            android:name=".ui.phone.ProbesActivity"
             android:label="@string/title_vendors">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -125,7 +125,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".ui.phone.VendorDetailActivity">
+        <activity android:name=".ui.phone.ProbesDetailActivity">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -144,7 +144,7 @@
             android:name=".ui.tablet.SessionsMultiPaneActivity"
             android:label="@string/title_sessions" />
         <activity
-            android:name=".ui.tablet.VendorsMultiPaneActivity"
+            android:name=".ui.tablet.ProbesMultiPaneActivity"
             android:label="@string/title_vendors" />
         <activity
             android:name=".ui.tablet.ScheduleMultiPaneActivity"
@@ -168,11 +168,16 @@
         
         <!-- Other manifest items -->
 
+        <service android:name="com.heneryh.aquanotes.service.SyncService" />
+        <service android:name="com.heneryh.aquanotes.service.NightlyService" />
+        
+        <provider
+            android:name=".provider.AquaNotesDbProvider"
+            android:authorities="com.heneryh.aquanotes" />
+
         <meta-data
             android:name="android.app.default_searchable"
             android:value=".ui.SearchActivity" />
-
-        <service android:name="com.heneryh.aquanotes.service.SyncService" />
 
         <provider
             android:name="com.heneryh.aquanotes.provider.ScheduleProvider"

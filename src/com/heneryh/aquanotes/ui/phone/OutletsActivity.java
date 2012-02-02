@@ -17,15 +17,15 @@
 package com.heneryh.aquanotes.ui.phone;
 
 import com.heneryh.aquanotes.ui.BaseSinglePaneActivity;
-import com.heneryh.aquanotes.ui.VendorDetailFragment;
+import com.heneryh.aquanotes.ui.OutletsFragment;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 
-public class VendorDetailActivity extends BaseSinglePaneActivity {
+public class OutletsActivity extends BaseSinglePaneActivity {
     @Override
     protected Fragment onCreatePane() {
-        return new VendorDetailFragment();
+        return new OutletsFragment();
     }
 
     @Override

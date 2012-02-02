@@ -21,7 +21,7 @@ import com.heneryh.aquanotes.provider.ScheduleContract;
 import com.heneryh.aquanotes.ui.phone.ScheduleActivity;
 import com.heneryh.aquanotes.ui.tablet.ScheduleMultiPaneActivity;
 import com.heneryh.aquanotes.ui.tablet.SessionsMultiPaneActivity;
-import com.heneryh.aquanotes.ui.tablet.VendorsMultiPaneActivity;
+import com.heneryh.aquanotes.ui.tablet.ProbesMultiPaneActivity;
 import com.heneryh.aquanotes.util.AnalyticsUtils;
 import com.heneryh.aquanotes.util.UIUtils;
 
@@ -68,8 +68,8 @@ public class DashboardFragment extends Fragment {
                     final Intent intent = new Intent(Intent.ACTION_VIEW,
                             ScheduleContract.Tracks.CONTENT_URI);
                     intent.putExtra(Intent.EXTRA_TITLE, getString(R.string.title_session_tracks));
-                    intent.putExtra(TracksFragment.EXTRA_NEXT_TYPE,
-                            TracksFragment.NEXT_TYPE_SESSIONS);
+                    intent.putExtra(OutletsFragment.EXTRA_NEXT_TYPE,
+                            OutletsFragment.NEXT_TYPE_SESSIONS);
                     startActivity(intent);
                 }
 
@@ -80,7 +80,7 @@ public class DashboardFragment extends Fragment {
             public void onClick(View view) {
                 fireTrackerEvent("Starred");
                 // Launch list of sessions and vendors the user has starred
-                startActivity(new Intent(getActivity(), StarredActivity.class));                
+                startActivity(new Intent(getActivity(), ControllersActivity.class));                
             }
         });
 
@@ -89,13 +89,13 @@ public class DashboardFragment extends Fragment {
                 fireTrackerEvent("Sandbox");
                 // Launch vendors list
                 if (UIUtils.isHoneycombTablet(getActivity())) {
-                    startActivity(new Intent(getActivity(), VendorsMultiPaneActivity.class));
+                    startActivity(new Intent(getActivity(), ProbesMultiPaneActivity.class));
                 } else {
                     final Intent intent = new Intent(Intent.ACTION_VIEW,
                             ScheduleContract.Tracks.CONTENT_URI);
                     intent.putExtra(Intent.EXTRA_TITLE, getString(R.string.title_vendor_tracks));
-                    intent.putExtra(TracksFragment.EXTRA_NEXT_TYPE,
-                            TracksFragment.NEXT_TYPE_VENDORS);
+                    intent.putExtra(OutletsFragment.EXTRA_NEXT_TYPE,
+                            OutletsFragment.NEXT_TYPE_VENDORS);
                     startActivity(intent);
                 }
             }

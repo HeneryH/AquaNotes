@@ -20,8 +20,8 @@ import com.heneryh.aquanotes.R;
 import com.heneryh.aquanotes.provider.ScheduleContract;
 import com.heneryh.aquanotes.ui.BaseActivity;
 import com.heneryh.aquanotes.ui.SessionDetailFragment;
-import com.heneryh.aquanotes.ui.TracksAdapter;
-import com.heneryh.aquanotes.ui.TracksFragment;
+import com.heneryh.aquanotes.ui.OutletsAdapter;
+import com.heneryh.aquanotes.ui.OutletsFragment;
 import com.heneryh.aquanotes.util.NotifyingAsyncQueryHandler;
 import com.heneryh.aquanotes.util.UIUtils;
 
@@ -41,11 +41,11 @@ import android.widget.TextView;
 
 /**
  * A tablet-specific fragment that is a giant {@link android.widget.Spinner}-like widget. It shows
- * a {@link ListPopupWindow} containing a list of tracks, using {@link TracksAdapter}.
+ * a {@link ListPopupWindow} containing a list of tracks, using {@link OutletsAdapter}.
  *
  * Requires API level 11 or later since {@link ListPopupWindow} is API level 11+.
  */
-public class TracksDropdownFragment extends Fragment implements
+public class OutletsDropdownFragment extends Fragment implements
         NotifyingAsyncQueryHandler.AsyncQueryListener,
         AdapterView.OnItemClickListener,
         PopupWindow.OnDismissListener {
@@ -57,7 +57,7 @@ public class TracksDropdownFragment extends Fragment implements
 
     private boolean mAutoloadTarget = true;
     private Cursor mCursor;
-    private TracksAdapter mAdapter;
+    private OutletsAdapter mAdapter;
     private String mNextType;
 
     private ListPopupWindow mListPopupWindow;
@@ -71,7 +71,7 @@ public class TracksDropdownFragment extends Fragment implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mHandler = new NotifyingAsyncQueryHandler(getActivity().getContentResolver(), this);
-        mAdapter = new TracksAdapter(getActivity());
+        mAdapter = new OutletsAdapter(getActivity());
 
         if (savedInstanceState != null) {
             // Prevent auto-load behavior on orientation change.
@@ -90,7 +90,7 @@ public class TracksDropdownFragment extends Fragment implements
             getActivity().stopManagingCursor(mCursor);
             mCursor = null;
         }
-        mHandler.cancelOperation(TracksAdapter.TracksQuery._TOKEN);
+        mHandler.cancelOperation(OutletsAdapter.TracksQuery._TOKEN);
 
         // Load new arguments
         final Intent intent = BaseActivity.fragmentArgumentsToIntent(arguments);
@@ -102,28 +102,28 @@ public class TracksDropdownFragment extends Fragment implements
         mNextType = intent.getStringExtra(EXTRA_NEXT_TYPE);
 
         // Filter our tracks query to only include those with valid results
-        String[] projection = TracksAdapter.TracksQuery.PROJECTION;
+        String[] projection = OutletsAdapter.TracksQuery.PROJECTION;
         String selection = null;
-        if (TracksFragment.NEXT_TYPE_SESSIONS.equals(mNextType)) {
+        if (OutletsFragment.NEXT_TYPE_SESSIONS.equals(mNextType)) {
             // Only show tracks with at least one session
-            projection = TracksAdapter.TracksQuery.PROJECTION_WITH_SESSIONS_COUNT;
+            projection = OutletsAdapter.TracksQuery.PROJECTION_WITH_SESSIONS_COUNT;
             selection = ScheduleContract.Tracks.SESSIONS_COUNT + ">0";
 
-        } else if (TracksFragment.NEXT_TYPE_VENDORS.equals(mNextType)) {
+        } else if (OutletsFragment.NEXT_TYPE_VENDORS.equals(mNextType)) {
             // Only show tracks with at least one vendor
-            projection = TracksAdapter.TracksQuery.PROJECTION_WITH_VENDORS_COUNT;
+            projection = OutletsAdapter.TracksQuery.PROJECTION_WITH_VENDORS_COUNT;
             selection = ScheduleContract.Tracks.VENDORS_COUNT + ">0";
         }
 
         // Start background query to load tracks
-        mHandler.startQuery(TracksAdapter.TracksQuery._TOKEN, null, tracksUri, projection,
+        mHandler.startQuery(OutletsAdapter.TracksQuery._TOKEN, null, tracksUri, projection,
                 selection, null, ScheduleContract.Tracks.DEFAULT_SORT);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        mRootView = (ViewGroup) inflater.inflate(R.layout.fragment_tracks_dropdown, null);
+        mRootView = (ViewGroup) inflater.inflate(R.layout.fragment_outlets_dropdown, null);
         mTitle = (TextView) mRootView.findViewById(R.id.track_title);
         mAbstract = (TextView) mRootView.findViewById(R.id.track_abstract);
 
@@ -134,9 +134,9 @@ public class TracksDropdownFragment extends Fragment implements
                 mListPopupWindow.setModal(true);
                 mListPopupWindow.setContentWidth(400);
                 mListPopupWindow.setAnchorView(mRootView);
-                mListPopupWindow.setOnItemClickListener(TracksDropdownFragment.this);
+                mListPopupWindow.setOnItemClickListener(OutletsDropdownFragment.this);
                 mListPopupWindow.show();
-                mListPopupWindow.setOnDismissListener(TracksDropdownFragment.this);
+                mListPopupWindow.setOnDismissListener(OutletsDropdownFragment.this);
             }
         });
         return mRootView;
@@ -161,7 +161,7 @@ public class TracksDropdownFragment extends Fragment implements
         String lastTrackID = UIUtils.getLastUsedTrackID(getActivity());
         if (lastTrackID != null) {
             while (!cursor.isAfterLast()) {
-                if (lastTrackID.equals(cursor.getString(TracksAdapter.TracksQuery.TRACK_ID))) {
+                if (lastTrackID.equals(cursor.getString(OutletsAdapter.TracksQuery.TRACK_ID))) {
                     break;
                 }
                 cursor.moveToNext();
@@ -177,7 +177,7 @@ public class TracksDropdownFragment extends Fragment implements
         }
 
         mAdapter.setHasAllItem(true);
-        mAdapter.setIsSessions(TracksFragment.NEXT_TYPE_SESSIONS.equals(mNextType));
+        mAdapter.setIsSessions(OutletsFragment.NEXT_TYPE_SESSIONS.equals(mNextType));
         mAdapter.changeCursor(mCursor);
     }
 
@@ -188,7 +188,7 @@ public class TracksDropdownFragment extends Fragment implements
 
         if (cursor != null) {
             UIUtils.setLastUsedTrackID(getActivity(), cursor.getString(
-                    TracksAdapter.TracksQuery.TRACK_ID));
+                    OutletsAdapter.TracksQuery.TRACK_ID));
         } else {
             UIUtils.setLastUsedTrackID(getActivity(), ScheduleContract.Tracks.ALL_TRACK_ID);
         }
@@ -204,20 +204,20 @@ public class TracksDropdownFragment extends Fragment implements
         final Resources res = getResources();
 
         if (cursor != null) {
-            trackColor = cursor.getInt(TracksAdapter.TracksQuery.TRACK_COLOR);
-            trackId = cursor.getString(TracksAdapter.TracksQuery.TRACK_ID);
+            trackColor = cursor.getInt(OutletsAdapter.TracksQuery.TRACK_COLOR);
+            trackId = cursor.getString(OutletsAdapter.TracksQuery.TRACK_ID);
 
-            mTitle.setText(cursor.getString(TracksAdapter.TracksQuery.TRACK_NAME));
-            mAbstract.setText(cursor.getString(TracksAdapter.TracksQuery.TRACK_ABSTRACT));
+            mTitle.setText(cursor.getString(OutletsAdapter.TracksQuery.TRACK_NAME));
+            mAbstract.setText(cursor.getString(OutletsAdapter.TracksQuery.TRACK_ABSTRACT));
 
         } else {
             trackColor = res.getColor(R.color.all_track_color);
             trackId = ScheduleContract.Tracks.ALL_TRACK_ID;
 
-            mTitle.setText(TracksFragment.NEXT_TYPE_SESSIONS.equals(mNextType)
+            mTitle.setText(OutletsFragment.NEXT_TYPE_SESSIONS.equals(mNextType)
                     ? R.string.all_sessions_title
                     : R.string.all_sandbox_title);
-            mAbstract.setText(TracksFragment.NEXT_TYPE_SESSIONS.equals(mNextType)
+            mAbstract.setText(OutletsFragment.NEXT_TYPE_SESSIONS.equals(mNextType)
                     ? R.string.all_sessions_subtitle
                     : R.string.all_sandbox_subtitle);
         }

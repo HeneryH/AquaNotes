@@ -33,9 +33,9 @@ import android.widget.ListView;
 
 /**
  * A simple {@link ListFragment} that renders a list of tracks with available sessions or vendors
- * (depending on {@link TracksFragment#EXTRA_NEXT_TYPE}) using a {@link TracksAdapter}.
+ * (depending on {@link OutletsFragment#EXTRA_NEXT_TYPE}) using a {@link OutletsAdapter}.
  */
-public class TracksFragment extends ListFragment implements
+public class OutletsFragment extends ListFragment implements
         NotifyingAsyncQueryHandler.AsyncQueryListener {
 
     public static final String EXTRA_NEXT_TYPE = "com.heneryh.aquanotes.extra.NEXT_TYPE";
@@ -43,7 +43,7 @@ public class TracksFragment extends ListFragment implements
     public static final String NEXT_TYPE_SESSIONS = "sessions";
     public static final String NEXT_TYPE_VENDORS = "vendors";
 
-    private TracksAdapter mAdapter;
+    private OutletsAdapter mAdapter;
     private NotifyingAsyncQueryHandler mHandler;
     private String mNextType;
 
@@ -55,21 +55,21 @@ public class TracksFragment extends ListFragment implements
         final Uri tracksUri = intent.getData();
         mNextType = intent.getStringExtra(EXTRA_NEXT_TYPE);
 
-        mAdapter = new TracksAdapter(getActivity());
+        mAdapter = new OutletsAdapter(getActivity());
         setListAdapter(mAdapter);
 
         // Filter our tracks query to only include those with valid results
-        String[] projection = TracksAdapter.TracksQuery.PROJECTION;
+        String[] projection = OutletsAdapter.TracksQuery.PROJECTION;
         String selection = null;
         if (NEXT_TYPE_SESSIONS.equals(mNextType)) {
             // Only show tracks with at least one session
-            projection = TracksAdapter.TracksQuery.PROJECTION_WITH_SESSIONS_COUNT;
+            projection = OutletsAdapter.TracksQuery.PROJECTION_WITH_SESSIONS_COUNT;
             selection = ScheduleContract.Tracks.SESSIONS_COUNT + ">0";
             AnalyticsUtils.getInstance(getActivity()).trackPageView("/Tracks");
 
         } else if (NEXT_TYPE_VENDORS.equals(mNextType)) {
             // Only show tracks with at least one vendor
-            projection = TracksAdapter.TracksQuery.PROJECTION_WITH_VENDORS_COUNT;
+            projection = OutletsAdapter.TracksQuery.PROJECTION_WITH_VENDORS_COUNT;
             selection = ScheduleContract.Tracks.VENDORS_COUNT + ">0";
             AnalyticsUtils.getInstance(getActivity()).trackPageView("/Sandbox");
         }
@@ -107,7 +107,7 @@ public class TracksFragment extends ListFragment implements
 
         getActivity().startManagingCursor(cursor);
         mAdapter.setHasAllItem(true);
-        mAdapter.setIsSessions(TracksFragment.NEXT_TYPE_SESSIONS.equals(mNextType));
+        mAdapter.setIsSessions(OutletsFragment.NEXT_TYPE_SESSIONS.equals(mNextType));
         mAdapter.changeCursor(cursor);
     }
 
@@ -118,7 +118,7 @@ public class TracksFragment extends ListFragment implements
         final String trackId;
 
         if (cursor != null) {
-            trackId = cursor.getString(TracksAdapter.TracksQuery.TRACK_ID);
+            trackId = cursor.getString(OutletsAdapter.TracksQuery.TRACK_ID);
         } else {
             trackId = ScheduleContract.Tracks.ALL_TRACK_ID;
         }

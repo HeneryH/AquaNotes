@@ -17,15 +17,15 @@
 package com.heneryh.aquanotes.ui.phone;
 
 import com.heneryh.aquanotes.ui.BaseSinglePaneActivity;
-import com.heneryh.aquanotes.ui.TracksFragment;
+import com.heneryh.aquanotes.ui.ProbesDetailFragment;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 
-public class TracksActivity extends BaseSinglePaneActivity {
+public class ProbesDetailActivity extends BaseSinglePaneActivity {
     @Override
     protected Fragment onCreatePane() {
-        return new TracksFragment();
+        return new ProbesDetailFragment();
     }
 
     @Override

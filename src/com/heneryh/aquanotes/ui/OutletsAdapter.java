@@ -33,7 +33,7 @@ import android.widget.TextView;
 /**
  * A {@link android.widget.CursorAdapter} that renders a {@link TracksQuery}.
  */
-public class TracksAdapter extends CursorAdapter {
+public class OutletsAdapter extends CursorAdapter {
     private static final int ALL_ITEM_ID = Integer.MAX_VALUE;
 
     private Activity mActivity;
@@ -41,7 +41,7 @@ public class TracksAdapter extends CursorAdapter {
     private int mPositionDisplacement;
     private boolean mIsSessions = true;
 
-    public TracksAdapter(Activity activity) {
+    public OutletsAdapter(Activity activity) {
         super(activity, null);
         mActivity = activity;
     }
@@ -65,7 +65,7 @@ public class TracksAdapter extends CursorAdapter {
         if (mHasAllItem && position == 0) {
             if (convertView == null) {
                 convertView = mActivity.getLayoutInflater().inflate(
-                        R.layout.list_item_track, parent, false);
+                        R.layout.list_item_outlet, parent, false);
             }
 
             // Custom binding for the first item
@@ -122,7 +122,7 @@ public class TracksAdapter extends CursorAdapter {
     /** {@inheritDoc} */
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        return mActivity.getLayoutInflater().inflate(R.layout.list_item_track, parent,
+        return mActivity.getLayoutInflater().inflate(R.layout.list_item_outlet, parent,
                 false);
     }
 

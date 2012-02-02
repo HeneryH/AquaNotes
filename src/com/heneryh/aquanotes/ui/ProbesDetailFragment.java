@@ -49,10 +49,10 @@ import android.widget.TextView;
  * A fragment that shows detail information for a sandbox company, including company name,
  * description, product description, logo, etc.
  */
-public class VendorDetailFragment extends Fragment implements
+public class ProbesDetailFragment extends Fragment implements
         NotifyingAsyncQueryHandler.AsyncQueryListener,
         CompoundButton.OnCheckedChangeListener {
-    private static final String TAG = "VendorDetailFragment";
+    private static final String TAG = "ProbesDetailFragment";
 
     private Uri mVendorUri;
 
@@ -101,7 +101,7 @@ public class VendorDetailFragment extends Fragment implements
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
 
-        mRootView = (ViewGroup) inflater.inflate(R.layout.fragment_vendor_detail, null);
+        mRootView = (ViewGroup) inflater.inflate(R.layout.fragment_probe_detail, null);
 
         mName = (TextView) mRootView.findViewById(R.id.vendor_name);
         mStarred = (CompoundButton) mRootView.findViewById(R.id.star_button);

@@ -20,7 +20,7 @@ import com.heneryh.aquanotes.R;
 import com.heneryh.aquanotes.provider.ScheduleContract.Sessions;
 import com.heneryh.aquanotes.provider.ScheduleContract.Vendors;
 import com.heneryh.aquanotes.ui.phone.SessionDetailActivity;
-import com.heneryh.aquanotes.ui.phone.VendorDetailActivity;
+import com.heneryh.aquanotes.ui.phone.ProbesDetailActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -38,7 +38,7 @@ import android.widget.TextView;
  * support that {@link BaseMultiPaneActivity} offers, so we inherit from it instead of
  * {@link BaseSinglePaneActivity}.
  */
-public class StarredActivity extends BaseMultiPaneActivity {
+public class ControllersActivity extends BaseMultiPaneActivity {
 
     public static final String TAG_SESSIONS = "sessions";
     public static final String TAG_VENDORS = "vendors";
@@ -47,12 +47,12 @@ public class StarredActivity extends BaseMultiPaneActivity {
     private TabWidget mTabWidget;
 
     private SessionsFragment mSessionsFragment;
-    private VendorsFragment mVendorsFragment;
+    private ProbesFragment mVendorsFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_starred);
+        setContentView(R.layout.activity_controllers);
         getActivityHelper().setupActionBar(getTitle(), 0);
 
         mTabHost = (TabHost) findViewById(android.R.id.tabhost);
@@ -120,9 +120,9 @@ public class StarredActivity extends BaseMultiPaneActivity {
 
         final FragmentManager fm = getSupportFragmentManager();
 
-        mVendorsFragment = (VendorsFragment) fm.findFragmentByTag("vendors");
+        mVendorsFragment = (ProbesFragment) fm.findFragmentByTag("vendors");
         if (mVendorsFragment == null) {
-            mVendorsFragment = new VendorsFragment();
+            mVendorsFragment = new ProbesFragment();
             mVendorsFragment.setArguments(intentToFragmentArguments(intent));
             fm.beginTransaction()
                     .add(R.id.fragment_vendors, mVendorsFragment, "vendors")
@@ -157,10 +157,10 @@ public class StarredActivity extends BaseMultiPaneActivity {
                         SessionDetailFragment.class,
                         "session_detail",
                         R.id.fragment_container_starred_detail);
-            } else if (VendorDetailActivity.class.getName().equals(activityClassName)) {
+            } else if (ProbesDetailActivity.class.getName().equals(activityClassName)) {
                 clearSelectedItems();
                 return new FragmentReplaceInfo(
-                        VendorDetailFragment.class,
+                        ProbesDetailFragment.class,
                         "vendor_detail",
                         R.id.fragment_container_starred_detail);
             }
