@@ -17,6 +17,7 @@
 package com.heneryh.aquanotes.ui;
 
 import com.heneryh.aquanotes.R;
+import com.heneryh.aquanotes.configure.ConfigurePrefs;
 import com.heneryh.aquanotes.provider.AquaNotesDbContract;
 import com.heneryh.aquanotes.provider.ScheduleContract;
 import com.heneryh.aquanotes.ui.phone.ScheduleActivity;
@@ -26,6 +27,7 @@ import com.heneryh.aquanotes.ui.tablet.ProbesMultiPaneActivity;
 import com.heneryh.aquanotes.util.AnalyticsUtils;
 import com.heneryh.aquanotes.util.UIUtils;
 
+import android.appwidget.AppWidgetManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -45,19 +47,19 @@ public class DashboardFragment extends Fragment {
             Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_dashboard, container);
 
-        // Attach event handlers
-        root.findViewById(R.id.home_btn_schedule).setOnClickListener(new View.OnClickListener() {
-            public void onClick(View view) {
-                fireTrackerEvent("Schedule");
-                if (UIUtils.isHoneycombTablet(getActivity())) {
-                    startActivity(new Intent(getActivity(), ScheduleMultiPaneActivity.class));
-                } else {
-                    startActivity(new Intent(getActivity(), ScheduleActivity.class));
-                }
-                
-            }
-            
-        });
+//        // Attach event handlers
+//        root.findViewById(R.id.home_btn_schedule).setOnClickListener(new View.OnClickListener() {
+//            public void onClick(View view) {
+//                fireTrackerEvent("Schedule");
+//                if (UIUtils.isHoneycombTablet(getActivity())) {
+//                    startActivity(new Intent(getActivity(), ScheduleMultiPaneActivity.class));
+//                } else {
+//                    startActivity(new Intent(getActivity(), ScheduleActivity.class));
+//                }
+//                
+//            }
+//            
+//        });
 
         root.findViewById(R.id.home_btn_outlets).setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
@@ -102,22 +104,22 @@ public class DashboardFragment extends Fragment {
             }
         });
 
-        root.findViewById(R.id.home_btn_map).setOnClickListener(new View.OnClickListener() {
-            public void onClick(View view) {
-                // Launch map of conference venue
-                fireTrackerEvent("Map");
-                startActivity(new Intent(getActivity(),
-                        UIUtils.getMapActivityClass(getActivity())));
-            }
-        });
+//        root.findViewById(R.id.home_btn_map).setOnClickListener(new View.OnClickListener() {
+//            public void onClick(View view) {
+//                // Launch map of conference venue
+//                fireTrackerEvent("Map");
+//                startActivity(new Intent(getActivity(),
+//                        UIUtils.getMapActivityClass(getActivity())));
+//            }
+//        });
 
-        root.findViewById(R.id.home_btn_announcements).setOnClickListener(
+        root.findViewById(R.id.home_btn_prefs).setOnClickListener(
                 new View.OnClickListener() {
                     public void onClick(View view) {
-                        // splicing in tag streamer
-                        fireTrackerEvent("Bulletin");
-                        Intent intent = new Intent(getActivity(), BulletinActivity.class);
-                        startActivity(intent);
+        				Intent i = new Intent(getActivity(), ConfigurePrefs.class);
+        				int controllerId = 999; // use the special case of widget=999 , this is not a good solution <-- no longer used!
+        				i.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, controllerId);
+        				startActivity(i);
                     }
                 });
 

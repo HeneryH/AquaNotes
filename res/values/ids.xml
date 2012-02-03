@@ -19,8 +19,8 @@
     <item type="id" name="actionbar_compat_logo" />
     <item type="id" name="actionbar_compat_text" />
 
-    <item type="id" name="fragment_sessions" />
-    <item type="id" name="fragment_session_detail" />
+    <item type="id" name="fragment_outlets" />
+    <item type="id" name="fragment_outlet_detail" />
     <item type="id" name="fragment_probes" />
     <item type="id" name="fragment_probe_detail" />
 

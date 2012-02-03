@@ -33,7 +33,7 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 
 /**
- * A simple {@link ListFragment} that renders a list of tracks with available sessions or vendors
+ * A simple {@link ListFragment} that renders a list of tracks with available outlets or probes
  * (depending on {@link OutletsFragment#EXTRA_NEXT_TYPE}) using a {@link OutletsAdapter}.
  */
 public class OutletsFragment extends ListFragment implements

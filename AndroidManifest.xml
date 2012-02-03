@@ -58,7 +58,7 @@
 
         <activity
             android:name=".ui.BulletinActivity"
-            android:label="@string/title_bulletin" />
+            android:label="@string/title_prefs" />
 
         <activity
             android:name=".ui.TagStreamActivity"
@@ -167,6 +167,24 @@
         </receiver>
         
         <!-- Other manifest items -->
+        <!-- The new preferences screen activity to configure the widgets or preferences -->
+        <activity
+            android:label="@string/title_configure"
+            android:launchMode="singleTop"
+            android:name=".configure.ConfigurePrefs"
+            android:windowSoftInputMode="stateHidden" >
+            <intent-filter >
+            </intent-filter>
+        </activity>
+        <activity
+            android:label="@string/title_configure"
+            android:launchMode="singleTop"
+            android:name=".configure.WidgetConfigurePrefs"
+            android:windowSoftInputMode="stateHidden" >
+            <intent-filter >
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+            </intent-filter>
+        </activity>
 
         <service android:name="com.heneryh.aquanotes.service.SyncService" />
         <service android:name="com.heneryh.aquanotes.service.NightlyService" />

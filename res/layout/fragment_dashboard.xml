@@ -18,7 +18,7 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
 
-    <Button android:id="@+id/home_btn_schedule"
+<!--     <Button android:id="@+id/home_btn_schedule"
         style="@style/DashboardButton"
         android:text="@string/btn_schedule"
         android:drawableTop="@drawable/home_btn_schedule" />
@@ -26,7 +26,7 @@
         style="@style/DashboardButton"
         android:text="@string/btn_map"
         android:drawableTop="@drawable/home_btn_map" />
-    <Button android:id="@+id/home_btn_outlets"
+ -->    <Button android:id="@+id/home_btn_outlets"
         style="@style/DashboardButton"
         android:text="@string/btn_outlets"
         android:drawableTop="@drawable/home_btn_sessions" />
@@ -38,9 +38,9 @@
         style="@style/DashboardButton"
         android:text="@string/btn_probes"
         android:drawableTop="@drawable/home_btn_probes" />
-    <Button android:id="@+id/home_btn_announcements"
+    <Button android:id="@+id/home_btn_prefs"
         style="@style/DashboardButton"
-        android:text="@string/btn_announcements"
+        android:text="@string/btn_prefs"
         android:drawableTop="@drawable/home_btn_announcements" />
 
 </com.heneryh.aquanotes.ui.widget.DashboardLayout>

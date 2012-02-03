@@ -24,20 +24,20 @@
     <string name="description_refresh">Refresh</string>
     <string name="description_share">Share</string>
     <string name="description_export">Export</string>
-    <string name="description_star">Star</string>
+    <string name="description_star">Controllers</string>
     <string name="description_now">Go to Now</string>
 
     <string name="title_now_playing">Now playing</string>
     <string name="title_schedule">Schedule</string>
     <string name="title_outletsX">Outlets</string>
     <string name="title_outlet_detail">Outlet information</string>
-    <string name="title_controllers">Starred</string>
+    <string name="title_controllers">Fix this title</string>
     <string name="title_outlets">Outlets</string>
     <string name="title_probes">Probes</string>
     <string name="title_probe_detail">Probe information</string>
     <string name="title_map">Map</string>
     <string name="title_tagstream">Realtime stream</string>
-    <string name="title_bulletin">Bulletin</string>
+    <string name="title_prefs">Prefs</string>
 
     <string name="title_outlets_tracks">Outlets</string>
     <string name="title_probes_tracks">Probes</string>
@@ -52,7 +52,7 @@
     <string name="btn_outlets">Outlets</string>
     <string name="btn_controllers">Controllers</string>
     <string name="btn_probes">Probes</string>
-    <string name="btn_announcements">Bulletin</string>
+    <string name="btn_prefs">Prefs</string>
 
     <string name="toast_sync_error">Sync error: <xliff:g id="error">%1$s</xliff:g></string>
 

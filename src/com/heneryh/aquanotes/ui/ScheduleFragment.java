@@ -335,8 +335,8 @@ public class ScheduleFragment extends Fragment implements
             final Uri sessionsUri = ScheduleContract.Blocks.buildSessionsUri(blockId);
 
             final Intent intent = new Intent(Intent.ACTION_VIEW, sessionsUri);
-            intent.putExtra(OutletsXFragment.EXTRA_SCHEDULE_TIME_STRING,
-                    ((BlockView) view).getBlockTimeString());
+//            intent.putExtra(OutletsXFragment.EXTRA_SCHEDULE_TIME_STRING,
+//                    ((BlockView) view).getBlockTimeString());
             ((BaseActivity) getActivity()).openActivityOrFragment(intent);
         }
     }

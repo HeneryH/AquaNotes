@@ -17,6 +17,8 @@
 package com.heneryh.aquanotes.ui;
 
 import com.heneryh.aquanotes.R;
+import com.heneryh.aquanotes.provider.AquaNotesDbContract.Outlets;
+import com.heneryh.aquanotes.provider.AquaNotesDbContract.Probes;
 import com.heneryh.aquanotes.provider.ScheduleContract.Sessions;
 import com.heneryh.aquanotes.provider.ScheduleContract.Vendors;
 import com.heneryh.aquanotes.ui.phone.SessionDetailActivity;
@@ -40,14 +42,14 @@ import android.widget.TextView;
  */
 public class ControllersActivity extends BaseMultiPaneActivity {
 
-    public static final String TAG_SESSIONS = "sessions";
-    public static final String TAG_VENDORS = "vendors";
+    public static final String TAG_OUTLETS = "outlets";
+    public static final String TAG_PROBES = "probes";
 
     private TabHost mTabHost;
     private TabWidget mTabWidget;
 
-    private OutletsXFragment mSessionsFragment;
-    private ProbesFragment mVendorsFragment;
+    private OutletsXFragment mOutletsFragment;
+    private ProbesFragment mProbesFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,8 +61,8 @@ public class ControllersActivity extends BaseMultiPaneActivity {
         mTabWidget = (TabWidget) findViewById(android.R.id.tabs);
         mTabHost.setup();
 
-        setupSessionsTab();
-        setupVendorsTab();
+        setupOutletsTab();
+        setupProbesTab();
     }
 
     @Override
@@ -77,37 +79,37 @@ public class ControllersActivity extends BaseMultiPaneActivity {
     /**
      * Build and add "sessions" tab.
      */
-    private void setupSessionsTab() {
+    private void setupOutletsTab() {
         // TODO: this is very inefficient and messy, clean it up
         FrameLayout fragmentContainer = new FrameLayout(this);
-        fragmentContainer.setId(R.id.fragment_sessions);
+        fragmentContainer.setId(R.id.fragment_outlets);
         fragmentContainer.setLayoutParams(
                 new ViewGroup.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT,
                         ViewGroup.LayoutParams.FILL_PARENT));
         ((ViewGroup) findViewById(android.R.id.tabcontent)).addView(fragmentContainer);
 
-        final Intent intent = new Intent(Intent.ACTION_VIEW, Sessions.CONTENT_STARRED_URI);
+        final Intent intent = new Intent(Intent.ACTION_VIEW, Outlets.CONTENT_URI);
 
         final FragmentManager fm = getSupportFragmentManager();
-        mSessionsFragment = (OutletsXFragment) fm.findFragmentByTag("sessions");
-        if (mSessionsFragment == null) {
-            mSessionsFragment = new OutletsXFragment();
-            mSessionsFragment.setArguments(intentToFragmentArguments(intent));
+        mOutletsFragment = (OutletsXFragment) fm.findFragmentByTag("outlets");
+        if (mOutletsFragment == null) {
+        	mOutletsFragment = new OutletsXFragment();
+        	mOutletsFragment.setArguments(intentToFragmentArguments(intent));
             fm.beginTransaction()
-                    .add(R.id.fragment_sessions, mSessionsFragment, "sessions")
+                    .add(R.id.fragment_outlets, mOutletsFragment, "outlets")
                     .commit();
         }
 
         // Sessions content comes from reused activity
-        mTabHost.addTab(mTabHost.newTabSpec(TAG_SESSIONS)
+        mTabHost.addTab(mTabHost.newTabSpec(TAG_OUTLETS)
                 .setIndicator(buildIndicator(R.string.starred_sessions))
-                .setContent(R.id.fragment_sessions));
+                .setContent(R.id.fragment_outlets));
     }
 
     /**
      * Build and add "vendors" tab.
      */
-    private void setupVendorsTab() {
+    private void setupProbesTab() {
         // TODO: this is very inefficient and messy, clean it up
         FrameLayout fragmentContainer = new FrameLayout(this);
         fragmentContainer.setId(R.id.fragment_probes);
@@ -116,21 +118,21 @@ public class ControllersActivity extends BaseMultiPaneActivity {
                         ViewGroup.LayoutParams.FILL_PARENT));
         ((ViewGroup) findViewById(android.R.id.tabcontent)).addView(fragmentContainer);
 
-        final Intent intent = new Intent(Intent.ACTION_VIEW, Vendors.CONTENT_STARRED_URI);
+        final Intent intent = new Intent(Intent.ACTION_VIEW, Probes.CONTENT_URI);
 
         final FragmentManager fm = getSupportFragmentManager();
 
-        mVendorsFragment = (ProbesFragment) fm.findFragmentByTag("vendors");
-        if (mVendorsFragment == null) {
-            mVendorsFragment = new ProbesFragment();
-            mVendorsFragment.setArguments(intentToFragmentArguments(intent));
+        mProbesFragment = (ProbesFragment) fm.findFragmentByTag("probes");
+        if (mProbesFragment == null) {
+        	mProbesFragment = new ProbesFragment();
+            mProbesFragment.setArguments(intentToFragmentArguments(intent));
             fm.beginTransaction()
-                    .add(R.id.fragment_probes, mVendorsFragment, "vendors")
+                    .add(R.id.fragment_probes, mProbesFragment, "probes")
                     .commit();
         }
 
         // Vendors content comes from reused activity
-        mTabHost.addTab(mTabHost.newTabSpec(TAG_VENDORS)
+        mTabHost.addTab(mTabHost.newTabSpec(TAG_PROBES)
                 .setIndicator(buildIndicator(R.string.starred_vendors))
                 .setContent(R.id.fragment_probes));
     }
@@ -169,11 +171,11 @@ public class ControllersActivity extends BaseMultiPaneActivity {
     }
 
     private void clearSelectedItems() {
-        if (mSessionsFragment != null) {
-            mSessionsFragment.clearCheckedPosition();
+        if (mOutletsFragment != null) {
+        	mOutletsFragment.clearCheckedPosition();
         }
-        if (mVendorsFragment != null) {
-            mVendorsFragment.clearCheckedPosition();
+        if (mProbesFragment != null) {
+        	mProbesFragment.clearCheckedPosition();
         }
     }
 }
