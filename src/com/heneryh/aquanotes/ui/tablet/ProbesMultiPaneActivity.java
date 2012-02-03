@@ -33,7 +33,7 @@ import android.view.ViewGroup;
 /**
  * A multi-pane activity, consisting of a {@link OutletsDropdownFragment}, a
  * {@link ProbesFragment}, and {@link ProbesDetailFragment}. This activity is very similar in
- * function to {@link SessionsMultiPaneActivity}.
+ * function to {@link OutletsMultiPaneActivity}.
  *
  * This activity requires API level 11 or greater because {@link OutletsDropdownFragment} requires
  * API level 11.
@@ -50,7 +50,7 @@ public class ProbesMultiPaneActivity extends BaseMultiPaneActivity {
 
         Intent intent = new Intent();
         intent.setData(ScheduleContract.Tracks.CONTENT_URI);
-        intent.putExtra(OutletsFragment.EXTRA_NEXT_TYPE, OutletsFragment.NEXT_TYPE_VENDORS);
+//        intent.putExtra(OutletsFragment.EXTRA_NEXT_TYPE, OutletsFragment.NEXT_TYPE_VENDORS);
 
         final FragmentManager fm = getSupportFragmentManager();
         mTracksDropdownFragment = (OutletsDropdownFragment) fm.findFragmentById(

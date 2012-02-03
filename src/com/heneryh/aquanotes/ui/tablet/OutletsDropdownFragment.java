@@ -17,6 +17,7 @@
 package com.heneryh.aquanotes.ui.tablet;
 
 import com.heneryh.aquanotes.R;
+import com.heneryh.aquanotes.provider.AquaNotesDbContract;
 import com.heneryh.aquanotes.provider.ScheduleContract;
 import com.heneryh.aquanotes.ui.BaseActivity;
 import com.heneryh.aquanotes.ui.SessionDetailFragment;
@@ -90,34 +91,34 @@ public class OutletsDropdownFragment extends Fragment implements
             getActivity().stopManagingCursor(mCursor);
             mCursor = null;
         }
-        mHandler.cancelOperation(OutletsAdapter.TracksQuery._TOKEN);
+        mHandler.cancelOperation(OutletsAdapter.OutletsViewQuery._TOKEN);
 
         // Load new arguments
         final Intent intent = BaseActivity.fragmentArgumentsToIntent(arguments);
-        final Uri tracksUri = intent.getData();
-        if (tracksUri == null) {
+        final Uri outletsUri = intent.getData();
+        if (outletsUri == null) {
             return;
         }
 
         mNextType = intent.getStringExtra(EXTRA_NEXT_TYPE);
 
         // Filter our tracks query to only include those with valid results
-        String[] projection = OutletsAdapter.TracksQuery.PROJECTION;
+        String[] projection = OutletsAdapter.OutletsViewQuery.PROJECTION;
         String selection = null;
-        if (OutletsFragment.NEXT_TYPE_SESSIONS.equals(mNextType)) {
-            // Only show tracks with at least one session
-            projection = OutletsAdapter.TracksQuery.PROJECTION_WITH_SESSIONS_COUNT;
-            selection = ScheduleContract.Tracks.SESSIONS_COUNT + ">0";
-
-        } else if (OutletsFragment.NEXT_TYPE_VENDORS.equals(mNextType)) {
-            // Only show tracks with at least one vendor
-            projection = OutletsAdapter.TracksQuery.PROJECTION_WITH_VENDORS_COUNT;
-            selection = ScheduleContract.Tracks.VENDORS_COUNT + ">0";
-        }
+//        if (OutletsFragment.NEXT_TYPE_SESSIONS.equals(mNextType)) {
+//            // Only show tracks with at least one session
+//            projection = OutletsAdapter.TracksQuery.PROJECTION_WITH_SESSIONS_COUNT;
+//            selection = ScheduleContract.Tracks.SESSIONS_COUNT + ">0";
+//
+//        } else if (OutletsFragment.NEXT_TYPE_VENDORS.equals(mNextType)) {
+//            // Only show tracks with at least one vendor
+//            projection = OutletsAdapter.TracksQuery.PROJECTION_WITH_VENDORS_COUNT;
+//            selection = ScheduleContract.Tracks.VENDORS_COUNT + ">0";
+//        }
 
         // Start background query to load tracks
-        mHandler.startQuery(OutletsAdapter.TracksQuery._TOKEN, null, tracksUri, projection,
-                selection, null, ScheduleContract.Tracks.DEFAULT_SORT);
+        mHandler.startQuery(OutletsAdapter.OutletsViewQuery._TOKEN, null, outletsUri, projection,
+                selection, null, AquaNotesDbContract.Outlets.DEFAULT_SORT);
     }
 
     @Override
@@ -161,7 +162,7 @@ public class OutletsDropdownFragment extends Fragment implements
         String lastTrackID = UIUtils.getLastUsedTrackID(getActivity());
         if (lastTrackID != null) {
             while (!cursor.isAfterLast()) {
-                if (lastTrackID.equals(cursor.getString(OutletsAdapter.TracksQuery.TRACK_ID))) {
+                if (lastTrackID.equals(cursor.getString(OutletsAdapter.OutletsViewQuery._ID))) {
                     break;
                 }
                 cursor.moveToNext();
@@ -177,7 +178,7 @@ public class OutletsDropdownFragment extends Fragment implements
         }
 
         mAdapter.setHasAllItem(true);
-        mAdapter.setIsSessions(OutletsFragment.NEXT_TYPE_SESSIONS.equals(mNextType));
+//        mAdapter.setIsSessions(OutletsFragment.NEXT_TYPE_SESSIONS.equals(mNextType));
         mAdapter.changeCursor(mCursor);
     }
 
@@ -188,7 +189,7 @@ public class OutletsDropdownFragment extends Fragment implements
 
         if (cursor != null) {
             UIUtils.setLastUsedTrackID(getActivity(), cursor.getString(
-                    OutletsAdapter.TracksQuery.TRACK_ID));
+                    OutletsAdapter.OutletsViewQuery._ID));
         } else {
             UIUtils.setLastUsedTrackID(getActivity(), ScheduleContract.Tracks.ALL_TRACK_ID);
         }
@@ -203,61 +204,61 @@ public class OutletsDropdownFragment extends Fragment implements
         final int trackColor;
         final Resources res = getResources();
 
-        if (cursor != null) {
-            trackColor = cursor.getInt(OutletsAdapter.TracksQuery.TRACK_COLOR);
-            trackId = cursor.getString(OutletsAdapter.TracksQuery.TRACK_ID);
-
-            mTitle.setText(cursor.getString(OutletsAdapter.TracksQuery.TRACK_NAME));
-            mAbstract.setText(cursor.getString(OutletsAdapter.TracksQuery.TRACK_ABSTRACT));
-
-        } else {
-            trackColor = res.getColor(R.color.all_track_color);
-            trackId = ScheduleContract.Tracks.ALL_TRACK_ID;
-
-            mTitle.setText(OutletsFragment.NEXT_TYPE_SESSIONS.equals(mNextType)
-                    ? R.string.all_sessions_title
-                    : R.string.all_sandbox_title);
-            mAbstract.setText(OutletsFragment.NEXT_TYPE_SESSIONS.equals(mNextType)
-                    ? R.string.all_sessions_subtitle
-                    : R.string.all_sandbox_subtitle);
-        }
-
-        boolean isDark = UIUtils.isColorDark(trackColor);
-        mRootView.setBackgroundColor(trackColor);
-
-        if (isDark) {
-            mTitle.setTextColor(res.getColor(R.color.body_text_1_inverse));
-            mAbstract.setTextColor(res.getColor(R.color.body_text_2_inverse));
-            mRootView.findViewById(R.id.track_dropdown_arrow).setBackgroundResource(
-                    R.drawable.track_dropdown_arrow_light);
-        } else {
-            mTitle.setTextColor(res.getColor(R.color.body_text_1));
-            mAbstract.setTextColor(res.getColor(R.color.body_text_2));
-            mRootView.findViewById(R.id.track_dropdown_arrow).setBackgroundResource(
-                    R.drawable.track_dropdown_arrow_dark);
-        }
-
-        if (loadTargetFragment) {
-            final Intent intent = new Intent(Intent.ACTION_VIEW);
-            final Uri trackUri = ScheduleContract.Tracks.buildTrackUri(trackId);
-            intent.putExtra(SessionDetailFragment.EXTRA_TRACK, trackUri);
-
-            if (NEXT_TYPE_SESSIONS.equals(mNextType)) {
-                if (cursor == null) {
-                    intent.setData(ScheduleContract.Sessions.CONTENT_URI);
-                } else {
-                    intent.setData(ScheduleContract.Tracks.buildSessionsUri(trackId));
-                }
-            } else if (NEXT_TYPE_VENDORS.equals(mNextType)) {
-                if (cursor == null) {
-                    intent.setData(ScheduleContract.Vendors.CONTENT_URI);
-                } else {
-                    intent.setData(ScheduleContract.Tracks.buildVendorsUri(trackId));
-                }
-            }
-
-            ((BaseActivity) getActivity()).openActivityOrFragment(intent);
-        }
+//        if (cursor != null) {
+//            trackColor = cursor.getInt(OutletsAdapter.TracksQuery.TRACK_COLOR);
+//            trackId = cursor.getString(OutletsAdapter.TracksQuery.TRACK_ID);
+//
+//            mTitle.setText(cursor.getString(OutletsAdapter.TracksQuery.TRACK_NAME));
+//            mAbstract.setText(cursor.getString(OutletsAdapter.TracksQuery.TRACK_ABSTRACT));
+//
+//        } else {
+//            trackColor = res.getColor(R.color.all_track_color);
+//            trackId = ScheduleContract.Tracks.ALL_TRACK_ID;
+//
+//            mTitle.setText(OutletsFragment.NEXT_TYPE_SESSIONS.equals(mNextType)
+//                    ? R.string.all_sessions_title
+//                    : R.string.all_sandbox_title);
+//            mAbstract.setText(OutletsFragment.NEXT_TYPE_SESSIONS.equals(mNextType)
+//                    ? R.string.all_sessions_subtitle
+//                    : R.string.all_sandbox_subtitle);
+//        }
+//
+//        boolean isDark = UIUtils.isColorDark(trackColor);
+//        mRootView.setBackgroundColor(trackColor);
+//
+//        if (isDark) {
+//            mTitle.setTextColor(res.getColor(R.color.body_text_1_inverse));
+//            mAbstract.setTextColor(res.getColor(R.color.body_text_2_inverse));
+//            mRootView.findViewById(R.id.track_dropdown_arrow).setBackgroundResource(
+//                    R.drawable.track_dropdown_arrow_light);
+//        } else {
+//            mTitle.setTextColor(res.getColor(R.color.body_text_1));
+//            mAbstract.setTextColor(res.getColor(R.color.body_text_2));
+//            mRootView.findViewById(R.id.track_dropdown_arrow).setBackgroundResource(
+//                    R.drawable.track_dropdown_arrow_dark);
+//        }
+//
+//        if (loadTargetFragment) {
+//            final Intent intent = new Intent(Intent.ACTION_VIEW);
+//            final Uri trackUri = ScheduleContract.Tracks.buildTrackUri(trackId);
+//            intent.putExtra(SessionDetailFragment.EXTRA_TRACK, trackUri);
+//
+//            if (NEXT_TYPE_SESSIONS.equals(mNextType)) {
+//                if (cursor == null) {
+//                    intent.setData(ScheduleContract.Sessions.CONTENT_URI);
+//                } else {
+//                    intent.setData(ScheduleContract.Tracks.buildSessionsUri(trackId));
+//                }
+//            } else if (NEXT_TYPE_VENDORS.equals(mNextType)) {
+//                if (cursor == null) {
+//                    intent.setData(ScheduleContract.Vendors.CONTENT_URI);
+//                } else {
+//                    intent.setData(ScheduleContract.Tracks.buildVendorsUri(trackId));
+//                }
+//            }
+//
+//            ((BaseActivity) getActivity()).openActivityOrFragment(intent);
+//        }
     }
 
     public void onDismiss() {

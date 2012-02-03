@@ -37,6 +37,7 @@
     <dimen name="body_padding_large">20dp</dimen>
     <dimen name="speaker_image_size">64dp</dimen>
     <dimen name="speaker_image_padding">16dp</dimen>
-    <dimen name="vendor_image_size">100dp</dimen>
-
+    <dimen name="probe_image_size">100dp</dimen>
+    <dimen name="outlet_image_size">100dp</dimen>
+    
 </resources>

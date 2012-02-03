@@ -29,18 +29,18 @@
 
     <string name="title_now_playing">Now playing</string>
     <string name="title_schedule">Schedule</string>
-    <string name="title_sessions">Sessions</string>
-    <string name="title_session_detail">Session information</string>
-    <string name="title_starred">Starred</string>
-    <string name="title_tracks">Tracks</string>
-    <string name="title_vendors">Sandbox</string>
-    <string name="title_vendor_detail">Company information</string>
+    <string name="title_outletsX">Outlets</string>
+    <string name="title_outlet_detail">Outlet information</string>
+    <string name="title_controllers">Starred</string>
+    <string name="title_outlets">Outlets</string>
+    <string name="title_probes">Probes</string>
+    <string name="title_probe_detail">Probe information</string>
     <string name="title_map">Map</string>
     <string name="title_tagstream">Realtime stream</string>
     <string name="title_bulletin">Bulletin</string>
 
-    <string name="title_session_tracks">Session tracks</string>
-    <string name="title_vendor_tracks">Sandbox pods</string>
+    <string name="title_outlets_tracks">Outlets</string>
+    <string name="title_probes_tracks">Probes</string>
 
     <string name="title_share">Share using</string>
 
@@ -49,9 +49,9 @@
 
     <string name="btn_schedule">Schedule</string>
     <string name="btn_map">Map</string>
-    <string name="btn_sessions">Sessions</string>
-    <string name="btn_starred">Starred</string>
-    <string name="btn_vendors">Sandbox</string>
+    <string name="btn_outlets">Outlets</string>
+    <string name="btn_controllers">Controllers</string>
+    <string name="btn_probes">Probes</string>
     <string name="btn_announcements">Bulletin</string>
 
     <string name="toast_sync_error">Sync error: <xliff:g id="error">%1$s</xliff:g></string>
@@ -65,9 +65,9 @@
     <string name="all_sessions_title">All sessions</string>
     <string name="all_sessions_subtitle">Touch to filter sessions by track.</string>
 
-    <string name="empty_sessions">No sessions found.</string>
+    <string name="empty_outlets">No outlets found.</string>
     <string name="empty_session_detail">No session details found.</string>
-    <string name="empty_vendors">No sandbox results found.</string>
+    <string name="empty_probes">No probes found.</string>
     <string name="empty_search">No search results found.</string>
     <string name="empty_links">No links available.</string>
 
@@ -89,8 +89,8 @@
     <string name="search_sessions">Sessions</string>
     <string name="search_vendors">Sandbox</string>
 
-    <string name="starred_sessions">Sessions</string>
-    <string name="starred_vendors">Sandbox</string>
+    <string name="starred_sessions">Outlets</string>
+    <string name="starred_vendors">Probes</string>
 
     <string name="search_label">Google I/O</string>
     <string name="search_hint">Session keywords</string>

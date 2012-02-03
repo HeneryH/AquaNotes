@@ -47,7 +47,7 @@ import static com.heneryh.aquanotes.util.UIUtils.formatSessionSubtitle;
 /**
  * A {@link ListFragment} showing a list of sessions.
  */
-public class SessionsFragment extends ListFragment implements
+public class OutletsXFragment extends ListFragment implements
         NotifyingAsyncQueryHandler.AsyncQueryListener {
 
     public static final String EXTRA_SCHEDULE_TIME_STRING =
@@ -132,7 +132,7 @@ public class SessionsFragment extends ListFragment implements
         if (!mHasSetEmptyText) {
             // Could be a bug, but calling this twice makes it become visible when it shouldn't
             // be visible.
-            setEmptyText(getString(R.string.empty_sessions));
+            setEmptyText(getString(R.string.empty_outlets));
             mHasSetEmptyText = true;
         }
     }
@@ -148,7 +148,7 @@ public class SessionsFragment extends ListFragment implements
         } else if (token == TracksQuery._TOKEN) {
             onTrackQueryComplete(cursor);
         } else {
-            Log.d("SessionsFragment/onQueryComplete", "Query complete, Not Actionable: " + token);
+            Log.d("OutletsXFragment/onQueryComplete", "Query complete, Not Actionable: " + token);
             cursor.close();
         }
     }

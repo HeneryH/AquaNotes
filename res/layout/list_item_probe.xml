@@ -24,20 +24,20 @@
         android:layout_height="wrap_content"
         android:src="@drawable/indicator_starred" />
 
-    <RelativeLayout android:id="@+id/list_item_vendor"
+    <RelativeLayout android:id="@+id/list_item_probe"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         style="@style/ListItemContent">
 
-        <TextView android:id="@+id/vendor_name"
+        <TextView android:id="@+id/probe_name"
             android:layout_toLeftOf="@id/star_button"
             android:layout_alignParentLeft="true"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             style="@style/ListItemTitle" />
 
-        <TextView android:id="@+id/vendor_location"
-            android:layout_below="@id/vendor_name"
+        <TextView android:id="@+id/probe_value"
+            android:layout_below="@id/probe_name"
             android:layout_toLeftOf="@id/star_button"
             android:layout_alignParentLeft="true"
             android:layout_width="fill_parent"

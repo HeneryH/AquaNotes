@@ -1070,6 +1070,31 @@ public class AquaNotesDbContract {
         }
 
     }
+    
+    /**
+     * Probes are overall categories for {@link Sessions} and {@link Vendors},
+     * such as "Android" or "Enterprise."
+     */
+    public static class ProbesView implements ViewProbesColumns, BaseColumns {
+
+        public static final String CONTENT_TYPE =
+                "vnd.android.cursor.dir/vnd.aquanotes.probes";
+        public static final String CONTENT_ITEM_TYPE =
+                "vnd.android.cursor.item/vnd.aquanotes.probes";
+
+        /** Default "ORDER BY" clause. */
+        public static final String DEFAULT_SORT = ProbesColumns._ID + " ASC";
+    }
+    public static class OutletsView implements ViewOutletsColumns, BaseColumns {
+
+        public static final String CONTENT_TYPE =
+                "vnd.android.cursor.dir/vnd.aquanotes.outlets";
+        public static final String CONTENT_ITEM_TYPE =
+                "vnd.android.cursor.item/vnd.aquanotes.outlets";
+
+        /** Default "ORDER BY" clause. */
+        public static final String DEFAULT_SORT = OutletsColumns._ID + " ASC";
+    }
 
     /**
      * ProbeData are physical locations at the conference venue.

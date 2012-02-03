@@ -49,7 +49,7 @@ public class SearchActivity extends BaseMultiPaneActivity {
     private TabHost mTabHost;
     private TabWidget mTabWidget;
 
-    private SessionsFragment mSessionsFragment;
+    private OutletsXFragment mSessionsFragment;
     private ProbesFragment mVendorsFragment;
 
     @Override
@@ -111,9 +111,9 @@ public class SearchActivity extends BaseMultiPaneActivity {
         ((ViewGroup) findViewById(android.R.id.tabcontent)).addView(fragmentContainer);
 
         final FragmentManager fm = getSupportFragmentManager();
-        mSessionsFragment = (SessionsFragment) fm.findFragmentByTag("sessions");
+        mSessionsFragment = (OutletsXFragment) fm.findFragmentByTag("sessions");
         if (mSessionsFragment == null) {
-            mSessionsFragment = new SessionsFragment();
+            mSessionsFragment = new OutletsXFragment();
             mSessionsFragment.setArguments(getSessionsFragmentArguments());
             fm.beginTransaction()
                     .add(R.id.fragment_sessions, mSessionsFragment, "sessions")
@@ -134,7 +134,7 @@ public class SearchActivity extends BaseMultiPaneActivity {
     private void setupVendorsTab() {
         // TODO: this is very inefficient and messy, clean it up
         FrameLayout fragmentContainer = new FrameLayout(this);
-        fragmentContainer.setId(R.id.fragment_vendors);
+        fragmentContainer.setId(R.id.fragment_probes);
         fragmentContainer.setLayoutParams(
                 new ViewGroup.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT,
                         ViewGroup.LayoutParams.FILL_PARENT));
@@ -146,7 +146,7 @@ public class SearchActivity extends BaseMultiPaneActivity {
             mVendorsFragment = new ProbesFragment();
             mVendorsFragment.setArguments(getVendorsFragmentArguments());
             fm.beginTransaction()
-                    .add(R.id.fragment_vendors, mVendorsFragment, "vendors")
+                    .add(R.id.fragment_probes, mVendorsFragment, "vendors")
                     .commit();
         } else {
             mVendorsFragment.reloadFromArguments(getVendorsFragmentArguments());
@@ -155,7 +155,7 @@ public class SearchActivity extends BaseMultiPaneActivity {
         // Vendors content comes from reused activity
         mTabHost.addTab(mTabHost.newTabSpec(TAG_VENDORS)
                 .setIndicator(buildIndicator(R.string.starred_vendors))
-                .setContent(R.id.fragment_vendors));
+                .setContent(R.id.fragment_probes));
     }
 
     private Bundle getSessionsFragmentArguments() {

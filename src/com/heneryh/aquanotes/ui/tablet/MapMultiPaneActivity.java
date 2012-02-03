@@ -20,7 +20,7 @@ import com.heneryh.aquanotes.R;
 import com.heneryh.aquanotes.ui.BaseMultiPaneActivity;
 import com.heneryh.aquanotes.ui.MapFragment;
 import com.heneryh.aquanotes.ui.SessionDetailFragment;
-import com.heneryh.aquanotes.ui.SessionsFragment;
+import com.heneryh.aquanotes.ui.OutletsXFragment;
 import com.heneryh.aquanotes.ui.ProbesDetailFragment;
 import com.heneryh.aquanotes.ui.ProbesFragment;
 import com.heneryh.aquanotes.ui.phone.SessionDetailActivity;
@@ -37,7 +37,7 @@ import android.view.View;
 
 /**
  * A multi-pane activity, where the primary navigation pane is a {@link MapFragment}, that shows
- * {@link SessionsFragment}, {@link SessionDetailFragment}, {@link ProbesFragment}, and
+ * {@link OutletsXFragment}, {@link SessionDetailFragment}, {@link ProbesFragment}, and
  * {@link ProbesDetailFragment} as popups.
  *
  * This activity requires API level 11 or greater because of its use of {@link FragmentBreadCrumbs}.
@@ -99,7 +99,7 @@ public class MapMultiPaneActivity extends BaseMultiPaneActivity implements
             mPopupType = POPUP_TYPE_SESSIONS;
             showHideDetailAndPan(true);
             return new FragmentReplaceInfo(
-                    SessionsFragment.class,
+                    OutletsXFragment.class,
                     "sessions",
                     R.id.fragment_container_map_detail);
         } else if (SessionDetailActivity.class.getName().equals(activityClassName)) {
@@ -132,7 +132,7 @@ public class MapMultiPaneActivity extends BaseMultiPaneActivity implements
     protected void onBeforeCommitReplaceFragment(FragmentManager fm, FragmentTransaction ft,
             Fragment fragment) {
         super.onBeforeCommitReplaceFragment(fm, ft, fragment);
-        if (fragment instanceof SessionsFragment || fragment instanceof ProbesFragment) {
+        if (fragment instanceof OutletsXFragment || fragment instanceof ProbesFragment) {
             mPauseBackStackWatcher = true;
             clearBackStack(fm);
             mPauseBackStackWatcher = false;
@@ -175,11 +175,11 @@ public class MapMultiPaneActivity extends BaseMultiPaneActivity implements
 
     public void updateBreadCrumb() {
         final String title = (mPopupType == POPUP_TYPE_SESSIONS)
-                ? getString(R.string.title_sessions)
-                : getString(R.string.title_vendors);
+                ? getString(R.string.title_outlets)
+                : getString(R.string.title_probes);
         final String detailTitle = (mPopupType == POPUP_TYPE_SESSIONS)
-                ? getString(R.string.title_session_detail)
-                : getString(R.string.title_vendor_detail);
+                ? getString(R.string.title_outlet_detail)
+                : getString(R.string.title_probe_detail);
 
         if (mFragmentManager.getBackStackEntryCount() >= 2) {
             mFragmentBreadCrumbs.setParentTitle(title, title, this);

@@ -66,7 +66,7 @@
 
         <activity
             android:name=".ui.ControllersActivity"
-            android:label="@string/title_starred" />
+            android:label="@string/title_controllers" />
 
         <activity
             android:name=".ui.SearchActivity"
@@ -87,17 +87,17 @@
 
         <activity
             android:name=".ui.phone.OutletsActivity"
-            android:label="@string/title_tracks">
+            android:label="@string/title_outlets">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
-                <data android:mimeType="vnd.android.cursor.dir/vnd.aquanotes.track" />
+                <data android:mimeType="vnd.android.cursor.dir/vnd.aquanotes.outlet" />
             </intent-filter>
         </activity>
 
         <activity
             android:name=".ui.phone.SessionsActivity"
-            android:label="@string/title_sessions">
+            android:label="@string/title_outlets">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -116,12 +116,12 @@
 
         <activity
             android:name=".ui.phone.ProbesActivity"
-            android:label="@string/title_vendors">
+            android:label="@string/title_probes">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.TAB" />
-                <data android:mimeType="vnd.android.cursor.dir/vnd.aquanotes.vendor" />
+                <data android:mimeType="vnd.android.cursor.dir/vnd.aquanotes.probes" />
             </intent-filter>
         </activity>
 
@@ -129,7 +129,7 @@
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
-                <data android:mimeType="vnd.android.cursor.item/vnd.aquanotes.vendor" />
+                <data android:mimeType="vnd.android.cursor.item/vnd.aquanotes.probe" />
             </intent-filter>
         </activity>
 
@@ -141,11 +141,11 @@
         <!-- Tablet-only activities -->
 
         <activity
-            android:name=".ui.tablet.SessionsMultiPaneActivity"
-            android:label="@string/title_sessions" />
+            android:name=".ui.tablet.OutletsMultiPaneActivity"
+            android:label="@string/title_outlets" />
         <activity
             android:name=".ui.tablet.ProbesMultiPaneActivity"
-            android:label="@string/title_vendors" />
+            android:label="@string/title_probes" />
         <activity
             android:name=".ui.tablet.ScheduleMultiPaneActivity"
             android:label="@string/title_schedule" />

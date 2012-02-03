@@ -17,6 +17,7 @@
 package com.heneryh.aquanotes.ui;
 
 import com.heneryh.aquanotes.R;
+import com.heneryh.aquanotes.provider.AquaNotesDbContract;
 import com.heneryh.aquanotes.provider.ScheduleContract;
 import com.heneryh.aquanotes.util.AnalyticsUtils;
 import com.heneryh.aquanotes.util.NotifyingAsyncQueryHandler;
@@ -38,46 +39,40 @@ import android.widget.ListView;
 public class OutletsFragment extends ListFragment implements
         NotifyingAsyncQueryHandler.AsyncQueryListener {
 
-    public static final String EXTRA_NEXT_TYPE = "com.heneryh.aquanotes.extra.NEXT_TYPE";
-
-    public static final String NEXT_TYPE_SESSIONS = "sessions";
-    public static final String NEXT_TYPE_VENDORS = "vendors";
-
     private OutletsAdapter mAdapter;
     private NotifyingAsyncQueryHandler mHandler;
-    private String mNextType;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         final Intent intent = BaseActivity.fragmentArgumentsToIntent(getArguments());
-        final Uri tracksUri = intent.getData();
-        mNextType = intent.getStringExtra(EXTRA_NEXT_TYPE);
+        final Uri outletsUri = intent.getData();
+//        mNextType = intent.getStringExtra(EXTRA_NEXT_TYPE);
 
         mAdapter = new OutletsAdapter(getActivity());
         setListAdapter(mAdapter);
 
         // Filter our tracks query to only include those with valid results
-        String[] projection = OutletsAdapter.TracksQuery.PROJECTION;
+        String[] projection = OutletsAdapter.OutletsViewQuery.PROJECTION;
         String selection = null;
-        if (NEXT_TYPE_SESSIONS.equals(mNextType)) {
-            // Only show tracks with at least one session
-            projection = OutletsAdapter.TracksQuery.PROJECTION_WITH_SESSIONS_COUNT;
-            selection = ScheduleContract.Tracks.SESSIONS_COUNT + ">0";
-            AnalyticsUtils.getInstance(getActivity()).trackPageView("/Tracks");
-
-        } else if (NEXT_TYPE_VENDORS.equals(mNextType)) {
-            // Only show tracks with at least one vendor
-            projection = OutletsAdapter.TracksQuery.PROJECTION_WITH_VENDORS_COUNT;
-            selection = ScheduleContract.Tracks.VENDORS_COUNT + ">0";
-            AnalyticsUtils.getInstance(getActivity()).trackPageView("/Sandbox");
-        }
+//        if (NEXT_TYPE_SESSIONS.equals(mNextType)) {
+//            // Only show tracks with at least one session
+//            projection = OutletsAdapter.OutletsViewQuery.PROJECTION;
+//            selection = ScheduleContract.Tracks.SESSIONS_COUNT + ">0";
+//            AnalyticsUtils.getInstance(getActivity()).trackPageView("/Tracks");
+//
+//        } else if (NEXT_TYPE_VENDORS.equals(mNextType)) {
+//            // Only show tracks with at least one vendor
+//            projection = OutletsAdapter.OutletsViewQuery.PROJECTION_WITH_VENDORS_COUNT;
+//            selection = ScheduleContract.Tracks.VENDORS_COUNT + ">0";
+//            AnalyticsUtils.getInstance(getActivity()).trackPageView("/Sandbox");
+//        }
 
         // Start background query to load tracks
         mHandler = new NotifyingAsyncQueryHandler(getActivity().getContentResolver(), this);
-        mHandler.startQuery(tracksUri, projection, selection, null,
-                ScheduleContract.Tracks.DEFAULT_SORT);
+        mHandler.startQuery(outletsUri, projection, selection, null,
+                AquaNotesDbContract.Outlets.DEFAULT_SORT);
     }
 
     @Override
@@ -107,7 +102,7 @@ public class OutletsFragment extends ListFragment implements
 
         getActivity().startManagingCursor(cursor);
         mAdapter.setHasAllItem(true);
-        mAdapter.setIsSessions(OutletsFragment.NEXT_TYPE_SESSIONS.equals(mNextType));
+//        mAdapter.setIsSessions(OutletsFragment.NEXT_TYPE_SESSIONS.equals(mNextType));
         mAdapter.changeCursor(cursor);
     }
 
@@ -115,34 +110,34 @@ public class OutletsFragment extends ListFragment implements
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         final Cursor cursor = (Cursor) mAdapter.getItem(position);
-        final String trackId;
+        final String outletId;
 
-        if (cursor != null) {
-            trackId = cursor.getString(OutletsAdapter.TracksQuery.TRACK_ID);
-        } else {
-            trackId = ScheduleContract.Tracks.ALL_TRACK_ID;
-        }
+//        if (cursor != null) {
+            outletId = cursor.getString(OutletsAdapter.OutletsViewQuery._ID);
+//        } else {
+//            trackId = ScheduleContract.Tracks.ALL_TRACK_ID;
+//        }
 
-        final Intent intent = new Intent(Intent.ACTION_VIEW);
-        final Uri trackUri = ScheduleContract.Tracks.buildTrackUri(trackId);
-        intent.putExtra(SessionDetailFragment.EXTRA_TRACK, trackUri);
-
-        if (NEXT_TYPE_SESSIONS.equals(mNextType)) {
-            if (cursor == null) {
-                intent.setData(ScheduleContract.Sessions.CONTENT_URI);
-            } else {
-                intent.setData(ScheduleContract.Tracks.buildSessionsUri(trackId));
-            }
-        } else if (NEXT_TYPE_VENDORS.equals(mNextType)) {
-            if (cursor == null) {
-                intent.setData(ScheduleContract.Vendors.CONTENT_URI);
-            } else {
-                intent.setData(ScheduleContract.Tracks.buildVendorsUri(trackId));
-            }
-        }
-
-        ((BaseActivity) getActivity()).openActivityOrFragment(intent);
-
-        getListView().setItemChecked(position, true);
+//        final Intent intent = new Intent(Intent.ACTION_VIEW);
+//        final Uri trackUri = ScheduleContract.Tracks.buildTrackUri(trackId);
+//        intent.putExtra(SessionDetailFragment.EXTRA_TRACK, trackUri);
+//
+//        if (NEXT_TYPE_SESSIONS.equals(mNextType)) {
+//            if (cursor == null) {
+//                intent.setData(ScheduleContract.Sessions.CONTENT_URI);
+//            } else {
+//                intent.setData(ScheduleContract.Tracks.buildSessionsUri(trackId));
+//            }
+//        } else if (NEXT_TYPE_VENDORS.equals(mNextType)) {
+//            if (cursor == null) {
+//                intent.setData(ScheduleContract.Vendors.CONTENT_URI);
+//            } else {
+//                intent.setData(ScheduleContract.Tracks.buildVendorsUri(trackId));
+//            }
+//        }
+//
+//        ((BaseActivity) getActivity()).openActivityOrFragment(intent);
+//
+//        getListView().setItemChecked(position, true);
     }
 }

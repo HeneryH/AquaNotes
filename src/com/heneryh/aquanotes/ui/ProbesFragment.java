@@ -17,6 +17,7 @@
 package com.heneryh.aquanotes.ui;
 
 import com.heneryh.aquanotes.R;
+import com.heneryh.aquanotes.provider.AquaNotesDbContract;
 import com.heneryh.aquanotes.provider.ScheduleContract;
 import com.heneryh.aquanotes.util.ActivityHelper;
 import com.heneryh.aquanotes.util.AnalyticsUtils;
@@ -42,14 +43,13 @@ import android.widget.TextView;
 import static com.heneryh.aquanotes.util.UIUtils.buildStyledSnippet;
 
 /**
- * A {@link ListFragment} showing a list of sandbox comapnies.
+ * A {@link ListFragment} showing a list of controller probes.
  */
 public class ProbesFragment extends ListFragment implements
         NotifyingAsyncQueryHandler.AsyncQueryListener {
 
     private static final String STATE_CHECKED_POSITION = "checkedPosition";
 
-    private Uri mTrackUri;
     private Cursor mCursor;
     private CursorAdapter mAdapter;
     private int mCheckedPosition = -1;
@@ -74,43 +74,27 @@ public class ProbesFragment extends ListFragment implements
         mCheckedPosition = -1;
         setListAdapter(null);
 
-        mHandler.cancelOperation(SearchQuery._TOKEN);
-        mHandler.cancelOperation(VendorsQuery._TOKEN);
+        mHandler.cancelOperation(ProbesViewQuery._TOKEN);
 
         // Load new arguments
         final Intent intent = BaseActivity.fragmentArgumentsToIntent(arguments);
-        final Uri vendorsUri = intent.getData();
-        final int vendorQueryToken;
+        final Uri probesUri = intent.getData();
+        final int probeQueryToken;
 
-        if (vendorsUri == null) {
+        if (probesUri == null) {
             return;
         }
 
         String[] projection;
-        if (!ScheduleContract.Vendors.isSearchUri(vendorsUri)) {
-            mAdapter = new VendorsAdapter(getActivity());
-            projection = VendorsQuery.PROJECTION;
-            vendorQueryToken = VendorsQuery._TOKEN;
-
-        } else {
-            Log.d("ProbesFragment/reloadFromArguments", "A search URL definitely gets passed in.");
-            mAdapter = new SearchAdapter(getActivity());
-            projection = SearchQuery.PROJECTION;
-            vendorQueryToken = SearchQuery._TOKEN;
-        }
+        mAdapter = new ProbesAdapter(getActivity());
+        projection = ProbesViewQuery.PROJECTION;
+        probeQueryToken = ProbesViewQuery._TOKEN;
 
         setListAdapter(mAdapter);
 
         // Start background query to load vendors
-        mHandler.startQuery(vendorQueryToken, null, vendorsUri, projection, null, null,
-                ScheduleContract.Vendors.DEFAULT_SORT);
-
-        // If caller launched us with specific track hint, pass it along when
-        // launching vendor details. Also start a query to load the track info.
-        mTrackUri = intent.getParcelableExtra(SessionDetailFragment.EXTRA_TRACK);
-        if (mTrackUri != null) {
-            mHandler.startQuery(TracksQuery._TOKEN, mTrackUri, TracksQuery.PROJECTION);
-        }
+        mHandler.startQuery(probeQueryToken, null, probesUri, projection, null, null,
+                AquaNotesDbContract.Probes.DEFAULT_SORT);
     }
 
     @Override
@@ -125,7 +109,7 @@ public class ProbesFragment extends ListFragment implements
         if (!mHasSetEmptyText) {
             // Could be a bug, but calling this twice makes it become visible when it shouldn't
             // be visible.
-            setEmptyText(getString(R.string.empty_vendors));
+            setEmptyText(getString(R.string.empty_probes));
             mHasSetEmptyText = true;
         }
     }
@@ -137,10 +121,8 @@ public class ProbesFragment extends ListFragment implements
             return;
         }
 
-        if (token == VendorsQuery._TOKEN || token == SearchQuery._TOKEN) {
-            onVendorsOrSearchQueryComplete(cursor);
-        } else if (token == TracksQuery._TOKEN) {
-            onTrackQueryComplete(cursor);
+        if (token == ProbesViewQuery._TOKEN) {
+            onProbesQueryComplete(cursor);
         } else {
             cursor.close();
         }
@@ -149,7 +131,7 @@ public class ProbesFragment extends ListFragment implements
     /**
      * Handle {@link VendorsQuery} {@link Cursor}.
      */
-    private void onVendorsOrSearchQueryComplete(Cursor cursor) {
+    private void onProbesQueryComplete(Cursor cursor) {
         if (mCursor != null) {
             // In case cancelOperation() doesn't work and we end up with consecutive calls to this
             // callback.
@@ -166,33 +148,11 @@ public class ProbesFragment extends ListFragment implements
         }
     }
 
-    /**
-     * Handle {@link TracksQuery} {@link Cursor}.
-     */
-    private void onTrackQueryComplete(Cursor cursor) {
-        try {
-            if (!cursor.moveToFirst()) {
-                return;
-            }
-
-            // Use found track to build title-bar
-            ActivityHelper activityHelper = ((BaseActivity) getActivity()).getActivityHelper();
-            String trackName = cursor.getString(TracksQuery.TRACK_NAME);
-            activityHelper.setActionBarTitle(trackName);
-            activityHelper.setActionBarColor(cursor.getInt(TracksQuery.TRACK_COLOR));
-
-            AnalyticsUtils.getInstance(getActivity()).trackPageView("/Sandbox/Track/" + trackName);
-
-        } finally {
-            cursor.close();
-        }
-    }
-
     @Override
     public void onResume() {
         super.onResume();
         getActivity().getContentResolver().registerContentObserver(
-                ScheduleContract.Vendors.CONTENT_URI, true, mVendorChangesObserver);
+                ScheduleContract.Vendors.CONTENT_URI, true, mProbeChangesObserver);
         if (mCursor != null) {
             mCursor.requery();
         }
@@ -201,7 +161,7 @@ public class ProbesFragment extends ListFragment implements
     @Override
     public void onPause() {
         super.onPause();
-        getActivity().getContentResolver().unregisterContentObserver(mVendorChangesObserver);
+        getActivity().getContentResolver().unregisterContentObserver(mProbeChangesObserver);
     }
 
     @Override
@@ -213,12 +173,12 @@ public class ProbesFragment extends ListFragment implements
     /** {@inheritDoc} */
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
-        // Launch viewer for specific vendor.
-        final Cursor cursor = (Cursor)mAdapter.getItem(position);
-        final String vendorId = cursor.getString(VendorsQuery.VENDOR_ID);
-        final Uri vendorUri = ScheduleContract.Vendors.buildVendorUri(vendorId);
-        ((BaseActivity) getActivity()).openActivityOrFragment(new Intent(Intent.ACTION_VIEW,
-                vendorUri));
+//        // Launch viewer for specific vendor.
+//        final Cursor cursor = (Cursor)mAdapter.getItem(position);
+//        final String vendorId = cursor.getString(VendorsQuery.VENDOR_ID);
+//        final Uri vendorUri = ScheduleContract.Vendors.buildVendorUri(vendorId);
+//        ((BaseActivity) getActivity()).openActivityOrFragment(new Intent(Intent.ACTION_VIEW,
+//                vendorUri));
 
         getListView().setItemChecked(position, true);
         mCheckedPosition = position;
@@ -234,62 +194,35 @@ public class ProbesFragment extends ListFragment implements
     /**
      * {@link CursorAdapter} that renders a {@link VendorsQuery}.
      */
-    private class VendorsAdapter extends CursorAdapter {
-        public VendorsAdapter(Context context) {
+    private class ProbesAdapter extends CursorAdapter {
+        public ProbesAdapter(Context context) {
             super(context, null);
         }
 
         /** {@inheritDoc} */
         @Override
         public View newView(Context context, Cursor cursor, ViewGroup parent) {
-            return getActivity().getLayoutInflater().inflate(R.layout.list_item_probe_oneline,
+            return getActivity().getLayoutInflater().inflate(R.layout.list_item_probe,
                     parent, false);
         }
 
         /** {@inheritDoc} */
         @Override
         public void bindView(View view, Context context, Cursor cursor) {
-            ((TextView) view.findViewById(R.id.vendor_name)).setText(
-                    cursor.getString(VendorsQuery.NAME));
+            ((TextView) view.findViewById(R.id.probe_name)).setText(
+                    cursor.getString(ProbesViewQuery.WAN_URL));
 
-            final boolean starred = cursor.getInt(VendorsQuery.STARRED) != 0;
+            ((TextView) view.findViewById(R.id.probe_value)).setText(
+            		cursor.getString(ProbesViewQuery.NAME));
+
+            final boolean starred = false /*cursor.getInt(VendorsQuery.STARRED) != 0*/;
             view.findViewById(R.id.star_button).setVisibility(
                     starred ? View.VISIBLE : View.INVISIBLE);
         }
     }
 
-    /**
-     * {@link CursorAdapter} that renders a {@link SearchQuery}.
-     */
-    private class SearchAdapter extends CursorAdapter {
-        public SearchAdapter(Context context) {
-            super(context, null);
-        }
 
-        /** {@inheritDoc} */
-        @Override
-        public View newView(Context context, Cursor cursor, ViewGroup parent) {
-            return getActivity().getLayoutInflater().inflate(R.layout.list_item_probe, parent,
-                    false);
-        }
-
-        /** {@inheritDoc} */ 
-        @Override
-        public void bindView(View view, Context context, Cursor cursor) {
-            ((TextView) view.findViewById(R.id.vendor_name)).setText(cursor
-                    .getString(SearchQuery.NAME));
-
-            final String snippet = cursor.getString(SearchQuery.SEARCH_SNIPPET);
-            final Spannable styledSnippet = buildStyledSnippet(snippet);
-            ((TextView) view.findViewById(R.id.vendor_location)).setText(styledSnippet);
-
-            final boolean starred = cursor.getInt(VendorsQuery.STARRED) != 0;
-            view.findViewById(R.id.star_button).setVisibility(
-                    starred ? View.VISIBLE : View.INVISIBLE);
-        }
-    }
-
-    private ContentObserver mVendorChangesObserver = new ContentObserver(new Handler()) {
+    private ContentObserver mProbeChangesObserver = new ContentObserver(new Handler()) {
         @Override
         public void onChange(boolean selfChange) {
             if (mCursor != null) {
@@ -298,59 +231,122 @@ public class ProbesFragment extends ListFragment implements
         }
     };
 
-    /**
-     * {@link com.heneryh.aquanotes.provider.ScheduleContract.Vendors} query parameters.
-     */
-    private interface VendorsQuery {
+    
+    private interface ControllersQuery {
+
         int _TOKEN = 0x1;
-
+        
         String[] PROJECTION = {
+//              String CONTROLLER_ID = "_id";
+//              String TITLE = "title";
+//              String WAN_URL = "wan_url";
+//              String LAN_URL = "wifi_url";
+//              String WIFI_SSID = "wifi_ssid";
+//              String USER = "user";
+//              String PW = "pw";
+//              String LAST_UPDATED = "last_updated";
+//              String UPDATE_INTERVAL = "update_i";
+//              String DB_SAVE_DAYS = "db_save_days";
+//              String CONTROLLER_TYPE = "controller_type";
                 BaseColumns._ID,
-                ScheduleContract.Vendors.VENDOR_ID,
-                ScheduleContract.Vendors.VENDOR_NAME,
-                ScheduleContract.Vendors.VENDOR_LOCATION,
-                ScheduleContract.Vendors.VENDOR_STARRED,
+                AquaNotesDbContract.Controllers.TITLE,
+                AquaNotesDbContract.Controllers.WAN_URL,
+                AquaNotesDbContract.Controllers.LAN_URL,
+                AquaNotesDbContract.Controllers.WIFI_SSID,
+                AquaNotesDbContract.Controllers.USER,
+                AquaNotesDbContract.Controllers.PW,
+                AquaNotesDbContract.Controllers.LAST_UPDATED,
+                AquaNotesDbContract.Controllers.UPDATE_INTERVAL,
+                AquaNotesDbContract.Controllers.DB_SAVE_DAYS,
+                AquaNotesDbContract.Controllers.MODEL,
         };
-
         int _ID = 0;
-        int VENDOR_ID = 1;
-        int NAME = 2;
-        int LOCATION = 3;
-        int STARRED = 4;
+        int TITLE = 1;
+        int WAN_URL = 2;
+        int LAN_URL = 3;
+        int WIFI_SSID = 4;
+        int USER = 5;
+        int PW = 6;
+        int LAST_UPDATED = 7;
+        int UPDATE_INTERVAL = 8;
+        int DB_SAVE_DAYS = 9;
+        int MODEL = 10;
     }
-
-    /**
-     * {@link com.heneryh.aquanotes.provider.ScheduleContract.Tracks} query parameters.
-     */
-    private interface TracksQuery {
+    
+	private interface xxxProbesQuery {
         int _TOKEN = 0x2;
-
         String[] PROJECTION = {
-                ScheduleContract.Tracks.TRACK_NAME,
-                ScheduleContract.Tracks.TRACK_COLOR,
-        };
-
-        int TRACK_NAME = 0;
-        int TRACK_COLOR = 1;
-    }
-
-    /** {@link com.heneryh.aquanotes.provider.ScheduleContract.Vendors} search query
-     * parameters. */
-    private interface SearchQuery {
-        int _TOKEN = 0x3;
-
-        String[] PROJECTION = {
+        	//  String PROBE_ID = "_id";
+        	//  String PROBE_NAME = "probe_name";
+        	//  String DEVICE_ID = "device_id";
+        	//  String TYPE = "probe_type";
+        	//  String RESOURCE_ID = "resource_id";
+        	//  String CONTROLLER_ID = "controller_id";
                 BaseColumns._ID,
-                ScheduleContract.Vendors.VENDOR_ID,
-                ScheduleContract.Vendors.VENDOR_NAME,
-                ScheduleContract.Vendors.SEARCH_SNIPPET,
-                ScheduleContract.Vendors.VENDOR_STARRED,
+                AquaNotesDbContract.Probes.NAME,
+                AquaNotesDbContract.Probes.RESOURCE_ID,
+                AquaNotesDbContract.Probes.CONTROLLER_ID,
         };
-
         int _ID = 0;
-        int VENDOR_ID = 1;
-        int NAME = 2;
-        int SEARCH_SNIPPET = 3;
-        int STARRED = 4;
+        int NAME = 1;
+        int RESOURCE_ID = 2;
+        int CONTROLLER_ID = 3;
     }
+
+    private interface ProbesViewQuery {
+
+        int _TOKEN = 0x1;
+        
+        String[] PROJECTION = {
+            	//  String PROBE_ID = "_id";
+            	//  String PROBE_NAME = "probe_name";
+            	//  String DEVICE_ID = "device_id";
+            	//  String TYPE = "probe_type";
+            	//  String RESOURCE_ID = "resource_id";
+            	//  String CONTROLLER_ID = "controller_id";
+                    BaseColumns._ID,
+                    AquaNotesDbContract.ProbesView.NAME,
+                    AquaNotesDbContract.ProbesView.RESOURCE_ID,
+                    AquaNotesDbContract.ProbesView.CONTROLLER_ID,
+//              String CONTROLLER_ID = "_id";
+//              String TITLE = "title";
+//              String WAN_URL = "wan_url";
+//              String LAN_URL = "wifi_url";
+//              String WIFI_SSID = "wifi_ssid";
+//              String USER = "user";
+//              String PW = "pw";
+//              String LAST_UPDATED = "last_updated";
+//              String UPDATE_INTERVAL = "update_i";
+//              String DB_SAVE_DAYS = "db_save_days";
+//              String CONTROLLER_TYPE = "controller_type";
+                BaseColumns._ID,
+                AquaNotesDbContract.ProbesView.TITLE,
+                AquaNotesDbContract.ProbesView.WAN_URL,
+                AquaNotesDbContract.ProbesView.LAN_URL,
+                AquaNotesDbContract.ProbesView.WIFI_SSID,
+                AquaNotesDbContract.ProbesView.USER,
+                AquaNotesDbContract.ProbesView.PW,
+                AquaNotesDbContract.ProbesView.LAST_UPDATED,
+                AquaNotesDbContract.ProbesView.UPDATE_INTERVAL,
+                AquaNotesDbContract.ProbesView.DB_SAVE_DAYS,
+                AquaNotesDbContract.ProbesView.MODEL,
+        };
+        int _ID = 0;
+        int NAME = 1;
+        int RESOURCE_ID = 2;
+        int CONTROLLER_ID = 3;
+        int TITLE = 4;
+        int WAN_URL = 5;
+        int LAN_URL = 6;
+        int WIFI_SSID = 7;
+        int USER = 8;
+        int PW = 9;
+        int LAST_UPDATED = 10;
+        int UPDATE_INTERVAL = 11;
+        int DB_SAVE_DAYS = 12;
+        int MODEL = 13;
+    }
+    
+
+
 }

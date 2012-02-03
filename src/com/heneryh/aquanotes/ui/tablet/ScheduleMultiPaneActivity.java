@@ -19,7 +19,7 @@ package com.heneryh.aquanotes.ui.tablet;
 import com.heneryh.aquanotes.R;
 import com.heneryh.aquanotes.ui.BaseMultiPaneActivity;
 import com.heneryh.aquanotes.ui.SessionDetailFragment;
-import com.heneryh.aquanotes.ui.SessionsFragment;
+import com.heneryh.aquanotes.ui.OutletsXFragment;
 import com.heneryh.aquanotes.ui.phone.SessionDetailActivity;
 import com.heneryh.aquanotes.ui.phone.SessionsActivity;
 
@@ -34,7 +34,7 @@ import android.view.ViewGroup;
 /**
  * A multi-pane activity, where the primary navigation pane is a
  * {@link com.heneryh.aquanotes.ui.ScheduleFragment}, that
- * shows {@link SessionsFragment} and {@link SessionDetailFragment} as popups.
+ * shows {@link OutletsXFragment} and {@link SessionDetailFragment} as popups.
  *
  * This activity requires API level 11 or greater because of its use of {@link FragmentBreadCrumbs}.
  */
@@ -75,7 +75,7 @@ public class ScheduleMultiPaneActivity extends BaseMultiPaneActivity implements
             getSupportFragmentManager().popBackStack();
             findViewById(R.id.fragment_container_schedule_detail).setBackgroundColor(0);
             return new FragmentReplaceInfo(
-                    SessionsFragment.class,
+                    OutletsXFragment.class,
                     "sessions",
                     R.id.fragment_container_schedule_detail);
         } else if (SessionDetailActivity.class.getName().equals(activityClassName)) {
@@ -94,7 +94,7 @@ public class ScheduleMultiPaneActivity extends BaseMultiPaneActivity implements
         super.onBeforeCommitReplaceFragment(fm, ft, fragment);
         if (fragment instanceof SessionDetailFragment) {
             ft.addToBackStack(null);
-        } else if (fragment instanceof SessionsFragment) {
+        } else if (fragment instanceof OutletsXFragment) {
             fm.popBackStack();
         }
         updateBreadCrumb();
@@ -112,8 +112,8 @@ public class ScheduleMultiPaneActivity extends BaseMultiPaneActivity implements
     }
 
     public void updateBreadCrumb() {
-        final String title = getString(R.string.title_sessions);
-        final String detailTitle = getString(R.string.title_session_detail);
+        final String title = getString(R.string.title_outlets);
+        final String detailTitle = getString(R.string.title_outlet_detail);
 
         if (mFragmentManager.getBackStackEntryCount() >= 1) {
             mFragmentBreadCrumbs.setParentTitle(title, title, this);

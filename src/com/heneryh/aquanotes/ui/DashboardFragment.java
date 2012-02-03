@@ -17,10 +17,11 @@
 package com.heneryh.aquanotes.ui;
 
 import com.heneryh.aquanotes.R;
+import com.heneryh.aquanotes.provider.AquaNotesDbContract;
 import com.heneryh.aquanotes.provider.ScheduleContract;
 import com.heneryh.aquanotes.ui.phone.ScheduleActivity;
 import com.heneryh.aquanotes.ui.tablet.ScheduleMultiPaneActivity;
-import com.heneryh.aquanotes.ui.tablet.SessionsMultiPaneActivity;
+import com.heneryh.aquanotes.ui.tablet.OutletsMultiPaneActivity;
 import com.heneryh.aquanotes.ui.tablet.ProbesMultiPaneActivity;
 import com.heneryh.aquanotes.util.AnalyticsUtils;
 import com.heneryh.aquanotes.util.UIUtils;
@@ -58,33 +59,33 @@ public class DashboardFragment extends Fragment {
             
         });
 
-        root.findViewById(R.id.home_btn_sessions).setOnClickListener(new View.OnClickListener() {
+        root.findViewById(R.id.home_btn_outlets).setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
                 fireTrackerEvent("Sessions");
                 // Launch sessions list
                 if (UIUtils.isHoneycombTablet(getActivity())) {
-                    startActivity(new Intent(getActivity(), SessionsMultiPaneActivity.class));
+                    startActivity(new Intent(getActivity(), OutletsMultiPaneActivity.class));
                 } else {
                     final Intent intent = new Intent(Intent.ACTION_VIEW,
-                            ScheduleContract.Tracks.CONTENT_URI);
-                    intent.putExtra(Intent.EXTRA_TITLE, getString(R.string.title_session_tracks));
-                    intent.putExtra(OutletsFragment.EXTRA_NEXT_TYPE,
-                            OutletsFragment.NEXT_TYPE_SESSIONS);
+                            AquaNotesDbContract.Outlets.CONTENT_URI);
+                    intent.putExtra(Intent.EXTRA_TITLE, getString(R.string.title_outlets_tracks));
+//                    intent.putExtra(OutletsFragment.EXTRA_NEXT_TYPE,
+//                            OutletsFragment.NEXT_TYPE_SESSIONS);
                     startActivity(intent);
                 }
 
             }
         });
 
-        root.findViewById(R.id.home_btn_starred).setOnClickListener(new View.OnClickListener() {
+        root.findViewById(R.id.home_btn_controllers).setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
-                fireTrackerEvent("Starred");
+                fireTrackerEvent("Controllers");
                 // Launch list of sessions and vendors the user has starred
                 startActivity(new Intent(getActivity(), ControllersActivity.class));                
             }
         });
 
-        root.findViewById(R.id.home_btn_vendors).setOnClickListener(new View.OnClickListener() {
+        root.findViewById(R.id.home_btn_probes).setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
                 fireTrackerEvent("Sandbox");
                 // Launch vendors list
@@ -92,10 +93,10 @@ public class DashboardFragment extends Fragment {
                     startActivity(new Intent(getActivity(), ProbesMultiPaneActivity.class));
                 } else {
                     final Intent intent = new Intent(Intent.ACTION_VIEW,
-                            ScheduleContract.Tracks.CONTENT_URI);
-                    intent.putExtra(Intent.EXTRA_TITLE, getString(R.string.title_vendor_tracks));
-                    intent.putExtra(OutletsFragment.EXTRA_NEXT_TYPE,
-                            OutletsFragment.NEXT_TYPE_VENDORS);
+                            AquaNotesDbContract.Probes.CONTENT_URI);
+                    intent.putExtra(Intent.EXTRA_TITLE, getString(R.string.title_probes_tracks));
+//                    intent.putExtra(OutletsFragment.EXTRA_NEXT_TYPE,
+//                            OutletsFragment.NEXT_TYPE_VENDORS);
                     startActivity(intent);
                 }
             }

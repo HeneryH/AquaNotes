@@ -24,12 +24,12 @@
         android:layout_height="wrap_content"
         android:src="@drawable/indicator_starred" />
 
-    <FrameLayout android:id="@+id/list_item_vendor"
+    <FrameLayout android:id="@+id/list_item_probe"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         style="@style/ListItemContent">
 
-        <TextView android:id="@+id/vendor_name"
+        <TextView android:id="@+id/probe_name"
             android:layout_gravity="center_vertical"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"

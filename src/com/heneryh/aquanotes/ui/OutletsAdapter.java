@@ -17,6 +17,7 @@
 package com.heneryh.aquanotes.ui;
 
 import com.heneryh.aquanotes.R;
+import com.heneryh.aquanotes.provider.AquaNotesDbContract;
 import com.heneryh.aquanotes.provider.ScheduleContract;
 
 import android.app.Activity;
@@ -130,47 +131,68 @@ public class OutletsAdapter extends CursorAdapter {
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
         final TextView textView = (TextView) view.findViewById(android.R.id.text1);
-        textView.setText(cursor.getString(TracksQuery.TRACK_NAME));
+        textView.setText(cursor.getString(OutletsViewQuery.NAME));
 
         // Assign track color to visible block
         final ImageView iconView = (ImageView) view.findViewById(android.R.id.icon1);
-        iconView.setImageDrawable(new ColorDrawable(cursor.getInt(TracksQuery.TRACK_COLOR)));
+        iconView.setImageDrawable(new ColorDrawable(1/*cursor.getInt(TracksQuery.TRACK_COLOR)*/));
     }
 
-    /** {@link com.heneryh.aquanotes.provider.ScheduleContract.Tracks} query parameters. */
-    public interface TracksQuery {
+    public interface OutletsViewQuery {
+
         int _TOKEN = 0x1;
-
+        
         String[] PROJECTION = {
+            	//  String PROBE_ID = "_id";
+            	//  String PROBE_NAME = "probe_name";
+            	//  String DEVICE_ID = "device_id";
+            	//  String TYPE = "probe_type";
+            	//  String RESOURCE_ID = "resource_id";
+            	//  String CONTROLLER_ID = "controller_id";
+                    BaseColumns._ID,
+                    AquaNotesDbContract.OutletsView.NAME,
+                    AquaNotesDbContract.OutletsView.DEVICE_ID,
+                    AquaNotesDbContract.OutletsView.RESOURCE_ID,
+                    AquaNotesDbContract.OutletsView.CONTROLLER_ID,
+//              String CONTROLLER_ID = "_id";
+//              String TITLE = "title";
+//              String WAN_URL = "wan_url";
+//              String LAN_URL = "wifi_url";
+//              String WIFI_SSID = "wifi_ssid";
+//              String USER = "user";
+//              String PW = "pw";
+//              String LAST_UPDATED = "last_updated";
+//              String UPDATE_INTERVAL = "update_i";
+//              String DB_SAVE_DAYS = "db_save_days";
+//              String CONTROLLER_TYPE = "controller_type";
                 BaseColumns._ID,
-                ScheduleContract.Tracks.TRACK_ID,
-                ScheduleContract.Tracks.TRACK_NAME,
-                ScheduleContract.Tracks.TRACK_ABSTRACT,
-                ScheduleContract.Tracks.TRACK_COLOR,
+                AquaNotesDbContract.OutletsView.TITLE,
+                AquaNotesDbContract.OutletsView.WAN_URL,
+                AquaNotesDbContract.OutletsView.LAN_URL,
+                AquaNotesDbContract.OutletsView.WIFI_SSID,
+                AquaNotesDbContract.OutletsView.USER,
+                AquaNotesDbContract.OutletsView.PW,
+                AquaNotesDbContract.OutletsView.LAST_UPDATED,
+                AquaNotesDbContract.OutletsView.UPDATE_INTERVAL,
+                AquaNotesDbContract.OutletsView.DB_SAVE_DAYS,
+                AquaNotesDbContract.OutletsView.MODEL,
         };
-
-        String[] PROJECTION_WITH_SESSIONS_COUNT = {
-                BaseColumns._ID,
-                ScheduleContract.Tracks.TRACK_ID,
-                ScheduleContract.Tracks.TRACK_NAME,
-                ScheduleContract.Tracks.TRACK_ABSTRACT,
-                ScheduleContract.Tracks.TRACK_COLOR,
-                ScheduleContract.Tracks.SESSIONS_COUNT,
-        };
-
-        String[] PROJECTION_WITH_VENDORS_COUNT = {
-                BaseColumns._ID,
-                ScheduleContract.Tracks.TRACK_ID,
-                ScheduleContract.Tracks.TRACK_NAME,
-                ScheduleContract.Tracks.TRACK_ABSTRACT,
-                ScheduleContract.Tracks.TRACK_COLOR,
-                ScheduleContract.Tracks.VENDORS_COUNT,
-        };
-
         int _ID = 0;
-        int TRACK_ID = 1;
-        int TRACK_NAME = 2;
-        int TRACK_ABSTRACT = 3;
-        int TRACK_COLOR = 4;
+        int NAME = 1;
+        int DEVICE_ID = 2;
+        int RESOURCE_ID = 3;
+        int CONTROLLER_ID = 4;
+        int TITLE = 5;
+        int WAN_URL = 6;
+        int LAN_URL = 7;
+        int WIFI_SSID = 8;
+        int USER = 9;
+        int PW = 10;
+        int LAST_UPDATED = 11;
+        int UPDATE_INTERVAL = 12;
+        int DB_SAVE_DAYS = 13;
+        int MODEL = 14;
     }
+    
+
 }

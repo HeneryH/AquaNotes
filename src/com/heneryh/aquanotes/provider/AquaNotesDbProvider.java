@@ -1012,10 +1012,10 @@ public class AquaNotesDbProvider extends ContentProvider {
         			.where(Outlets.DEVICE_ID + "=?", outletDID);
         }
         case PROBES: {
-        	return builder.table(Tables.PROBES);
+        	return builder.table(Tables.PROBE_VIEW);
         }
         case OUTLETS: {
-        	return builder.table(Tables.OUTLETS);
+        	return builder.table(Tables.OUTLET_VIEW);
         }
       
       // Get all data records regardless of controller, db maint use only
