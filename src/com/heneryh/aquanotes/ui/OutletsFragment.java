@@ -48,7 +48,6 @@ public class OutletsFragment extends ListFragment implements
 
         final Intent intent = BaseActivity.fragmentArgumentsToIntent(getArguments());
         final Uri outletsUri = intent.getData();
-//        mNextType = intent.getStringExtra(EXTRA_NEXT_TYPE);
 
         mAdapter = new OutletsAdapter(getActivity());
         setListAdapter(mAdapter);
@@ -56,18 +55,6 @@ public class OutletsFragment extends ListFragment implements
         // Filter our tracks query to only include those with valid results
         String[] projection = OutletsAdapter.OutletsViewQuery.PROJECTION;
         String selection = null;
-//        if (NEXT_TYPE_SESSIONS.equals(mNextType)) {
-//            // Only show tracks with at least one session
-//            projection = OutletsAdapter.OutletsViewQuery.PROJECTION;
-//            selection = ScheduleContract.Tracks.SESSIONS_COUNT + ">0";
-//            AnalyticsUtils.getInstance(getActivity()).trackPageView("/Tracks");
-//
-//        } else if (NEXT_TYPE_VENDORS.equals(mNextType)) {
-//            // Only show tracks with at least one vendor
-//            projection = OutletsAdapter.OutletsViewQuery.PROJECTION_WITH_VENDORS_COUNT;
-//            selection = ScheduleContract.Tracks.VENDORS_COUNT + ">0";
-//            AnalyticsUtils.getInstance(getActivity()).trackPageView("/Sandbox");
-//        }
 
         // Start background query to load tracks
         mHandler = new NotifyingAsyncQueryHandler(getActivity().getContentResolver(), this);
@@ -102,7 +89,6 @@ public class OutletsFragment extends ListFragment implements
 
         getActivity().startManagingCursor(cursor);
         mAdapter.setHasAllItem(true);
-//        mAdapter.setIsSessions(OutletsFragment.NEXT_TYPE_SESSIONS.equals(mNextType));
         mAdapter.changeCursor(cursor);
     }
 
@@ -112,32 +98,6 @@ public class OutletsFragment extends ListFragment implements
         final Cursor cursor = (Cursor) mAdapter.getItem(position);
         final String outletId;
 
-//        if (cursor != null) {
             outletId = cursor.getString(OutletsAdapter.OutletsViewQuery._ID);
-//        } else {
-//            trackId = ScheduleContract.Tracks.ALL_TRACK_ID;
-//        }
-
-//        final Intent intent = new Intent(Intent.ACTION_VIEW);
-//        final Uri trackUri = ScheduleContract.Tracks.buildTrackUri(trackId);
-//        intent.putExtra(SessionDetailFragment.EXTRA_TRACK, trackUri);
-//
-//        if (NEXT_TYPE_SESSIONS.equals(mNextType)) {
-//            if (cursor == null) {
-//                intent.setData(ScheduleContract.Sessions.CONTENT_URI);
-//            } else {
-//                intent.setData(ScheduleContract.Tracks.buildSessionsUri(trackId));
-//            }
-//        } else if (NEXT_TYPE_VENDORS.equals(mNextType)) {
-//            if (cursor == null) {
-//                intent.setData(ScheduleContract.Vendors.CONTENT_URI);
-//            } else {
-//                intent.setData(ScheduleContract.Tracks.buildVendorsUri(trackId));
-//            }
-//        }
-//
-//        ((BaseActivity) getActivity()).openActivityOrFragment(intent);
-//
-//        getListView().setItemChecked(position, true);
     }
 }

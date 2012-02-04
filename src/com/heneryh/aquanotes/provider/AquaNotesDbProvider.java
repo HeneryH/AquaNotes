@@ -986,7 +986,7 @@ public class AquaNotesDbProvider extends ContentProvider {
 
         case CONTROLLERS_ID_PROBES: {
         	final String controllerId = Probes.getControllerId(uri);
-        	return builder.table(Tables.PROBES)
+        	return builder.table(Tables.PROBE_VIEW)
         			.where(Probes.CONTROLLER_ID + "=?", controllerId);
         }
 
@@ -1000,7 +1000,7 @@ public class AquaNotesDbProvider extends ContentProvider {
 
         case CONTROLLERS_ID_OUTLETS: {
         	final String controllerId = Probes.getControllerId(uri);
-        	return builder.table(Tables.OUTLETS)
+        	return builder.table(Tables.OUTLET_VIEW)
         			.where(Probes.CONTROLLER_ID + "=?", controllerId);
         }
 

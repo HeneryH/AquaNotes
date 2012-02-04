@@ -36,6 +36,7 @@ import android.provider.BaseColumns;
 import android.support.v4.app.ListFragment;
 import android.text.Spannable;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
@@ -67,6 +68,30 @@ public class OutletsXFragment extends ListFragment implements
         mHandler = new NotifyingAsyncQueryHandler(getActivity().getContentResolver(), this);
         reloadFromArguments(getArguments());
     }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+            Bundle savedInstanceState) {
+
+        ViewGroup root = (ViewGroup) inflater.inflate(android.R.layout.list_content, null);
+
+        // For some reason, if we omit this, NoSaveStateFrameLayout thinks we are
+        // FILL_PARENT / WRAP_CONTENT, making the progress bar stick to the top of the activity.
+        root.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT,
+                ViewGroup.LayoutParams.FILL_PARENT));
+        return root;
+    }
+
+    /**
+     * 
+    ListFragment has a default layout that consists of a single list view. However, if you desire, you can customize 
+    the fragment layout by returning your own view hierarchy from onCreateView(LayoutInflater, ViewGroup, Bundle). To do 
+    this, your view hierarchy must contain a ListView object with the id "@android:id/list" (or list if it's in code)
+
+    		So my listview extends ListFragment and not containing list in xml , and directly we can setListAdapter in 
+    		onActivityCreated rather than in onCreateView.
+     */
+
 
     public void reloadFromArguments(Bundle arguments) {
         // Teardown from previous arguments
@@ -120,7 +145,7 @@ public class OutletsXFragment extends ListFragment implements
         if (!mHasSetEmptyText) {
             // Could be a bug, but calling this twice makes it become visible when it shouldn't
             // be visible.
-            setEmptyText(getString(R.string.empty_outlets));
+//            setEmptyText(getString(R.string.empty_outlets)); <-- re-do this since I had to turn if off for custom formats.
             mHasSetEmptyText = true;
         }
     }

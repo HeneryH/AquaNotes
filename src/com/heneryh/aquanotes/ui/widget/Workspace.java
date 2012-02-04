@@ -331,7 +331,7 @@ public class Workspace extends ViewGroup {
             final View child = getChildAt(i);
             if (child.getVisibility() != View.GONE) {
                 final int childWidth = child.getMeasuredWidth();
-                child.layout(childLeft, 0, childLeft + childWidth, child.getMeasuredHeight());
+                child.layout(childLeft, 0, childLeft + childWidth, child.getMeasuredHeight());  // was child.getMeasuredHeight()
                 childLeft += childWidth;
             }
         }

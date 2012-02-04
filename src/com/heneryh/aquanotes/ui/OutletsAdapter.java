@@ -165,7 +165,6 @@ public class OutletsAdapter extends CursorAdapter {
 //              String UPDATE_INTERVAL = "update_i";
 //              String DB_SAVE_DAYS = "db_save_days";
 //              String CONTROLLER_TYPE = "controller_type";
-                BaseColumns._ID,
                 AquaNotesDbContract.OutletsView.TITLE,
                 AquaNotesDbContract.OutletsView.WAN_URL,
                 AquaNotesDbContract.OutletsView.LAN_URL,

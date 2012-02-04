@@ -72,7 +72,7 @@ public class OutletsMultiPaneActivity extends BaseMultiPaneActivity {
     public FragmentReplaceInfo onSubstituteFragmentForActivityLaunch(String activityClassName) {
         if (SessionsActivity.class.getName().equals(activityClassName)) {
             return new FragmentReplaceInfo(
-                    OutletsXFragment.class,
+                    OutletsXFragment.class, // was OutletXFragment
                     "sessions",
                     R.id.fragment_container_sessions);
         } else if (SessionDetailActivity.class.getName().equals(activityClassName)) {

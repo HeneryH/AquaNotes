@@ -34,6 +34,7 @@ import android.provider.BaseColumns;
 import android.support.v4.app.ListFragment;
 import android.text.Spannable;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
@@ -63,7 +64,21 @@ public class ProbesFragment extends ListFragment implements
         mHandler = new NotifyingAsyncQueryHandler(getActivity().getContentResolver(), this);
         reloadFromArguments(getArguments());
     }
+    
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+            Bundle savedInstanceState) {
 
+//        ViewGroup root = (ViewGroup) inflater.inflate(android.R.layout.list_content, null);
+        ViewGroup root = (ViewGroup) inflater.inflate(R.layout.fragment_list_with_spinner, null);
+
+        // For some reason, if we omit this, NoSaveStateFrameLayout thinks we are
+        // FILL_PARENT / WRAP_CONTENT, making the progress bar stick to the top of the activity.
+        root.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT,
+                ViewGroup.LayoutParams.FILL_PARENT));
+        return root;
+    }
+    
     public void reloadFromArguments(Bundle arguments) {
         // Teardown from previous arguments
         if (mCursor != null) {
@@ -109,7 +124,7 @@ public class ProbesFragment extends ListFragment implements
         if (!mHasSetEmptyText) {
             // Could be a bug, but calling this twice makes it become visible when it shouldn't
             // be visible.
-            setEmptyText(getString(R.string.empty_probes));
+//            setEmptyText(getString(R.string.empty_probes));
             mHasSetEmptyText = true;
         }
     }
