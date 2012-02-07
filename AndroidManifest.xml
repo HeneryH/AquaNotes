@@ -17,8 +17,8 @@
 <manifest
     xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.heneryh.aquanotes"
-    android:versionCode="12"
-    android:versionName="0.12"
+    android:versionCode="14"
+    android:versionName="0.14"
     android:installLocation="auto">
 
     <uses-sdk
@@ -88,12 +88,33 @@
             android:label="@string/title_schedule" />
 
         <activity
+            android:name=".ui.phone.ProbesActivity"
+            android:label="@string/title_probes">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.TAB" />
+                <data android:mimeType="vnd.android.cursor.dir/vnd.aquanotes.probes" />
+            </intent-filter>
+        </activity>
+
+        <activity
             android:name=".ui.phone.OutletsActivity"
             android:label="@string/title_outlets">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
-                <data android:mimeType="vnd.android.cursor.dir/vnd.aquanotes.outlet" />
+                <data android:mimeType="vnd.android.cursor.dir/vnd.aquanotes.outlets" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".ui.phone.DataActivity"
+            android:label="@string/title_data">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="vnd.android.cursor.dir/vnd.aquanotes.data" />
             </intent-filter>
         </activity>
 
@@ -113,17 +134,6 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="vnd.android.cursor.item/vnd.aquanotes.session" />
-            </intent-filter>
-        </activity>
-
-        <activity
-            android:name=".ui.phone.ProbesActivity"
-            android:label="@string/title_probes">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.TAB" />
-                <data android:mimeType="vnd.android.cursor.dir/vnd.aquanotes.probes" />
             </intent-filter>
         </activity>
 

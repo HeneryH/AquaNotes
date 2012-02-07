@@ -131,7 +131,8 @@ public class OutletsAdapter extends CursorAdapter {
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
         final TextView textView = (TextView) view.findViewById(android.R.id.text1);
-        textView.setText(cursor.getString(OutletsViewQuery.NAME));
+        String titleText = cursor.getString(OutletsViewQuery.TITLE) + ": " + cursor.getString(OutletsViewQuery.NAME);
+        textView.setText(titleText);
 
         // Assign track color to visible block
         final ImageView iconView = (ImageView) view.findViewById(android.R.id.icon1);

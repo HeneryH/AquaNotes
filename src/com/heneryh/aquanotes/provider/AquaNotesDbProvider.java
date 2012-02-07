@@ -422,19 +422,19 @@ public class AquaNotesDbProvider extends ContentProvider {
 //private static final String PATH_OUTLETS_RESOURCE_ID = "outlets_rsc";
 //private static final String PATH_OUTLETS_DEVICE_ID = "outlets_did";
         case OUTLETS:
-        	return Probes.CONTENT_TYPE;
+        	return Outlets.CONTENT_TYPE;
         	
         case CONTROLLERS_ID_OUTLETS:
-        	return Probes.CONTENT_TYPE;
+        	return Outlets.CONTENT_TYPE;
         	
         case CONTROLLERS_ID_OUTLETS_ID:
-        	return Probes.CONTENT_ITEM_TYPE;
+        	return Outlets.CONTENT_ITEM_TYPE;
         	
         case CONTROLLERS_ID_OUTLETS_DEVICE_ID:
-        	return Probes.CONTENT_ITEM_TYPE;
+        	return Outlets.CONTENT_ITEM_TYPE;
         	
         case CONTROLLERS_ID_OUTLETS_RSC:
-        	return Probes.CONTENT_ITEM_TYPE;
+        	return Outlets.CONTENT_ITEM_TYPE;
 
 //////////////////////////////////////////////
 //        	private static final int DATA = 912; 
@@ -452,29 +452,29 @@ public class AquaNotesDbProvider extends ContentProvider {
 //    	    private static final String PATH_OUTLET_DATA_FOR_ID = "odata_id";
 //    	    private static final String PATH_OUTLET_DATA_FOR_DID = "odata_did";
         case DATA:
-        	return Probes.CONTENT_TYPE;
+        	return Data.CONTENT_TYPE;
         case PDATA:
-        	return Probes.CONTENT_TYPE;
+        	return Data.CONTENT_TYPE;
         case ODATA:
-        	return Probes.CONTENT_TYPE;
+        	return Data.CONTENT_TYPE;
         	
         case CONTROLLERS_ID_PROBEDATA_AT:
-        	return Probes.CONTENT_TYPE;
+        	return Data.CONTENT_TYPE;
         	
         case CONTROLLERS_ID_OUTLETDATA_AT:
-        	return Probes.CONTENT_TYPE;
+        	return Data.CONTENT_TYPE;
         	
         case CONTROLLERS_ID_PROBEDATA_FOR_ID:
-        	return Probes.CONTENT_TYPE;
+        	return Data.CONTENT_TYPE;
         	
         case CONTROLLERS_ID_OUTLETDATA_FOR_ID:
-        	return Probes.CONTENT_TYPE;
+        	return Data.CONTENT_TYPE;
         	
         case CONTROLLERS_ID_PROBEDATA_FOR_NAME:
-        	return Probes.CONTENT_TYPE;
+        	return Data.CONTENT_TYPE;
         	
         case CONTROLLERS_ID_OUTLETDATA_FOR_DEVICE_ID:
-        	return Probes.CONTENT_TYPE;
+        	return Data.CONTENT_TYPE;
         	
         	
             case BLOCKS:
@@ -1028,7 +1028,7 @@ public class AquaNotesDbProvider extends ContentProvider {
 			.where(Data.TYPE + "=?", "1");
         }
       case ODATA: {
-      	return builder.table(Tables.PDATA_VIEW)
+      	return builder.table(Tables.ODATA_VIEW)
 			.where(Data.TYPE + "=?", "0");
         }
       

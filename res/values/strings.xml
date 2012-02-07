@@ -34,6 +34,7 @@
     <string name="title_controllers">Fix this title</string>
     <string name="title_outlets">Outlets</string>
     <string name="title_probes">Probes</string>
+    <string name="title_data">Data</string>
     <string name="title_probe_detail">Probe information</string>
     <string name="title_map">Map</string>
     <string name="title_tagstream">Realtime stream</string>
@@ -48,10 +49,10 @@
     <string name="title_search_query">Search for \"<xliff:g id="query">%1$s</xliff:g>\"</string>
 
     <string name="btn_schedule">Schedule</string>
-    <string name="btn_map">Map</string>
-    <string name="btn_outlets">Outlets</string>
+    <string name="btn_data">db: Data</string>
+    <string name="btn_outlets">db: Outlets</string>
     <string name="btn_controllers">Controllers</string>
-    <string name="btn_probes">Probes</string>
+    <string name="btn_probes">db: Probes</string>
     <string name="btn_prefs">Prefs</string>
 
     <string name="toast_sync_error">Sync error: <xliff:g id="error">%1$s</xliff:g></string>

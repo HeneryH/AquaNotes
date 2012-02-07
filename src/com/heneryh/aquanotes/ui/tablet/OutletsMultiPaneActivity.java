@@ -17,6 +17,7 @@
 package com.heneryh.aquanotes.ui.tablet;
 
 import com.heneryh.aquanotes.R;
+import com.heneryh.aquanotes.provider.AquaNotesDbContract;
 import com.heneryh.aquanotes.provider.ScheduleContract;
 import com.heneryh.aquanotes.ui.BaseMultiPaneActivity;
 import com.heneryh.aquanotes.ui.SessionDetailFragment;
@@ -46,9 +47,12 @@ public class OutletsMultiPaneActivity extends BaseMultiPaneActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sessions);
 
+//        Intent intent = new Intent();
+//        intent.setData(ScheduleContract.Tracks.CONTENT_URI);
+////        intent.putExtra(OutletsFragment.EXTRA_NEXT_TYPE, OutletsFragment.NEXT_TYPE_SESSIONS);
         Intent intent = new Intent();
-        intent.setData(ScheduleContract.Tracks.CONTENT_URI);
-//        intent.putExtra(OutletsFragment.EXTRA_NEXT_TYPE, OutletsFragment.NEXT_TYPE_SESSIONS);
+        intent.setData(AquaNotesDbContract.Outlets.CONTENT_URI);
+//        intent.putExtra(Intent.EXTRA_TITLE, getString(R.string.title_outlets_tracks));
 
         final FragmentManager fm = getSupportFragmentManager();
         mTracksDropdownFragment = (OutletsDropdownFragment) fm.findFragmentById(

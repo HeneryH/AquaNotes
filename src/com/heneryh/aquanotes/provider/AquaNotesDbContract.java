@@ -1102,12 +1102,13 @@ public class AquaNotesDbContract {
     public static class Data implements DataColumns, BaseColumns {
 
         public static final String CONTENT_TYPE =
-                "vnd.android.cursor.dir/vnd.aquanotes.probe_data";
+                "vnd.android.cursor.dir/vnd.aquanotes.data";
         public static final String CONTENT_ITEM_TYPE =
-                "vnd.android.cursor.item/vnd.aquanotes.probe_data";
+                "vnd.android.cursor.item/vnd.aquanotes.data";
 
         public static final Uri CONTENT_URI =
-                BASE_CONTENT_URI.buildUpon().appendPath(PATH_PDATA).build();
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_DATA).build();
+ 
  
 
         /** Default "ORDER BY" clause. */
@@ -1242,49 +1243,37 @@ public class AquaNotesDbContract {
 
     }
 
-    /**
-     * ProbeData are physical locations at the conference venue.
-     */
-    public static class ViewProbeData implements ViewProbeDataColumns, BaseColumns {
+    public static class ProbeDataView implements ViewProbeDataColumns, BaseColumns {
 
         public static final String CONTENT_TYPE =
-                "vnd.android.cursor.dir/vnd.aquanotes.data";
+                "vnd.android.cursor.dir/vnd.aquanotes.pdata";
         public static final String CONTENT_ITEM_TYPE =
-                "vnd.android.cursor.item/vnd.aquanotes.data";
-
-        public static final Uri CONTENT_URI =
-                BASE_CONTENT_URI.buildUpon().appendPath(PATH_DATA).build();
+                "vnd.android.cursor.item/vnd.aquanotes.pdata";
+        
+        public static final Uri CONTENT_P_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_PDATA).build();
  
-
         /** Default "ORDER BY" clause. */
-//        public static final String DEFAULT_SORT = ProbeDataColumns.PROBE_ID + " ASC, "
-//                + ProbeDataColumns.VALUE + " COLLATE NOCASE ASC";
-        public static final String DEFAULT_SORT = DataColumns.TIMESTAMP + " DESC ";
-//                + ProbeDataColumns.VALUE + " COLLATE NOCASE ASC";
-
+        public static final String DEFAULT_SORT = ViewProbeDataColumns.TIMESTAMP + " DESC";
     }
 
-    /**
-     * ProbeData are physical locations at the conference venue.
-     */
-    public static class ViewOutletData implements ViewOutletDataColumns, BaseColumns {
+
+     public static class OutletDataView implements ViewOutletDataColumns, BaseColumns {
 
         public static final String CONTENT_TYPE =
-                "vnd.android.cursor.dir/vnd.aquanotes.data";
+                "vnd.android.cursor.dir/vnd.aquanotes.odata";
         public static final String CONTENT_ITEM_TYPE =
-                "vnd.android.cursor.item/vnd.aquanotes.data";
+                "vnd.android.cursor.item/vnd.aquanotes.odata";
 
-        public static final Uri CONTENT_URI =
-                BASE_CONTENT_URI.buildUpon().appendPath(PATH_DATA).build();
+        public static final Uri CONTENT_O_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_ODATA).build();
  
 
-        /** Default "ORDER BY" clause. */
-//        public static final String DEFAULT_SORT = ProbeDataColumns.PROBE_ID + " ASC, "
-//                + ProbeDataColumns.VALUE + " COLLATE NOCASE ASC";
-        public static final String DEFAULT_SORT = DataColumns.TIMESTAMP + " DESC ";
-//                + ProbeDataColumns.VALUE + " COLLATE NOCASE ASC";
 
+        /** Default "ORDER BY" clause. */
+        public static final String DEFAULT_SORT = ViewOutletDataColumns.TIMESTAMP + " DESC";
     }
+
 
     private AquaNotesDbContract() {
     }

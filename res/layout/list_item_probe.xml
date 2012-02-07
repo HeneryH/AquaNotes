@@ -40,8 +40,16 @@
             android:layout_below="@id/probe_name"
             android:layout_toLeftOf="@id/star_button"
             android:layout_alignParentLeft="true"
-            android:layout_width="fill_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             style="@style/ListItemSubtitle" />
-    </RelativeLayout>
+        
+        <TextView android:id="@+id/probe_timestamp"
+            android:layout_below="@id/probe_name"
+            android:layout_toRightOf="@+id/probe_value"
+            android:layout_alignParentLeft="false"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/ListItemSubtitle" />
+        </RelativeLayout>
 </FrameLayout>

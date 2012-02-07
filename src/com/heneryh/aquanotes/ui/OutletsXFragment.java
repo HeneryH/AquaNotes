@@ -276,9 +276,7 @@ public class OutletsXFragment extends ListFragment implements
             titleView.setText(cursor.getString(OutletsViewQuery.TITLE));
 
             // Format time block this session occupies
-            final String outletName = cursor.getString(OutletsViewQuery.NAME);
-
-            subtitleView.setText(outletName);
+            subtitleView.setText(cursor.getString(OutletsViewQuery.NAME));
 
             final boolean starred = false /*cursor.getInt(SessionsQuery.STARRED) != 0*/;
             view.findViewById(R.id.star_button).setVisibility(

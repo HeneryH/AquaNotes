@@ -67,12 +67,11 @@ import android.widget.TextView;
  */
 public class ControllersActivity extends BaseMultiPaneActivity implements
 								NotifyingAsyncQueryHandler.AsyncQueryListener,
-								ObservableScrollView.OnScrollListener,
 								View.OnClickListener  {
 
     public static final String TAG_OUTLETS = "outlets";
     public static final String TAG_PROBES = "probes";
-//    public static final String TAG_NOTES = "notes";
+    public static final String TAG_NOTES = "notes";
 
     private NotifyingAsyncQueryHandler mHandler;
 
@@ -96,7 +95,7 @@ public class ControllersActivity extends BaseMultiPaneActivity implements
          * Views for each swipe pane for each controller
          */
         private ViewGroup mRootView; // Host for the tab view within the fragment.  Below the L/R and Workspace Title
-        private ObservableScrollView scrollView;
+        private FrameLayout scrollView;
         private TabHost mTabHost;
         private TabWidget mTabWidget;
 //        private TabManager mTabManager;
@@ -250,8 +249,8 @@ public class ControllersActivity extends BaseMultiPaneActivity implements
         	 * Setup views
         	 */
         	ctlr.mRootView = (ViewGroup) inflater.inflate(R.layout.controllers_tabbed_content, null);
-        	ctlr.scrollView = (ObservableScrollView) ctlr.mRootView.findViewById(R.id.controllers_scroll);
-        	ctlr.scrollView.setOnScrollListener(this);
+        	ctlr.scrollView = (FrameLayout) ctlr.mRootView.findViewById(R.id.controllers_scroll);
+        	//ctlr.scrollView.setOnScrollListener(this);
         	
         	ctlr.mTitleView = (TextView) ctlr.mRootView.findViewById(R.id.controller_title);
         	ctlr.mSubtitleView = (TextView) ctlr.mRootView.findViewById(R.id.controller_subtitle);
@@ -589,7 +588,7 @@ public class ControllersActivity extends BaseMultiPaneActivity implements
         			// otherwise it must be in there somewhere
         			thisCtlr = mCtlrs.get(index);
         		}
-//        		updateControllerTabs(thisCtlr, cursor);
+        		updateControllerTabs(thisCtlr, cursor);
         			
         	} // end of while()
         } finally {
