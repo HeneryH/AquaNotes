@@ -20,9 +20,9 @@ import com.heneryh.aquanotes.R;
 import com.heneryh.aquanotes.provider.AquaNotesDbContract;
 import com.heneryh.aquanotes.provider.ScheduleContract;
 import com.heneryh.aquanotes.ui.BaseActivity;
+import com.heneryh.aquanotes.ui.OutletsDataAdapter;
 import com.heneryh.aquanotes.ui.SessionDetailFragment;
-import com.heneryh.aquanotes.ui.OutletsAdapter;
-import com.heneryh.aquanotes.ui.OutletsFragment;
+import com.heneryh.aquanotes.ui.OutletsDataFragment;
 import com.heneryh.aquanotes.util.NotifyingAsyncQueryHandler;
 import com.heneryh.aquanotes.util.UIUtils;
 
@@ -58,7 +58,7 @@ public class OutletsDropdownFragment extends Fragment implements
 
     private boolean mAutoloadTarget = true;
     private Cursor mCursor;
-    private OutletsAdapter mAdapter;
+    private OutletsDataAdapter mAdapter;
     private String mNextType;
 
     private ListPopupWindow mListPopupWindow;
@@ -72,7 +72,7 @@ public class OutletsDropdownFragment extends Fragment implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mHandler = new NotifyingAsyncQueryHandler(getActivity().getContentResolver(), this);
-        mAdapter = new OutletsAdapter(getActivity());
+        mAdapter = new OutletsDataAdapter(getActivity());
 
         if (savedInstanceState != null) {
             // Prevent auto-load behavior on orientation change.
@@ -91,7 +91,7 @@ public class OutletsDropdownFragment extends Fragment implements
             getActivity().stopManagingCursor(mCursor);
             mCursor = null;
         }
-        mHandler.cancelOperation(OutletsAdapter.OutletsViewQuery._TOKEN);
+        mHandler.cancelOperation(OutletsDataAdapter.OutletDataViewQuery._TOKEN);
 
         // Load new arguments
         final Intent intent = BaseActivity.fragmentArgumentsToIntent(arguments);
@@ -103,21 +103,21 @@ public class OutletsDropdownFragment extends Fragment implements
         mNextType = intent.getStringExtra(EXTRA_NEXT_TYPE);
 
         // Filter our tracks query to only include those with valid results
-        String[] projection = OutletsAdapter.OutletsViewQuery.PROJECTION;
+        String[] projection = OutletsDataAdapter.OutletDataViewQuery.PROJECTION;
         String selection = null;
-//        if (OutletsFragment.NEXT_TYPE_SESSIONS.equals(mNextType)) {
+//        if (OutletsDataFragment.NEXT_TYPE_SESSIONS.equals(mNextType)) {
 //            // Only show tracks with at least one session
 //            projection = OutletsAdapter.TracksQuery.PROJECTION_WITH_SESSIONS_COUNT;
 //            selection = ScheduleContract.Tracks.SESSIONS_COUNT + ">0";
 //
-//        } else if (OutletsFragment.NEXT_TYPE_VENDORS.equals(mNextType)) {
+//        } else if (OutletsDataFragment.NEXT_TYPE_VENDORS.equals(mNextType)) {
 //            // Only show tracks with at least one vendor
 //            projection = OutletsAdapter.TracksQuery.PROJECTION_WITH_VENDORS_COUNT;
 //            selection = ScheduleContract.Tracks.VENDORS_COUNT + ">0";
 //        }
 
         // Start background query to load tracks
-        mHandler.startQuery(OutletsAdapter.OutletsViewQuery._TOKEN, null, outletsUri, projection,
+        mHandler.startQuery(OutletsDataAdapter.OutletDataViewQuery._TOKEN, null, outletsUri, projection,
                 selection, null, AquaNotesDbContract.Outlets.DEFAULT_SORT);
     }
 
@@ -162,7 +162,7 @@ public class OutletsDropdownFragment extends Fragment implements
         String lastTrackID = UIUtils.getLastUsedTrackID(getActivity());
         if (lastTrackID != null) {
             while (!cursor.isAfterLast()) {
-                if (lastTrackID.equals(cursor.getString(OutletsAdapter.OutletsViewQuery._ID))) {
+                if (lastTrackID.equals(cursor.getString(OutletsDataAdapter.OutletDataViewQuery._ID))) {
                     break;
                 }
                 cursor.moveToNext();
@@ -178,7 +178,7 @@ public class OutletsDropdownFragment extends Fragment implements
         }
 
         mAdapter.setHasAllItem(true);
-//        mAdapter.setIsSessions(OutletsFragment.NEXT_TYPE_SESSIONS.equals(mNextType));
+//        mAdapter.setIsSessions(OutletsDataFragment.NEXT_TYPE_SESSIONS.equals(mNextType));
         mAdapter.changeCursor(mCursor);
     }
 
@@ -189,7 +189,7 @@ public class OutletsDropdownFragment extends Fragment implements
 
         if (cursor != null) {
             UIUtils.setLastUsedTrackID(getActivity(), cursor.getString(
-                    OutletsAdapter.OutletsViewQuery._ID));
+                    OutletsDataAdapter.OutletDataViewQuery._ID));
         } else {
             UIUtils.setLastUsedTrackID(getActivity(), ScheduleContract.Tracks.ALL_TRACK_ID);
         }
@@ -215,10 +215,10 @@ public class OutletsDropdownFragment extends Fragment implements
 //            trackColor = res.getColor(R.color.all_track_color);
 //            trackId = ScheduleContract.Tracks.ALL_TRACK_ID;
 //
-//            mTitle.setText(OutletsFragment.NEXT_TYPE_SESSIONS.equals(mNextType)
+//            mTitle.setText(OutletsDataFragment.NEXT_TYPE_SESSIONS.equals(mNextType)
 //                    ? R.string.all_sessions_title
 //                    : R.string.all_sandbox_title);
-//            mAbstract.setText(OutletsFragment.NEXT_TYPE_SESSIONS.equals(mNextType)
+//            mAbstract.setText(OutletsDataFragment.NEXT_TYPE_SESSIONS.equals(mNextType)
 //                    ? R.string.all_sessions_subtitle
 //                    : R.string.all_sandbox_subtitle);
 //        }

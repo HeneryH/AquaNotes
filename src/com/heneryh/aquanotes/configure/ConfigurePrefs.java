@@ -307,9 +307,9 @@ public class ConfigurePrefs extends Activity implements View.OnClickListener {
 			// Grab the values, note that they are all strings regardless of 
 			// the format they will be stored in the database.
 			String title = mTitle.getText().toString();
-			String url = mWanUrl.getText().toString().toLowerCase();
-			String wiFiUrl = mLanUrl.getText().toString().toLowerCase();
-			String wiFiSid = mWiFiSid.getText().toString().toLowerCase();
+			String url = mWanUrl.getText().toString();
+			String wiFiUrl = mLanUrl.getText().toString();
+			String wiFiSid = mWiFiSid.getText().toString();
 			String user = mUser.getText().toString();
 			String pword = mPassword.getText().toString();
 			String updIntervalMins = mUpdateIntervalMins.getText().toString();
@@ -389,7 +389,7 @@ public class ConfigurePrefs extends Activity implements View.OnClickListener {
 			break;
 		} // end of case save:
 		case R.id.conf_delete: {
-			String url = mWanUrl.getText().toString().toLowerCase();
+			String url = mWanUrl.getText().toString();
 			Uri deleteOne = Controllers.buildDeleteControllerUrlUri(url);
 			ContentResolver resolver = getContentResolver();
 			int ct = resolver.delete(deleteOne, null, null);

@@ -17,6 +17,7 @@
 package com.heneryh.aquanotes.ui;
 
 import com.heneryh.aquanotes.R;
+import com.heneryh.aquanotes.service.NightlyService;
 import com.heneryh.aquanotes.service.SyncService;
 import com.heneryh.aquanotes.util.AnalyticsUtils;
 import com.heneryh.aquanotes.util.DetachableResultReceiver;
@@ -71,6 +72,10 @@ public class HomeActivity extends BaseActivity {
 
             triggerRefresh();
         }
+        
+        final Intent intent = new Intent(this, NightlyService.class);
+        startService(intent);
+
     }
 
 

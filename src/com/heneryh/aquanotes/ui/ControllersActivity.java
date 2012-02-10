@@ -16,6 +16,8 @@
 
 package com.heneryh.aquanotes.ui;
 
+import java.sql.Date;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -24,6 +26,7 @@ import java.util.List;
 import com.heneryh.aquanotes.R;
 import com.heneryh.aquanotes.provider.AquaNotesDbContract;
 import com.heneryh.aquanotes.provider.AquaNotesDbContract.Controllers;
+import com.heneryh.aquanotes.provider.AquaNotesDbContract.Data;
 import com.heneryh.aquanotes.provider.AquaNotesDbContract.Outlets;
 import com.heneryh.aquanotes.provider.AquaNotesDbContract.Probes;
 import com.heneryh.aquanotes.provider.ScheduleContract.Sessions;
@@ -102,15 +105,16 @@ public class ControllersActivity extends BaseMultiPaneActivity implements
         FrameLayout probeFragmentContainer;
         FrameLayout outletFragmentContainer;
         
-        private OutletsFragment mOutletsFragment; // was OutletXFragment
+        private OutletsDataFragment mOutletsFragment; // was OutletXFragment
         private ProbesFragment mProbesFragment;
 //        private NotesFragment mNotesFragment;
 
         
         private Integer mControllerId;
         private Uri mControllerUri;
+        private Long mTimestamp;
 
-        private String mTitleString;  // Probes Tab
+        private String mTitleString;  // 
         private TextView mTitleView;// check
         private TextView mSubtitleView;// check
         private String mHashtag;
@@ -189,7 +193,7 @@ public class ControllersActivity extends BaseMultiPaneActivity implements
          * Need at least one tab-view for the next step to continue
          * so put a dummy one in.
          */
-        setupCtlr(new Ctlr(), -1,"Empty1");
+        setupCtlr(new Ctlr(), null);
  
         /**
          * Set the scroll listener for the workspace
@@ -241,7 +245,7 @@ public class ControllersActivity extends BaseMultiPaneActivity implements
          * @param controllerId
          * @param title
          */
-        private void setupCtlr(Ctlr ctlr, int controllerId, String title) {
+        private void setupCtlr(Ctlr ctlr, Cursor cursor) {
 
         	LayoutInflater inflater = getLayoutInflater();
         	
@@ -268,11 +272,20 @@ public class ControllersActivity extends BaseMultiPaneActivity implements
 //        	ctlr.mTabManager = new TabManager(this, ctlr.mTabHost, R.id.realtabcontent);
 //
         	ctlr.index = mCtlrs.size();
-        	ctlr.mControllerId=controllerId;
-        	ctlr.mControllerUri=Controllers.buildUpdateControllerXUri(controllerId);
-        	ctlr.mTitleString=title;
+        	if(cursor!=null) {
+        		ctlr.mControllerId=cursor.getInt(ControllersQuery._ID);
+        		ctlr.mTitleString = cursor.getString(ControllersQuery.TITLE);
+        		ctlr.mTimestamp = cursor.getLong(ControllersQuery.LAST_UPDATED);
+        		ctlr.mControllerUri=Controllers.buildUpdateControllerXUri(ctlr.mControllerId);
+        	} else {
+        		ctlr.mControllerId=-1;
+        		ctlr.mTitleString = "Empty";
+        		ctlr.mTimestamp = (long) 0;
+        		ctlr.mControllerUri=null;
+        	}
 
-        	if(controllerId>=0) {
+        	
+        	if(ctlr.mControllerId>=0) {
         		setupProbesTab(ctlr);
         		setupOutletsTab(ctlr);
 //        		setupNotesTab(ctlr);
@@ -338,7 +351,8 @@ public class ControllersActivity extends BaseMultiPaneActivity implements
 //                            ViewGroup.LayoutParams.FILL_PARENT));
             ((ViewGroup) ctlr.mRootView.findViewById(android.R.id.tabcontent)).addView(ctlr.probeFragmentContainer);
 
-            final Intent intent = new Intent(Intent.ACTION_VIEW, Probes.buildQueryProbesUri(ctlr.mControllerUri));
+//            final Intent intent = new Intent(Intent.ACTION_VIEW, Probes.buildQueryProbesUri(ctlr.mControllerUri));
+            final Intent intent = new Intent(Intent.ACTION_VIEW, Data.buildQueryPDataAtUri(ctlr.mControllerId, ctlr.mTimestamp));
 
             final FragmentManager fm = getSupportFragmentManager();
 
@@ -417,12 +431,19 @@ public class ControllersActivity extends BaseMultiPaneActivity implements
 //                        ViewGroup.LayoutParams.FILL_PARENT));
         ((ViewGroup) ctlr.mRootView.findViewById(android.R.id.tabcontent)).addView(ctlr.outletFragmentContainer);
 
-        final Intent intent = new Intent(Intent.ACTION_VIEW, Outlets.buildQueryOutletsUri(ctlr.mControllerUri));
+        final Intent intent = new Intent(Intent.ACTION_VIEW, Data.buildQueryODataAtUri(ctlr.mControllerId, ctlr.mTimestamp));
+//        final Intent intent = new Intent(Intent.ACTION_VIEW, Data.buildQueryAllOutletDataUri(ctlr.mControllerId));
+        
+        /**
+         * rather than put the time in the extra, just build the uri
+         */
+//        Long timestamp = (long) 0;
+//        intent.putExtra(OutletsDataFragment.EXTRA_NEXT_TYPE,timestamp);
 
         final FragmentManager fm = getSupportFragmentManager();
-        ctlr.mOutletsFragment = (OutletsFragment) fm.findFragmentByTag(tagSpec); // was OutletXFragment
+        ctlr.mOutletsFragment = (OutletsDataFragment) fm.findFragmentByTag(tagSpec); // was OutletXFragment
         if (ctlr.mOutletsFragment == null) {
-        	ctlr.mOutletsFragment = new OutletsFragment(); // was OutletXFragment
+        	ctlr.mOutletsFragment = new OutletsDataFragment(); // was OutletXFragment
         	ctlr.mOutletsFragment.setArguments(intentToFragmentArguments(intent));
             fm.beginTransaction()
                     .add(Rid, ctlr.mOutletsFragment, tagSpec)
@@ -463,7 +484,13 @@ public class ControllersActivity extends BaseMultiPaneActivity implements
             // Header Area
             cntl.mTitleString = cursor.getString(ControllersQuery.TITLE);
             cntl.mSubtitle = cursor.getString(ControllersQuery.WAN_URL);
-            cntl.mTitleView.setText(cntl.mTitleString);
+            cntl.mTimestamp = cursor.getLong(ControllersQuery.LAST_UPDATED);
+
+			Date timestampD = new Date(cntl.mTimestamp);
+			SimpleDateFormat formatter = new SimpleDateFormat("M/d/yy h:mm a");
+			String timestampS = formatter.format(timestampD);
+
+            cntl.mTitleView.setText(timestampS);
             cntl.mSubtitleView.setText(cntl.mSubtitle);
             try {
             	cntl.mControllerId = Integer.valueOf(cursor.getString(ControllersQuery._ID));
@@ -556,7 +583,6 @@ public class ControllersActivity extends BaseMultiPaneActivity implements
         	/** For each controller in the database, */
         	while (cursor.moveToNext()) {
         		final Integer controllerId = cursor.getInt(ControllersQuery._ID);
-        		final String controllerTitle = cursor.getString(ControllersQuery.TITLE);
         		Ctlr thisCtlr;
 
         		// Look for this controller already in the list
@@ -575,14 +601,14 @@ public class ControllersActivity extends BaseMultiPaneActivity implements
         			// If only the stub one is there, reuse it.
         			DeleteCtlr(mCtlrs.get(0));
         			thisCtlr = new Ctlr();
-        			setupCtlr(thisCtlr, controllerId, controllerTitle);
+        			setupCtlr(thisCtlr, cursor);
         		}
         		else 
         			
         		if (index == -1) {
         			// else if it is not found, create a new one
         			thisCtlr = new Ctlr();
-        			setupCtlr(thisCtlr, controllerId, controllerTitle);
+        			setupCtlr(thisCtlr, cursor);
         		}
         		else {
         			// otherwise it must be in there somewhere

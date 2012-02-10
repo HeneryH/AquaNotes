@@ -200,7 +200,7 @@ public class ApexStateXMLParser extends DefaultHandler {
 		try { versionNumber = Float.valueOf(versionSubstring);}
 		catch (NumberFormatException e) {} // need to error checking here.
 		
-		if (versionNumber.compareTo(minVersion)<0) {
+		if (deviceType.equalsIgnoreCase("AC4") && versionNumber.compareTo(minVersion)<0) {
 			// Update the database to tag the fact that the firmware is old and not supported
 			ContentValues values = new ContentValues();
 	        values.clear();
@@ -324,6 +324,7 @@ public class ApexStateXMLParser extends DefaultHandler {
 				values2.put(AquaNotesDbContract.Data.VALUE, currentValue);
 				values2.put(AquaNotesDbContract.Data.TIMESTAMP, timeStamp.getTime());
 				values2.put(AquaNotesDbContract.Data.PARENT_ID, parentRecord);
+				values2.put(AquaNotesDbContract.Data.TYPE, 1);
 				Uri probeUri = Data.buildInsertProbeDataUri(controllerUri, parentRecord);
 				mResolver.insert(probeUri, values2);
 
@@ -334,7 +335,7 @@ public class ApexStateXMLParser extends DefaultHandler {
 			}
 			this.in_probe_tag = false;
 		}else if (localName.equalsIgnoreCase("outlet")) {
-			if(this.in_outlets_tag & this.in_outlet_tag & (currentName!=null) & (currentDeviceID!=null) & (currentState!=null)) {
+			if(this.in_outlets_tag & this.in_outlet_tag & (currentName!=null) &  (currentState!=null)) {
 				/////////////////////////////////
 				// We've got a value which we assume came after a name, so process the name/value pair
 				/////////////////////////////////
@@ -350,7 +351,7 @@ public class ApexStateXMLParser extends DefaultHandler {
 				int controllerId = Integer.parseInt(controllerUri.getPathSegments().get(1));
 
 				try {
-					cursor = mResolver.query(outletByDevIdUri, ProbesQuery.PROJECTION, null, null, null);
+					cursor = mResolver.query(outletByDevIdUri, OutletsQuery.PROJECTION, null, null, null);
 					if (cursor == null || !cursor.moveToFirst()) {
 						Log.d(LOG_TAG, "Outlet query did not return an existing outlet.");	
 						Log.d(LOG_TAG, "Inserting a new one.");	
@@ -372,7 +373,7 @@ public class ApexStateXMLParser extends DefaultHandler {
 						if (cursor != null) {
 							cursor.close();
 						}
-						cursor = mResolver.query(outletByDevIdUri, ProbesQuery.PROJECTION, null, null, null);
+						cursor = mResolver.query(outletByDevIdUri, OutletsQuery.PROJECTION, null, null, null);
 						if (cursor == null || !cursor.moveToFirst()) {
 								// This is a serious error, we just put it in, it must be there.
 						}
@@ -380,8 +381,8 @@ public class ApexStateXMLParser extends DefaultHandler {
 						Log.d(LOG_TAG, "Probe query returned an existing outlet.");	
 					}
 					// grab the probe record #
-					parentRecord = cursor.getInt(ProbesQuery.CONTROLLER_ID);
-					resourceID = cursor.getInt(ProbesQuery.RESOURCE_ID);
+					parentRecord = cursor.getInt(OutletsQuery._ID);
+					resourceID = cursor.getInt(OutletsQuery.RESOURCE_ID);
 					
 					
 				} catch (SQLException e) {
@@ -400,9 +401,10 @@ public class ApexStateXMLParser extends DefaultHandler {
 //				values2.put(ProbeDataColumns.CONTROLLER_ID, controllerId); // redundant but easier without join capability
 //				values2.put(ProbeDataColumns.PROBENAME, currentName); // redundant but easier without join capability
 //				values2.put(ProbeDataColumns.DATUM_TYPE, 1); // 1=probe, 0=outlet
-				values2.put(AquaNotesDbContract.Data.VALUE, currentValue);
+				values2.put(AquaNotesDbContract.Data.VALUE, currentState);
 				values2.put(AquaNotesDbContract.Data.TIMESTAMP, timeStamp.getTime());
 				values2.put(AquaNotesDbContract.Data.PARENT_ID, parentRecord);
+				values2.put(AquaNotesDbContract.Data.TYPE, 0);
 				Uri outletUri = Data.buildInsertOutletDataUri(controllerUri, parentRecord);
 				mResolver.insert(outletUri, values2);
 
@@ -513,7 +515,7 @@ public class ApexStateXMLParser extends DefaultHandler {
         int LAST_UPDATED = 7;
         int UPDATE_INTERVAL = 8;
         int DB_SAVE_DAYS = 9;
-        int CONTROLLER_TYPE = 10;
+        int MODEL = 10;
     }
     
 	private interface ProbesQuery {
@@ -528,6 +530,27 @@ public class ApexStateXMLParser extends DefaultHandler {
                 AquaNotesDbContract.Probes.NAME,
                 AquaNotesDbContract.Probes.RESOURCE_ID,
                 AquaNotesDbContract.Probes.CONTROLLER_ID,
+        };
+        
+        int _ID = 0;
+        int NAME = 1;
+        int RESOURCE_ID = 2;
+        int CONTROLLER_ID = 3;
+    }
+	
+	private interface OutletsQuery {
+        String[] PROJECTION = {
+        	//  String PROBE_ID = "_id";
+        	//  String PROBE_NAME = "probe_name";
+        	//  String DEVICE_ID = "device_id";
+        	//  String TYPE = "probe_type";
+        	//  String RESOURCE_ID = "resource_id";
+        	//  String CONTROLLER_ID = "controller_id";
+                BaseColumns._ID,
+                AquaNotesDbContract.Outlets.NAME,
+                AquaNotesDbContract.Outlets.DEVICE_ID,
+                AquaNotesDbContract.Outlets.RESOURCE_ID,
+                AquaNotesDbContract.Outlets.CONTROLLER_ID,
         };
         
         int _ID = 0;

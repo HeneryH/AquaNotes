@@ -16,14 +16,21 @@
 
 package com.heneryh.aquanotes.ui;
 
+import java.sql.Date;
+import java.text.SimpleDateFormat;
+
 import com.heneryh.aquanotes.R;
 import com.heneryh.aquanotes.provider.AquaNotesDbContract;
 import com.heneryh.aquanotes.provider.ScheduleContract;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Resources;
+import android.database.ContentObserver;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Handler;
 import android.provider.BaseColumns;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,9 +39,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 /**
- * A {@link android.widget.CursorAdapter} that renders a {@link TracksQuery}.
+ * A {@link android.widget.CursorAdapter} that renders a {@link OutletQuery}.
  */
-public class OutletsAdapter extends CursorAdapter {
+public class OutletsDataAdapter extends CursorAdapter {
     private static final int ALL_ITEM_ID = Integer.MAX_VALUE;
 
     private Activity mActivity;
@@ -42,14 +49,16 @@ public class OutletsAdapter extends CursorAdapter {
     private int mPositionDisplacement;
     private boolean mIsSessions = true;
 
-    public OutletsAdapter(Activity activity) {
+    public OutletsDataAdapter(Activity activity) {
         super(activity, null);
         mActivity = activity;
+      mHasAllItem = false;
+      mPositionDisplacement =  0;
     }
 
     public void setHasAllItem(boolean hasAllItem) {
-        mHasAllItem = hasAllItem;
-        mPositionDisplacement = mHasAllItem ? 1 : 0;
+//        mHasAllItem = hasAllItem;
+//        mPositionDisplacement = mHasAllItem ? 1 : 0;
     }
 
     public void setIsSessions(boolean isSessions) {
@@ -131,68 +140,68 @@ public class OutletsAdapter extends CursorAdapter {
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
         final TextView textView = (TextView) view.findViewById(android.R.id.text1);
-        String titleText = cursor.getString(OutletsViewQuery.TITLE) + ": " + cursor.getString(OutletsViewQuery.NAME);
+        String titleText = cursor.getString(OutletDataViewQuery.NAME) + " (" + cursor.getString(OutletDataViewQuery.DEVICE_ID)+ ")";
         textView.setText(titleText);
 
         // Assign track color to visible block
+        String val = cursor.getString(OutletDataViewQuery.VALUE);
         final ImageView iconView = (ImageView) view.findViewById(android.R.id.icon1);
-        iconView.setImageDrawable(new ColorDrawable(1/*cursor.getInt(TracksQuery.TRACK_COLOR)*/));
+        Resources res = mActivity.getResources();
+        if(val.equalsIgnoreCase("ON")) {
+        	iconView.setImageDrawable(res.getDrawable(R.drawable.on));
+        	//iconView = (ImageView) view.findViewById(R.drawable.on);
+        } else if (val.equalsIgnoreCase("AON")) {
+        	iconView.setImageDrawable(res.getDrawable(R.drawable.on));
+        } else if (val.equalsIgnoreCase("AOF")) {
+        	iconView.setImageDrawable(res.getDrawable(R.drawable.off));
+        } else if (val.equalsIgnoreCase("OFF")) {
+        	iconView.setImageDrawable(res.getDrawable(R.drawable.off));
+        } else  {
+        	iconView.setImageDrawable(new ColorDrawable(Color.BLUE));
+       }
     }
-
-    public interface OutletsViewQuery {
-
-        int _TOKEN = 0x1;
         
-        String[] PROJECTION = {
-            	//  String PROBE_ID = "_id";
-            	//  String PROBE_NAME = "probe_name";
-            	//  String DEVICE_ID = "device_id";
-            	//  String TYPE = "probe_type";
-            	//  String RESOURCE_ID = "resource_id";
-            	//  String CONTROLLER_ID = "controller_id";
-                    BaseColumns._ID,
-                    AquaNotesDbContract.OutletsView.NAME,
-                    AquaNotesDbContract.OutletsView.DEVICE_ID,
-                    AquaNotesDbContract.OutletsView.RESOURCE_ID,
-                    AquaNotesDbContract.OutletsView.CONTROLLER_ID,
-//              String CONTROLLER_ID = "_id";
-//              String TITLE = "title";
-//              String WAN_URL = "wan_url";
-//              String LAN_URL = "wifi_url";
-//              String WIFI_SSID = "wifi_ssid";
-//              String USER = "user";
-//              String PW = "pw";
-//              String LAST_UPDATED = "last_updated";
-//              String UPDATE_INTERVAL = "update_i";
-//              String DB_SAVE_DAYS = "db_save_days";
-//              String CONTROLLER_TYPE = "controller_type";
-                AquaNotesDbContract.OutletsView.TITLE,
-                AquaNotesDbContract.OutletsView.WAN_URL,
-                AquaNotesDbContract.OutletsView.LAN_URL,
-                AquaNotesDbContract.OutletsView.WIFI_SSID,
-                AquaNotesDbContract.OutletsView.USER,
-                AquaNotesDbContract.OutletsView.PW,
-                AquaNotesDbContract.OutletsView.LAST_UPDATED,
-                AquaNotesDbContract.OutletsView.UPDATE_INTERVAL,
-                AquaNotesDbContract.OutletsView.DB_SAVE_DAYS,
-                AquaNotesDbContract.OutletsView.MODEL,
-        };
-        int _ID = 0;
-        int NAME = 1;
-        int DEVICE_ID = 2;
-        int RESOURCE_ID = 3;
-        int CONTROLLER_ID = 4;
-        int TITLE = 5;
-        int WAN_URL = 6;
-        int LAN_URL = 7;
-        int WIFI_SSID = 8;
-        int USER = 9;
-        int PW = 10;
-        int LAST_UPDATED = 11;
-        int UPDATE_INTERVAL = 12;
-        int DB_SAVE_DAYS = 13;
-        int MODEL = 14;
-    }
-    
+        
+
+        public interface OutletDataViewQuery {
+
+            int _TOKEN = 0x1;
+            
+            String[] PROJECTION = {
+//                    String _ID = "_id";
+//                    String TYPE = "type";
+//                    String VALUE = "value";
+//                    String TIMESTAMP = "timestamp";
+//                    String PARENT_ID = "parent_id";   	
+//
+//            		//\\
+//            		Join
+//            		\\//
+//                    
+//                    String NAME = "name";
+//                    String DEVICE_ID = "device_id";
+//                    String RESOURCE_ID = "resource_id";
+//                    String CONTROLLER_ID = "controller_id";
+            		BaseColumns._ID,
+            		AquaNotesDbContract.OutletDataView.TYPE,
+            		AquaNotesDbContract.OutletDataView.VALUE,
+            		AquaNotesDbContract.OutletDataView.TIMESTAMP,
+            		AquaNotesDbContract.OutletDataView.PARENT_ID,
+
+            		AquaNotesDbContract.OutletDataView.NAME,
+            		AquaNotesDbContract.OutletDataView.DEVICE_ID,
+            		AquaNotesDbContract.OutletDataView.RESOURCE_ID,
+            		AquaNotesDbContract.OutletDataView.CONTROLLER_ID,
+             };
+            int _ID = 0;
+            int TYPE = 1;
+            int VALUE = 2;
+            int TIMESTAMP = 3;
+            int PARENT_ID = 4;
+            int NAME = 5;
+            int DEVICE_ID = 6;
+            int RESOURCE_ID = 7;
+            int CONTROLLER_ID = 8;
+         }
 
 }

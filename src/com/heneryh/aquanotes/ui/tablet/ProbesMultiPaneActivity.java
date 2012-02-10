@@ -19,7 +19,7 @@ package com.heneryh.aquanotes.ui.tablet;
 import com.heneryh.aquanotes.R;
 import com.heneryh.aquanotes.provider.ScheduleContract;
 import com.heneryh.aquanotes.ui.BaseMultiPaneActivity;
-import com.heneryh.aquanotes.ui.OutletsFragment;
+import com.heneryh.aquanotes.ui.OutletsDataFragment;
 import com.heneryh.aquanotes.ui.ProbesDetailFragment;
 import com.heneryh.aquanotes.ui.ProbesFragment;
 import com.heneryh.aquanotes.ui.phone.ProbesDetailActivity;
@@ -50,7 +50,7 @@ public class ProbesMultiPaneActivity extends BaseMultiPaneActivity {
 
         Intent intent = new Intent();
         intent.setData(ScheduleContract.Tracks.CONTENT_URI);
-//        intent.putExtra(OutletsFragment.EXTRA_NEXT_TYPE, OutletsFragment.NEXT_TYPE_VENDORS);
+//        intent.putExtra(OutletsDataFragment.EXTRA_NEXT_TYPE, OutletsDataFragment.NEXT_TYPE_VENDORS);
 
         final FragmentManager fm = getSupportFragmentManager();
         mTracksDropdownFragment = (OutletsDropdownFragment) fm.findFragmentById(

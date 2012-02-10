@@ -34,12 +34,14 @@ import android.widget.ListView;
 
 /**
  * A simple {@link ListFragment} that renders a list of tracks with available outlets or probes
- * (depending on {@link OutletsFragment#EXTRA_NEXT_TYPE}) using a {@link OutletsAdapter}.
+ * (depending on {@link OutletsDataFragment#EXTRA_NEXT_TYPE}) using a {@link OutletsAdapter}.
  */
-public class OutletsFragment extends ListFragment implements
+public class OutletsDataFragment extends ListFragment implements
         NotifyingAsyncQueryHandler.AsyncQueryListener {
 
-    private OutletsAdapter mAdapter;
+    public static final String EXTRA_NEXT_TYPE = "com.google.android.iosched.extra.NEXT_TYPE";
+
+    private OutletsDataAdapter mAdapter;
     private NotifyingAsyncQueryHandler mHandler;
 
     @Override
@@ -47,13 +49,17 @@ public class OutletsFragment extends ListFragment implements
         super.onCreate(savedInstanceState);
 
         final Intent intent = BaseActivity.fragmentArgumentsToIntent(getArguments());
+        // timestamp in the base uri now
         final Uri outletsUri = intent.getData();
+//        final Long timestamp = intent.getLongExtra(EXTRA_NEXT_TYPE, 0);
 
-        mAdapter = new OutletsAdapter(getActivity());
+
+        mAdapter = new OutletsDataAdapter(getActivity());
+        mAdapter.setHasAllItem(false);
         setListAdapter(mAdapter);
 
         // Filter our tracks query to only include those with valid results
-        String[] projection = OutletsAdapter.OutletsViewQuery.PROJECTION;
+        String[] projection = OutletsDataAdapter.OutletDataViewQuery.PROJECTION;
         String selection = null;
 
         // Start background query to load tracks
@@ -98,6 +104,6 @@ public class OutletsFragment extends ListFragment implements
         final Cursor cursor = (Cursor) mAdapter.getItem(position);
         final String outletId;
 
-            outletId = cursor.getString(OutletsAdapter.OutletsViewQuery._ID);
+            outletId = cursor.getString(OutletsDataAdapter.OutletDataViewQuery._ID);
     }
 }

@@ -69,7 +69,6 @@ public class ProbesFragment extends ListFragment implements
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
 
-//        ViewGroup root = (ViewGroup) inflater.inflate(android.R.layout.list_content, null);
         ViewGroup root = (ViewGroup) inflater.inflate(R.layout.fragment_list_with_spinner, null);
 
         // For some reason, if we omit this, NoSaveStateFrameLayout thinks we are
@@ -89,27 +88,27 @@ public class ProbesFragment extends ListFragment implements
         mCheckedPosition = -1;
         setListAdapter(null);
 
-        mHandler.cancelOperation(ProbesViewQuery._TOKEN);
+        mHandler.cancelOperation(ProbeDataViewQuery._TOKEN);
 
         // Load new arguments
         final Intent intent = BaseActivity.fragmentArgumentsToIntent(arguments);
         final Uri probesUri = intent.getData();
-        final int probeQueryToken;
+        final int probeDataQueryToken;
 
         if (probesUri == null) {
             return;
         }
 
         String[] projection;
-        mAdapter = new ProbesAdapter(getActivity());
-        projection = ProbesViewQuery.PROJECTION;
-        probeQueryToken = ProbesViewQuery._TOKEN;
+        mAdapter = new ProbeDataAdapter(getActivity());
+        projection = ProbeDataViewQuery.PROJECTION;
+        probeDataQueryToken = ProbeDataViewQuery._TOKEN;
 
         setListAdapter(mAdapter);
 
         // Start background query to load vendors
-        mHandler.startQuery(probeQueryToken, null, probesUri, projection, null, null,
-                AquaNotesDbContract.Probes.DEFAULT_SORT);
+        mHandler.startQuery(probeDataQueryToken, null, probesUri, projection, null, null,
+                AquaNotesDbContract.ProbeDataView.DEFAULT_SORT);
     }
 
     @Override
@@ -136,7 +135,7 @@ public class ProbesFragment extends ListFragment implements
             return;
         }
 
-        if (token == ProbesViewQuery._TOKEN) {
+        if (token == ProbeDataViewQuery._TOKEN) {
             onProbesQueryComplete(cursor);
         } else {
             cursor.close();
@@ -167,10 +166,10 @@ public class ProbesFragment extends ListFragment implements
     public void onResume() {
         super.onResume();
         getActivity().getContentResolver().registerContentObserver(
-                ScheduleContract.Vendors.CONTENT_URI, true, mProbeChangesObserver);
-        if (mCursor != null) {
-            mCursor.requery();
-        }
+                AquaNotesDbContract.Controllers.CONTENT_URI, true, mProbeChangesObserver);
+//        if (mCursor != null) {
+//            mCursor.requery();
+//        }
     }
 
     @Override
@@ -209,8 +208,8 @@ public class ProbesFragment extends ListFragment implements
     /**
      * {@link CursorAdapter} that renders a {@link VendorsQuery}.
      */
-    private class ProbesAdapter extends CursorAdapter {
-        public ProbesAdapter(Context context) {
+    private class ProbeDataAdapter extends CursorAdapter {
+        public ProbeDataAdapter(Context context) {
             super(context, null);
         }
 
@@ -225,10 +224,10 @@ public class ProbesFragment extends ListFragment implements
         @Override
         public void bindView(View view, Context context, Cursor cursor) {
             ((TextView) view.findViewById(R.id.probe_name)).setText(
-                    cursor.getString(ProbesViewQuery.TITLE));
+                    cursor.getString(ProbeDataViewQuery.NAME));
 
             ((TextView) view.findViewById(R.id.probe_value)).setText(
-            		cursor.getString(ProbesViewQuery.NAME));
+            		cursor.getString(ProbeDataViewQuery.VALUE));
 
             final boolean starred = false /*cursor.getInt(VendorsQuery.STARRED) != 0*/;
             view.findViewById(R.id.star_button).setVisibility(
@@ -247,59 +246,94 @@ public class ProbesFragment extends ListFragment implements
     };
 
 
-    private interface ProbesViewQuery {
+//    private interface ProbesViewQuery {
+//
+//        int _TOKEN = 0x1;
+//        
+//        String[] PROJECTION = {
+//            	//  String PROBE_ID = "_id";
+//            	//  String PROBE_NAME = "probe_name";
+//            	//  String DEVICE_ID = "device_id";
+//            	//  String TYPE = "probe_type";
+//            	//  String RESOURCE_ID = "resource_id";
+//            	//  String CONTROLLER_ID = "controller_id";
+//                    BaseColumns._ID,
+//                    AquaNotesDbContract.ProbesView.NAME,
+//                    AquaNotesDbContract.ProbesView.RESOURCE_ID,
+//                    AquaNotesDbContract.ProbesView.CONTROLLER_ID,
+////              String CONTROLLER_ID = "_id";
+////              String TITLE = "title";
+////              String WAN_URL = "wan_url";
+////              String LAN_URL = "wifi_url";
+////              String WIFI_SSID = "wifi_ssid";
+////              String USER = "user";
+////              String PW = "pw";
+////              String LAST_UPDATED = "last_updated";
+////              String UPDATE_INTERVAL = "update_i";
+////              String DB_SAVE_DAYS = "db_save_days";
+////              String CONTROLLER_TYPE = "controller_type";
+//                AquaNotesDbContract.ProbesView.TITLE,
+//                AquaNotesDbContract.ProbesView.WAN_URL,
+//                AquaNotesDbContract.ProbesView.LAN_URL,
+//                AquaNotesDbContract.ProbesView.WIFI_SSID,
+//                AquaNotesDbContract.ProbesView.USER,
+//                AquaNotesDbContract.ProbesView.PW,
+//                AquaNotesDbContract.ProbesView.LAST_UPDATED,
+//                AquaNotesDbContract.ProbesView.UPDATE_INTERVAL,
+//                AquaNotesDbContract.ProbesView.DB_SAVE_DAYS,
+//                AquaNotesDbContract.ProbesView.MODEL,
+//        };
+//        int _ID = 0;
+//        int NAME = 1;
+//        int RESOURCE_ID = 2;
+//        int CONTROLLER_ID = 3;
+//        int TITLE = 4;
+//        int WAN_URL = 5;
+//        int LAN_URL = 6;
+//        int WIFI_SSID = 7;
+//        int USER = 8;
+//        int PW = 9;
+//        int LAST_UPDATED = 10;
+//        int UPDATE_INTERVAL = 11;
+//        int DB_SAVE_DAYS = 12;
+//        int MODEL = 13;
+//    }
+    
+    private interface ProbeDataViewQuery {
 
-        int _TOKEN = 0x1;
+        int _TOKEN = 0x2;
         
         String[] PROJECTION = {
-            	//  String PROBE_ID = "_id";
-            	//  String PROBE_NAME = "probe_name";
-            	//  String DEVICE_ID = "device_id";
-            	//  String TYPE = "probe_type";
-            	//  String RESOURCE_ID = "resource_id";
-            	//  String CONTROLLER_ID = "controller_id";
-                    BaseColumns._ID,
-                    AquaNotesDbContract.ProbesView.NAME,
-                    AquaNotesDbContract.ProbesView.RESOURCE_ID,
-                    AquaNotesDbContract.ProbesView.CONTROLLER_ID,
-//              String CONTROLLER_ID = "_id";
-//              String TITLE = "title";
-//              String WAN_URL = "wan_url";
-//              String LAN_URL = "wifi_url";
-//              String WIFI_SSID = "wifi_ssid";
-//              String USER = "user";
-//              String PW = "pw";
-//              String LAST_UPDATED = "last_updated";
-//              String UPDATE_INTERVAL = "update_i";
-//              String DB_SAVE_DAYS = "db_save_days";
-//              String CONTROLLER_TYPE = "controller_type";
-                AquaNotesDbContract.ProbesView.TITLE,
-                AquaNotesDbContract.ProbesView.WAN_URL,
-                AquaNotesDbContract.ProbesView.LAN_URL,
-                AquaNotesDbContract.ProbesView.WIFI_SSID,
-                AquaNotesDbContract.ProbesView.USER,
-                AquaNotesDbContract.ProbesView.PW,
-                AquaNotesDbContract.ProbesView.LAST_UPDATED,
-                AquaNotesDbContract.ProbesView.UPDATE_INTERVAL,
-                AquaNotesDbContract.ProbesView.DB_SAVE_DAYS,
-                AquaNotesDbContract.ProbesView.MODEL,
-        };
-        int _ID = 0;
-        int NAME = 1;
-        int RESOURCE_ID = 2;
-        int CONTROLLER_ID = 3;
-        int TITLE = 4;
-        int WAN_URL = 5;
-        int LAN_URL = 6;
-        int WIFI_SSID = 7;
-        int USER = 8;
-        int PW = 9;
-        int LAST_UPDATED = 10;
-        int UPDATE_INTERVAL = 11;
-        int DB_SAVE_DAYS = 12;
-        int MODEL = 13;
-    }
-    
+//                String _ID = "_id";
+//                String TYPE = "type";
+//                String VALUE = "value";
+//                String TIMESTAMP = "timestamp";
+//                String PARENT_ID = "parent_id";   	
+//
+//        		//\\
+//        		Join
+//        		\\//
+//                String NAME = "name";
+//                String RESOURCE_ID = "resource_id";
+//                String CONTROLLER_ID = "controller_id";
+        		BaseColumns._ID,
+        		AquaNotesDbContract.ProbeDataView.TYPE,
+        		AquaNotesDbContract.ProbeDataView.VALUE,
+        		AquaNotesDbContract.ProbeDataView.TIMESTAMP,
+        		AquaNotesDbContract.ProbeDataView.PARENT_ID,
 
+        		AquaNotesDbContract.ProbeDataView.NAME,
+        		AquaNotesDbContract.ProbeDataView.RESOURCE_ID,
+        		AquaNotesDbContract.ProbeDataView.CONTROLLER_ID,
+         };
+        int _ID = 0;
+        int TYPE = 1;
+        int VALUE = 2;
+        int TIMESTAMP = 3;
+        int PARENT_ID = 4;
+        int NAME = 5;
+        int RESOURCE_ID = 6;
+        int CONTROLLER_ID = 7;
+     }
 
 }

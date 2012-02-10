@@ -48,7 +48,7 @@ public class DBMaintActivity extends BaseMultiPaneActivity {
     private TabHost mTabHost;
     private TabWidget mTabWidget;
 
-    private OutletsFragment mOutletsFragment; // was OutletXFragment
+    private OutletsDataFragment mOutletsFragment; // was OutletXFragment
     private ProbesFragment mProbesFragment;
 
     @Override
@@ -91,9 +91,9 @@ public class DBMaintActivity extends BaseMultiPaneActivity {
         final Intent intent = new Intent(Intent.ACTION_VIEW, Outlets.CONTENT_URI);
 
         final FragmentManager fm = getSupportFragmentManager();
-        mOutletsFragment = (OutletsFragment) fm.findFragmentByTag("outlets"); // was OutletXFragment
+        mOutletsFragment = (OutletsDataFragment) fm.findFragmentByTag("outlets"); // was OutletXFragment
         if (mOutletsFragment == null) {
-        	mOutletsFragment = new OutletsFragment(); // was OutletXFragment
+        	mOutletsFragment = new OutletsDataFragment(); // was OutletXFragment
         	mOutletsFragment.setArguments(intentToFragmentArguments(intent));
             fm.beginTransaction()
                     .add(R.id.fragment_outlets_0, mOutletsFragment, "outlets")

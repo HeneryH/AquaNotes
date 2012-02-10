@@ -156,7 +156,7 @@ public class SyncService extends IntentService {
 		 */
 		dbResolverSyncSrvc = getContentResolver();
 
-        mLocalExecutor = new LocalExecutor(getResources(), dbResolverSyncSrvc);
+//        mLocalExecutor = new LocalExecutor(getResources(), dbResolverSyncSrvc);
 
         /**
 		 * Create the executor for the controller of choice.  Now it is just the apex but I can see using
@@ -275,24 +275,24 @@ public class SyncService extends IntentService {
 				// Bulk of sync work, performed by executing several fetches from
 				// local and online sources.
 
-				final long startLocal = System.currentTimeMillis();
-				final boolean localParse = true;
-				if (localParse) {
-					// Load static local data
-					mLocalExecutor.execute(R.xml.blocks, new LocalBlocksHandler());
-					mLocalExecutor.execute(R.xml.rooms, new LocalRoomsHandler());
-					mLocalExecutor.execute(R.xml.tracks, new LocalTracksHandler());
-					mLocalExecutor.execute(R.xml.search_suggest, new LocalSearchSuggestHandler());
-					mLocalExecutor.execute(R.xml.sessions, new LocalSessionsHandler());
-
-					// Parse values from local cache first, since spreadsheet copy
-					// or network might be down.
-					mLocalExecutor.execute(mSyncServiceContext, "cache-sessions.xml", new RemoteSessionsHandler());
-					mLocalExecutor.execute(mSyncServiceContext, "cache-speakers.xml", new RemoteSpeakersHandler());
-					mLocalExecutor.execute(mSyncServiceContext, "cache-vendors.xml", new RemoteVendorsHandler());
-
-				} // end of localParse
-				Log.d(TAG, "local sync took " + (System.currentTimeMillis() - startLocal) + "ms");
+//				final long startLocal = System.currentTimeMillis();
+//				final boolean localParse = true;
+//				if (localParse) {
+//					// Load static local data
+//					mLocalExecutor.execute(R.xml.blocks, new LocalBlocksHandler());
+//					mLocalExecutor.execute(R.xml.rooms, new LocalRoomsHandler());
+//					mLocalExecutor.execute(R.xml.tracks, new LocalTracksHandler());
+//					mLocalExecutor.execute(R.xml.search_suggest, new LocalSearchSuggestHandler());
+//					mLocalExecutor.execute(R.xml.sessions, new LocalSessionsHandler());
+//
+//					// Parse values from local cache first, since spreadsheet copy
+//					// or network might be down.
+//					mLocalExecutor.execute(mSyncServiceContext, "cache-sessions.xml", new RemoteSessionsHandler());
+//					mLocalExecutor.execute(mSyncServiceContext, "cache-speakers.xml", new RemoteSpeakersHandler());
+//					mLocalExecutor.execute(mSyncServiceContext, "cache-vendors.xml", new RemoteVendorsHandler());
+//
+//				} // end of localParse
+//				Log.d(TAG, "local sync took " + (System.currentTimeMillis() - startLocal) + "ms");
 
 				// Always hit remote spreadsheet for any updates
 				final long startRemote = System.currentTimeMillis();

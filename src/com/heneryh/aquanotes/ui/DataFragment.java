@@ -93,7 +93,8 @@ public class DataFragment extends ListFragment implements
         mCheckedPosition = -1;
         setListAdapter(null);
 
-        mHandler.cancelOperation(ProbeDataViewQuery._TOKEN);
+//        mHandler.cancelOperation(ProbeDataViewQuery._TOKEN);
+        mHandler.cancelOperation(OutletDataViewQuery._TOKEN);
 
         // Load new arguments
         final Intent intent = BaseActivity.fragmentArgumentsToIntent(arguments);
@@ -106,8 +107,8 @@ public class DataFragment extends ListFragment implements
 
         String[] projection;
         mAdapter = new ProbeDataAdapter(getActivity());
-        projection = ProbeDataViewQuery.PROJECTION;
-        probeQueryToken = ProbeDataViewQuery._TOKEN;
+        projection = OutletDataViewQuery.PROJECTION;
+        probeQueryToken = OutletDataViewQuery._TOKEN;
 
         setListAdapter(mAdapter);
 
@@ -294,6 +295,44 @@ public class DataFragment extends ListFragment implements
         int CONTROLLER_ID = 7;
      }
     
+    public interface OutletDataViewQuery {
 
+        int _TOKEN = 0x2;
+        
+        String[] PROJECTION = {
+//                String _ID = "_id";
+//                String TYPE = "type";
+//                String VALUE = "value";
+//                String TIMESTAMP = "timestamp";
+//                String PARENT_ID = "parent_id";   	
+//
+//        		//\\
+//        		Join
+//        		\\//
+//                
+//                String NAME = "name";
+//                String DEVICE_ID = "device_id";
+//                String RESOURCE_ID = "resource_id";
+//                String CONTROLLER_ID = "controller_id";
+        		BaseColumns._ID,
+        		AquaNotesDbContract.OutletDataView.TYPE,
+        		AquaNotesDbContract.OutletDataView.VALUE,
+        		AquaNotesDbContract.OutletDataView.TIMESTAMP,
+        		AquaNotesDbContract.OutletDataView.PARENT_ID,
 
+        		AquaNotesDbContract.OutletDataView.NAME,
+        		AquaNotesDbContract.OutletDataView.DEVICE_ID,
+        		AquaNotesDbContract.OutletDataView.RESOURCE_ID,
+        		AquaNotesDbContract.OutletDataView.CONTROLLER_ID,
+         };
+        int _ID = 0;
+        int TYPE = 1;
+        int VALUE = 2;
+        int TIMESTAMP = 3;
+        int PARENT_ID = 4;
+        int NAME = 5;
+        int DEVICE_ID = 6;
+        int RESOURCE_ID = 7;
+        int CONTROLLER_ID = 8;
+     }
 }

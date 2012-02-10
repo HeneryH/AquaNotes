@@ -61,21 +61,21 @@ public class DashboardFragment extends Fragment {
 //            
 //        });
 
-        root.findViewById(R.id.home_btn_outlets).setOnClickListener(new View.OnClickListener() {
-            public void onClick(View view) {
-                fireTrackerEvent("Sessions");
-                // Launch sessions list
-                if (UIUtils.isHoneycombTablet(getActivity())) {
-                    startActivity(new Intent(getActivity(), OutletsMultiPaneActivity.class));
-                } else {
-                    final Intent intent = new Intent(Intent.ACTION_VIEW,
-                            AquaNotesDbContract.Outlets.CONTENT_URI);
-                    intent.putExtra(Intent.EXTRA_TITLE, getString(R.string.title_outlets_tracks));
-                    startActivity(intent);
-                }
-
-            }
-        });
+//        root.findViewById(R.id.home_btn_outlets).setOnClickListener(new View.OnClickListener() {
+//            public void onClick(View view) {
+//                fireTrackerEvent("Sessions");
+//                // Launch sessions list
+//                if (UIUtils.isHoneycombTablet(getActivity())) {
+//                    startActivity(new Intent(getActivity(), OutletsMultiPaneActivity.class));
+//                } else {
+//                    final Intent intent = new Intent(Intent.ACTION_VIEW,
+//                            AquaNotesDbContract.Outlets.CONTENT_URI);
+//                    intent.putExtra(Intent.EXTRA_TITLE, getString(R.string.title_outlets_tracks));
+//                    startActivity(intent);
+//                }
+//
+//            }
+//        });
 
         root.findViewById(R.id.home_btn_controllers).setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
@@ -85,39 +85,39 @@ public class DashboardFragment extends Fragment {
             }
         });
 
-        root.findViewById(R.id.home_btn_probes).setOnClickListener(new View.OnClickListener() {
-            public void onClick(View view) {
-                fireTrackerEvent("Sandbox");
-                // Launch vendors list
-                if (UIUtils.isHoneycombTablet(getActivity())) {
-                    startActivity(new Intent(getActivity(), ProbesMultiPaneActivity.class));
-                } else {
-                    final Intent intent = new Intent(Intent.ACTION_VIEW,
-                            AquaNotesDbContract.Probes.CONTENT_URI);
-//                    intent.putExtra(Intent.EXTRA_TITLE, getString(R.string.title_probes_tracks));
-//                    intent.putExtra(OutletsFragment.EXTRA_NEXT_TYPE,
-//                            OutletsFragment.NEXT_TYPE_VENDORS);
-                    startActivity(intent);
-                }
-            }
-        });
+//        root.findViewById(R.id.home_btn_probes).setOnClickListener(new View.OnClickListener() {
+//            public void onClick(View view) {
+//                fireTrackerEvent("Sandbox");
+//                // Launch vendors list
+//                if (UIUtils.isHoneycombTablet(getActivity())) {
+//                    startActivity(new Intent(getActivity(), ProbesMultiPaneActivity.class));
+//                } else {
+//                    final Intent intent = new Intent(Intent.ACTION_VIEW,
+//                            AquaNotesDbContract.Probes.CONTENT_URI);
+////                    intent.putExtra(Intent.EXTRA_TITLE, getString(R.string.title_probes_tracks));
+////                    intent.putExtra(OutletsDataFragment.EXTRA_NEXT_TYPE,
+////                            OutletsDataFragment.NEXT_TYPE_VENDORS);
+//                    startActivity(intent);
+//                }
+//            }
+//        });
 
-        root.findViewById(R.id.home_btn_data).setOnClickListener(new View.OnClickListener() {
-            public void onClick(View view) {
-                // Launch map of conference venue
-                fireTrackerEvent("Map");
-                if (UIUtils.isHoneycombTablet(getActivity())) {
-                    startActivity(new Intent(getActivity(), ProbesMultiPaneActivity.class));
-                } else {
-                    final Intent intent = new Intent(Intent.ACTION_VIEW,
-                            AquaNotesDbContract.ProbeDataView.CONTENT_P_URI);
-//                    intent.putExtra(Intent.EXTRA_TITLE, getString(R.string.title_probes_tracks));
-//                    intent.putExtra(OutletsFragment.EXTRA_NEXT_TYPE,
-//                            OutletsFragment.NEXT_TYPE_VENDORS);
-                    startActivity(intent);
-                }
-            }
-        });
+//        root.findViewById(R.id.home_btn_data).setOnClickListener(new View.OnClickListener() {
+//            public void onClick(View view) {
+//                // Launch map of conference venue
+//                fireTrackerEvent("Map");
+//                if (UIUtils.isHoneycombTablet(getActivity())) {
+//                    startActivity(new Intent(getActivity(), ProbesMultiPaneActivity.class));
+//                } else {
+//                    final Intent intent = new Intent(Intent.ACTION_VIEW,
+//                            AquaNotesDbContract.OutletDataView.CONTENT_O_URI);
+////                    intent.putExtra(Intent.EXTRA_TITLE, getString(R.string.title_probes_tracks));
+////                    intent.putExtra(OutletsDataFragment.EXTRA_NEXT_TYPE,
+////                            OutletsDataFragment.NEXT_TYPE_VENDORS);
+//                    startActivity(intent);
+//                }
+//            }
+//        });
 
         root.findViewById(R.id.home_btn_prefs).setOnClickListener(
                 new View.OnClickListener() {

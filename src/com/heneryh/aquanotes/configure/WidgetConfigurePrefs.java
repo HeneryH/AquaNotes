@@ -303,9 +303,9 @@ public class WidgetConfigurePrefs extends Activity implements View.OnClickListen
 			// Grab the values, note that they are all strings regardless of 
 			// the format they will be stored in the database.
 			String title = mTitle.getText().toString();
-			String url = mWanUrl.getText().toString().toLowerCase();
-			String wiFiUrl = mLanUrl.getText().toString().toLowerCase();
-			String wiFiSid = mWiFiSid.getText().toString().toLowerCase();
+			String url = mWanUrl.getText().toString();
+			String wiFiUrl = mLanUrl.getText().toString();
+			String wiFiSid = mWiFiSid.getText().toString();
 			String user = mUser.getText().toString();
 			String pword = mPassword.getText().toString();
 			String updIntervalMins = mUpdateIntervalMins.getText().toString();

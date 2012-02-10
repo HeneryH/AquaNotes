@@ -17,8 +17,8 @@
 <manifest
     xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.heneryh.aquanotes"
-    android:versionCode="14"
-    android:versionName="0.14"
+    android:versionCode="20"
+    android:versionName="0.20"
     android:installLocation="auto">
 
     <uses-sdk
@@ -70,22 +70,8 @@
             android:name=".ui.ControllersActivity"
             android:label="@string/title_controllers" />
 
-        <activity
-            android:name=".ui.SearchActivity"
-            android:label="@string/title_search"
-            android:launchMode="singleTop">
-            <intent-filter>
-                <action android:name="android.intent.action.SEARCH" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-            <meta-data android:name="android.app.searchable" android:resource="@xml/searchable" />
-        </activity>
 
         <!-- Phone-only activities -->
-
-        <activity
-            android:name=".ui.phone.ScheduleActivity"
-            android:label="@string/title_schedule" />
 
         <activity
             android:name=".ui.phone.ProbesActivity"
@@ -145,10 +131,6 @@
             </intent-filter>
         </activity>
 
-        <activity
-            android:name=".ui.phone.MapActivity"
-            android:label="@string/title_map"
-            android:configChanges="orientation|keyboardHidden" />
 
         <!-- Tablet-only activities -->
 
@@ -188,6 +170,7 @@
             <intent-filter >
             </intent-filter>
         </activity>
+        
         <activity
             android:label="@string/title_configure"
             android:launchMode="singleTop"
@@ -204,15 +187,6 @@
         <provider
             android:name=".provider.AquaNotesDbProvider"
             android:authorities="com.heneryh.aquanotes" />
-
-        <meta-data
-            android:name="android.app.default_searchable"
-            android:value=".ui.SearchActivity" />
-
-        <provider
-            android:name="com.heneryh.aquanotes.provider.ScheduleProvider"
-            android:authorities="com.heneryh.aquanotes"
-            android:writePermission="com.heneryh.aquanotes.permission.WRITE_SCHEDULE" />
 
     </application>
 </manifest>

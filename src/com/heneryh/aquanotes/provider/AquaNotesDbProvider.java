@@ -18,8 +18,10 @@ package com.heneryh.aquanotes.provider;
 
 import com.heneryh.aquanotes.provider.AquaNotesDbContract.Blocks;
 import com.heneryh.aquanotes.provider.AquaNotesDbContract.Controllers;
+import com.heneryh.aquanotes.provider.AquaNotesDbContract.OutletDataView;
 import com.heneryh.aquanotes.provider.AquaNotesDbContract.Outlets;
 import com.heneryh.aquanotes.provider.AquaNotesDbContract.Data;
+import com.heneryh.aquanotes.provider.AquaNotesDbContract.ProbeDataView;
 import com.heneryh.aquanotes.provider.AquaNotesDbContract.Probes;
 import com.heneryh.aquanotes.provider.AquaNotesDbContract.Rooms;
 import com.heneryh.aquanotes.provider.AquaNotesDbContract.SearchSuggest;
@@ -77,64 +79,66 @@ public class AquaNotesDbProvider extends ContentProvider {
 	 *  URI IDs to be used in the switch () statements
 	 *  notice two possible switch statements for the same twig depending on if something follows
 	 */
-	private static final int CONTROLLERS = 901;
-	private static final int CONTROLLERS_ID = 902;
-	private static final int CONTROLLERS_URL = 903;
-	private static final int CONTROLLERS_WID = 922;
+	private static final int CONTROLLERS = 501;
+	private static final int CONTROLLERS_ID = 502;
+	private static final int CONTROLLERS_URL = 503;
+	private static final int CONTROLLERS_WID = 504;
 
-	private static final int PROBES = 904;
-	private static final int CONTROLLERS_ID_PROBES = 905;
-	private static final int CONTROLLERS_ID_PROBES_ID = 906;
-	private static final int CONTROLLERS_ID_PROBES_NAME = 907;
+	private static final int PROBES = 601;
+	private static final int CONTROLLERS_ID_PROBES = 602;
+	private static final int CONTROLLERS_ID_PROBES_ID = 603;
+	private static final int CONTROLLERS_ID_PROBES_NAME = 604;
 	
-	private static final int OUTLETS = 908;
-	private static final int CONTROLLERS_ID_OUTLETS = 909;
-	private static final int CONTROLLERS_ID_OUTLETS_ID = 910;
-	private static final int CONTROLLERS_ID_OUTLETS_DEVICE_ID = 911;
-	private static final int CONTROLLERS_ID_OUTLETS_RSC = 912; 
+	private static final int OUTLETS = 701;
+	private static final int CONTROLLERS_ID_OUTLETS = 702;
+	private static final int CONTROLLERS_ID_OUTLETS_ID = 703;
+	private static final int CONTROLLERS_ID_OUTLETS_DEVICE_ID = 704;
+	private static final int CONTROLLERS_ID_OUTLETS_RSC = 705; 
 
-	private static final int DATA = 913; 
-	private static final int PDATA = 920; 
-	private static final int ODATA = 921; 
-	private static final int CONTROLLERS_ID_PROBEDATA_AT = 914; 
-	private static final int CONTROLLERS_ID_PROBEDATA_FOR_ID = 915; 
-	private static final int CONTROLLERS_ID_PROBEDATA_FOR_NAME = 916; 
-	private static final int CONTROLLERS_ID_OUTLETDATA_AT = 917; 
-	private static final int CONTROLLERS_ID_OUTLETDATA_FOR_ID = 918; 
-	private static final int CONTROLLERS_ID_OUTLETDATA_FOR_DEVICE_ID = 919; 
+	private static final int DATA = 801; 
+	private static final int PDATA = 802; 
+	private static final int ODATA = 803; 
+	private static final int CONTROLLERS_ID_PROBEDATA = 804; 
+	private static final int CONTROLLERS_ID_PROBEDATA_AT = 805; 
+	private static final int CONTROLLERS_ID_PROBEDATA_FOR_ID = 806; 
+	private static final int CONTROLLERS_ID_PROBEDATA_FOR_NAME = 807; 
+	private static final int CONTROLLERS_ID_OUTLETDATA = 808; 
+	private static final int CONTROLLERS_ID_OUTLETDATA_AT = 809; 
+	private static final int CONTROLLERS_ID_OUTLETDATA_FOR_ID = 810; 
+	private static final int CONTROLLERS_ID_OUTLETDATA_FOR_DEVICE_ID = 811; 
     
-    private static final int BLOCKS = 100;
-    private static final int BLOCKS_BETWEEN = 101;
-    private static final int BLOCKS_ID = 102;
-    private static final int BLOCKS_ID_SESSIONS = 103;
-
-    private static final int TRACKS = 200;
-    private static final int TRACKS_ID = 201;
-    private static final int TRACKS_ID_SESSIONS = 202;
-    private static final int TRACKS_ID_VENDORS = 203;
-
-    private static final int ROOMS = 300;
-    private static final int ROOMS_ID = 301;
-    private static final int ROOMS_ID_SESSIONS = 302;
-
-    private static final int SESSIONS = 400;
-    private static final int SESSIONS_STARRED = 401;
-    private static final int SESSIONS_SEARCH = 402;
-    private static final int SESSIONS_AT = 403;
-    private static final int SESSIONS_ID = 404;
-    private static final int SESSIONS_ID_SPEAKERS = 405;
-    private static final int SESSIONS_ID_TRACKS = 406;
-
-    private static final int SPEAKERS = 500;
-    private static final int SPEAKERS_ID = 501;
-    private static final int SPEAKERS_ID_SESSIONS = 502;
-
-    private static final int VENDORS = 600;
-    private static final int VENDORS_STARRED = 601;
-    private static final int VENDORS_SEARCH = 603;
-    private static final int VENDORS_ID = 604;
-
-    private static final int SEARCH_SUGGEST = 800;
+//    private static final int BLOCKS = 100;
+//    private static final int BLOCKS_BETWEEN = 101;
+//    private static final int BLOCKS_ID = 102;
+//    private static final int BLOCKS_ID_SESSIONS = 103;
+//
+//    private static final int TRACKS = 200;
+//    private static final int TRACKS_ID = 201;
+//    private static final int TRACKS_ID_SESSIONS = 202;
+//    private static final int TRACKS_ID_VENDORS = 203;
+//
+//    private static final int ROOMS = 300;
+//    private static final int ROOMS_ID = 301;
+//    private static final int ROOMS_ID_SESSIONS = 302;
+//
+//    private static final int SESSIONS = 400;
+//    private static final int SESSIONS_STARRED = 401;
+//    private static final int SESSIONS_SEARCH = 402;
+//    private static final int SESSIONS_AT = 403;
+//    private static final int SESSIONS_ID = 404;
+//    private static final int SESSIONS_ID_SPEAKERS = 405;
+//    private static final int SESSIONS_ID_TRACKS = 406;
+//
+//    private static final int SPEAKERS = 500;
+//    private static final int SPEAKERS_ID = 501;
+//    private static final int SPEAKERS_ID_SESSIONS = 502;
+//
+//    private static final int VENDORS = 600;
+//    private static final int VENDORS_STARRED = 601;
+//    private static final int VENDORS_SEARCH = 603;
+//    private static final int VENDORS_ID = 604;
+//
+//    private static final int SEARCH_SUGGEST = 800;
 
     private static final String MIME_XML = "text/xml";
 
@@ -328,39 +332,53 @@ public class AquaNotesDbProvider extends ContentProvider {
 		// update = N/A
 		// delete = N/A
 		// getType = ?  
-		
-		matcher.addURI(authority, "blocks", BLOCKS);
-        matcher.addURI(authority, "blocks/between/*/*", BLOCKS_BETWEEN);
-        matcher.addURI(authority, "blocks/*", BLOCKS_ID);
-        matcher.addURI(authority, "blocks/*/sessions", BLOCKS_ID_SESSIONS);
 
-        matcher.addURI(authority, "tracks", TRACKS);
-        matcher.addURI(authority, "tracks/*", TRACKS_ID);
-        matcher.addURI(authority, "tracks/*/sessions", TRACKS_ID_SESSIONS);
-        matcher.addURI(authority, "tracks/*/vendors", TRACKS_ID_VENDORS);
+		matcher.addURI(authority, "controllers/#/odata/", CONTROLLERS_ID_OUTLETDATA);
+		// query = return all the outlet data records for a given controller.
+		// insert = N/A
+		// update = N/A
+		// delete = N/A
+		// getType = ?  
 
-        matcher.addURI(authority, "rooms", ROOMS);
-        matcher.addURI(authority, "rooms/*", ROOMS_ID);
-        matcher.addURI(authority, "rooms/*/sessions", ROOMS_ID_SESSIONS);
+		matcher.addURI(authority, "controllers/#/pdata/", CONTROLLERS_ID_PROBEDATA);
+		// query = return all the outlet data records for a given controller.
+		// insert = N/A
+		// update = N/A
+		// delete = N/A
+		// getType = ?  
 
-        matcher.addURI(authority, "sessions", SESSIONS);
-        matcher.addURI(authority, "sessions/starred", SESSIONS_STARRED);
-        matcher.addURI(authority, "sessions/search/*", SESSIONS_SEARCH);
-        matcher.addURI(authority, "sessions/at/*", SESSIONS_AT);
-        matcher.addURI(authority, "sessions/*", SESSIONS_ID);
-        matcher.addURI(authority, "sessions/*/speakers", SESSIONS_ID_SPEAKERS);
-        matcher.addURI(authority, "sessions/*/tracks", SESSIONS_ID_TRACKS);
-
-        matcher.addURI(authority, "speakers", SPEAKERS);
-        matcher.addURI(authority, "speakers/*", SPEAKERS_ID);
-        matcher.addURI(authority, "speakers/*/sessions", SPEAKERS_ID_SESSIONS);
-
-        matcher.addURI(authority, "vendors", VENDORS);
-        matcher.addURI(authority, "vendors/starred", VENDORS_STARRED);
-        matcher.addURI(authority, "vendors/search/*", VENDORS_SEARCH);
-        matcher.addURI(authority, "vendors/*", VENDORS_ID);
-
-        matcher.addURI(authority, "search_suggest_query", SEARCH_SUGGEST);
+//		matcher.addURI(authority, "blocks", BLOCKS);
+//        matcher.addURI(authority, "blocks/between/*/*", BLOCKS_BETWEEN);
+//        matcher.addURI(authority, "blocks/*", BLOCKS_ID);
+//        matcher.addURI(authority, "blocks/*/sessions", BLOCKS_ID_SESSIONS);
+//
+//        matcher.addURI(authority, "tracks", TRACKS);
+//        matcher.addURI(authority, "tracks/*", TRACKS_ID);
+//        matcher.addURI(authority, "tracks/*/sessions", TRACKS_ID_SESSIONS);
+//        matcher.addURI(authority, "tracks/*/vendors", TRACKS_ID_VENDORS);
+//
+//        matcher.addURI(authority, "rooms", ROOMS);
+//        matcher.addURI(authority, "rooms/*", ROOMS_ID);
+//        matcher.addURI(authority, "rooms/*/sessions", ROOMS_ID_SESSIONS);
+//
+//        matcher.addURI(authority, "sessions", SESSIONS);
+//        matcher.addURI(authority, "sessions/starred", SESSIONS_STARRED);
+//        matcher.addURI(authority, "sessions/search/*", SESSIONS_SEARCH);
+//        matcher.addURI(authority, "sessions/at/*", SESSIONS_AT);
+//        matcher.addURI(authority, "sessions/*", SESSIONS_ID);
+//        matcher.addURI(authority, "sessions/*/speakers", SESSIONS_ID_SPEAKERS);
+//        matcher.addURI(authority, "sessions/*/tracks", SESSIONS_ID_TRACKS);
+//
+//        matcher.addURI(authority, "speakers", SPEAKERS);
+//        matcher.addURI(authority, "speakers/*", SPEAKERS_ID);
+//        matcher.addURI(authority, "speakers/*/sessions", SPEAKERS_ID_SESSIONS);
+//
+//        matcher.addURI(authority, "vendors", VENDORS);
+//        matcher.addURI(authority, "vendors/starred", VENDORS_STARRED);
+//        matcher.addURI(authority, "vendors/search/*", VENDORS_SEARCH);
+//        matcher.addURI(authority, "vendors/*", VENDORS_ID);
+//
+//        matcher.addURI(authority, "search_suggest_query", SEARCH_SUGGEST);
 
         return matcher;
     }
@@ -475,58 +493,64 @@ public class AquaNotesDbProvider extends ContentProvider {
         	
         case CONTROLLERS_ID_OUTLETDATA_FOR_DEVICE_ID:
         	return Data.CONTENT_TYPE;
+
+        case CONTROLLERS_ID_OUTLETDATA:
+        	return Data.CONTENT_TYPE;
+
+        case CONTROLLERS_ID_PROBEDATA:
+        	return Data.CONTENT_TYPE;
+
         	
-        	
-            case BLOCKS:
-                return Blocks.CONTENT_TYPE;
-            case BLOCKS_BETWEEN:
-                return Blocks.CONTENT_TYPE;
-            case BLOCKS_ID:
-                return Blocks.CONTENT_ITEM_TYPE;
-            case BLOCKS_ID_SESSIONS:
-                return Sessions.CONTENT_TYPE;
-            case TRACKS:
-                return Tracks.CONTENT_TYPE;
-            case TRACKS_ID:
-                return Tracks.CONTENT_ITEM_TYPE;
-            case TRACKS_ID_SESSIONS:
-                return Sessions.CONTENT_TYPE;
-            case TRACKS_ID_VENDORS:
-                return Vendors.CONTENT_TYPE;
-            case ROOMS:
-                return Rooms.CONTENT_TYPE;
-            case ROOMS_ID:
-                return Rooms.CONTENT_ITEM_TYPE;
-            case ROOMS_ID_SESSIONS:
-                return Sessions.CONTENT_TYPE;
-            case SESSIONS:
-                return Sessions.CONTENT_TYPE;
-            case SESSIONS_STARRED:
-                return Sessions.CONTENT_TYPE;
-            case SESSIONS_SEARCH:
-                return Sessions.CONTENT_TYPE;
-            case SESSIONS_AT:
-                return Sessions.CONTENT_TYPE;
-            case SESSIONS_ID:
-                return Sessions.CONTENT_ITEM_TYPE;
-            case SESSIONS_ID_SPEAKERS:
-                return Speakers.CONTENT_TYPE;
-            case SESSIONS_ID_TRACKS:
-                return Tracks.CONTENT_TYPE;
-            case SPEAKERS:
-                return Speakers.CONTENT_TYPE;
-            case SPEAKERS_ID:
-                return Speakers.CONTENT_ITEM_TYPE;
-            case SPEAKERS_ID_SESSIONS:
-                return Sessions.CONTENT_TYPE;
-            case VENDORS:
-                return Vendors.CONTENT_TYPE;
-            case VENDORS_STARRED:
-                return Vendors.CONTENT_TYPE;
-            case VENDORS_SEARCH:
-                return Vendors.CONTENT_TYPE;
-            case VENDORS_ID:
-                return Vendors.CONTENT_ITEM_TYPE;
+//            case BLOCKS:
+//                return Blocks.CONTENT_TYPE;
+//            case BLOCKS_BETWEEN:
+//                return Blocks.CONTENT_TYPE;
+//            case BLOCKS_ID:
+//                return Blocks.CONTENT_ITEM_TYPE;
+//            case BLOCKS_ID_SESSIONS:
+//                return Sessions.CONTENT_TYPE;
+//            case TRACKS:
+//                return Tracks.CONTENT_TYPE;
+//            case TRACKS_ID:
+//                return Tracks.CONTENT_ITEM_TYPE;
+//            case TRACKS_ID_SESSIONS:
+//                return Sessions.CONTENT_TYPE;
+//            case TRACKS_ID_VENDORS:
+//                return Vendors.CONTENT_TYPE;
+//            case ROOMS:
+//                return Rooms.CONTENT_TYPE;
+//            case ROOMS_ID:
+//                return Rooms.CONTENT_ITEM_TYPE;
+//            case ROOMS_ID_SESSIONS:
+//                return Sessions.CONTENT_TYPE;
+//            case SESSIONS:
+//                return Sessions.CONTENT_TYPE;
+//            case SESSIONS_STARRED:
+//                return Sessions.CONTENT_TYPE;
+//            case SESSIONS_SEARCH:
+//                return Sessions.CONTENT_TYPE;
+//            case SESSIONS_AT:
+//                return Sessions.CONTENT_TYPE;
+//            case SESSIONS_ID:
+//                return Sessions.CONTENT_ITEM_TYPE;
+//            case SESSIONS_ID_SPEAKERS:
+//                return Speakers.CONTENT_TYPE;
+//            case SESSIONS_ID_TRACKS:
+//                return Tracks.CONTENT_TYPE;
+//            case SPEAKERS:
+//                return Speakers.CONTENT_TYPE;
+//            case SPEAKERS_ID:
+//                return Speakers.CONTENT_ITEM_TYPE;
+//            case SPEAKERS_ID_SESSIONS:
+//                return Sessions.CONTENT_TYPE;
+//            case VENDORS:
+//                return Vendors.CONTENT_TYPE;
+//            case VENDORS_STARRED:
+//                return Vendors.CONTENT_TYPE;
+//            case VENDORS_SEARCH:
+//                return Vendors.CONTENT_TYPE;
+//            case VENDORS_ID:
+//                return Vendors.CONTENT_ITEM_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -615,22 +639,22 @@ public class AquaNotesDbProvider extends ContentProvider {
         	final SelectionBuilder builder = buildExpandedSelection(uri, match);
         	return builder.where(selection, selectionArgs).query(db, projection, sortOrder);
         }
-        case SEARCH_SUGGEST: {
-        	final SelectionBuilder builder = new SelectionBuilder();
-
-        	// Adjust incoming query to become SQL text match
-        	selectionArgs[0] = selectionArgs[0] + "%";
-        	builder.table(Tables.SEARCH_SUGGEST);
-        	builder.where(selection, selectionArgs);
-        	builder.map(SearchManager.SUGGEST_COLUMN_QUERY,
-        			SearchManager.SUGGEST_COLUMN_TEXT_1);
-
-        	projection = new String[] { BaseColumns._ID, SearchManager.SUGGEST_COLUMN_TEXT_1,
-        			SearchManager.SUGGEST_COLUMN_QUERY };
-
-        	final String limit = uri.getQueryParameter(SearchManager.SUGGEST_PARAMETER_LIMIT);
-        	return builder.query(db, projection, null, null, SearchSuggest.DEFAULT_SORT, limit);
-        }
+//        case SEARCH_SUGGEST: {
+//        	final SelectionBuilder builder = new SelectionBuilder();
+//
+//        	// Adjust incoming query to become SQL text match
+//        	selectionArgs[0] = selectionArgs[0] + "%";
+//        	builder.table(Tables.SEARCH_SUGGEST);
+//        	builder.where(selection, selectionArgs);
+//        	builder.map(SearchManager.SUGGEST_COLUMN_QUERY,
+//        			SearchManager.SUGGEST_COLUMN_TEXT_1);
+//
+//        	projection = new String[] { BaseColumns._ID, SearchManager.SUGGEST_COLUMN_TEXT_1,
+//        			SearchManager.SUGGEST_COLUMN_QUERY };
+//
+//        	final String limit = uri.getQueryParameter(SearchManager.SUGGEST_PARAMETER_LIMIT);
+//        	return builder.query(db, projection, null, null, SearchSuggest.DEFAULT_SORT, limit);
+//        }
         }
     }
 
@@ -679,51 +703,51 @@ public class AquaNotesDbProvider extends ContentProvider {
             return ContentUris.withAppendedId(uri, rowId);
 		}
 
-            case BLOCKS: {
-                db.insertOrThrow(Tables.BLOCKS, null, values);
-                getContext().getContentResolver().notifyChange(uri, null);
-                return Blocks.buildBlockUri(values.getAsString(Blocks.BLOCK_ID));
-            }
-            case TRACKS: {
-                db.insertOrThrow(Tables.TRACKS, null, values);
-                getContext().getContentResolver().notifyChange(uri, null);
-                return Tracks.buildTrackUri(values.getAsString(Tracks.TRACK_ID));
-            }
-            case ROOMS: {
-                db.insertOrThrow(Tables.ROOMS, null, values);
-                getContext().getContentResolver().notifyChange(uri, null);
-                return Rooms.buildRoomUri(values.getAsString(Rooms.ROOM_ID));
-            }
-            case SESSIONS: {
-                db.insertOrThrow(Tables.SESSIONS, null, values);
-                getContext().getContentResolver().notifyChange(uri, null);
-                return Sessions.buildSessionUri(values.getAsString(Sessions.SESSION_ID));
-            }
-            case SESSIONS_ID_SPEAKERS: {
-                db.insertOrThrow(Tables.SESSIONS_SPEAKERS, null, values);
-                getContext().getContentResolver().notifyChange(uri, null);
-                return Speakers.buildSpeakerUri(values.getAsString(SessionsSpeakers.SPEAKER_ID));
-            }
-            case SESSIONS_ID_TRACKS: {
-                db.insertOrThrow(Tables.SESSIONS_TRACKS, null, values);
-                getContext().getContentResolver().notifyChange(uri, null);
-                return Tracks.buildTrackUri(values.getAsString(SessionsTracks.TRACK_ID));
-            }
-            case SPEAKERS: {
-                db.insertOrThrow(Tables.SPEAKERS, null, values);
-                getContext().getContentResolver().notifyChange(uri, null);
-                return Speakers.buildSpeakerUri(values.getAsString(Speakers.SPEAKER_ID));
-            }
-            case VENDORS: {
-                db.insertOrThrow(Tables.VENDORS, null, values);
-                getContext().getContentResolver().notifyChange(uri, null);
-                return Vendors.buildVendorUri(values.getAsString(Vendors.VENDOR_ID));
-            }
-            case SEARCH_SUGGEST: {
-                db.insertOrThrow(Tables.SEARCH_SUGGEST, null, values);
-                getContext().getContentResolver().notifyChange(uri, null);
-                return SearchSuggest.CONTENT_URI;
-            }
+//            case BLOCKS: {
+//                db.insertOrThrow(Tables.BLOCKS, null, values);
+//                getContext().getContentResolver().notifyChange(uri, null);
+//                return Blocks.buildBlockUri(values.getAsString(Blocks.BLOCK_ID));
+//            }
+//            case TRACKS: {
+//                db.insertOrThrow(Tables.TRACKS, null, values);
+//                getContext().getContentResolver().notifyChange(uri, null);
+//                return Tracks.buildTrackUri(values.getAsString(Tracks.TRACK_ID));
+//            }
+//            case ROOMS: {
+//                db.insertOrThrow(Tables.ROOMS, null, values);
+//                getContext().getContentResolver().notifyChange(uri, null);
+//                return Rooms.buildRoomUri(values.getAsString(Rooms.ROOM_ID));
+//            }
+//            case SESSIONS: {
+//                db.insertOrThrow(Tables.SESSIONS, null, values);
+//                getContext().getContentResolver().notifyChange(uri, null);
+//                return Sessions.buildSessionUri(values.getAsString(Sessions.SESSION_ID));
+//            }
+//            case SESSIONS_ID_SPEAKERS: {
+//                db.insertOrThrow(Tables.SESSIONS_SPEAKERS, null, values);
+//                getContext().getContentResolver().notifyChange(uri, null);
+//                return Speakers.buildSpeakerUri(values.getAsString(SessionsSpeakers.SPEAKER_ID));
+//            }
+//            case SESSIONS_ID_TRACKS: {
+//                db.insertOrThrow(Tables.SESSIONS_TRACKS, null, values);
+//                getContext().getContentResolver().notifyChange(uri, null);
+//                return Tracks.buildTrackUri(values.getAsString(SessionsTracks.TRACK_ID));
+//            }
+//            case SPEAKERS: {
+//                db.insertOrThrow(Tables.SPEAKERS, null, values);
+//                getContext().getContentResolver().notifyChange(uri, null);
+//                return Speakers.buildSpeakerUri(values.getAsString(Speakers.SPEAKER_ID));
+//            }
+//            case VENDORS: {
+//                db.insertOrThrow(Tables.VENDORS, null, values);
+//                getContext().getContentResolver().notifyChange(uri, null);
+//                return Vendors.buildVendorUri(values.getAsString(Vendors.VENDOR_ID));
+//            }
+//            case SEARCH_SUGGEST: {
+//                db.insertOrThrow(Tables.SEARCH_SUGGEST, null, values);
+//                getContext().getContentResolver().notifyChange(uri, null);
+//                return SearchSuggest.CONTENT_URI;
+//            }
             default: {
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
             }
@@ -763,8 +787,8 @@ public class AquaNotesDbProvider extends ContentProvider {
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         
 		int count = 0;
-//
-//		switch (sUriMatcher.match(uri)) {
+
+		switch (sUriMatcher.match(uri)) {
 //		case CONTROLLERS: {
 //			//count = db.delete(TABLE_CONTROLLERS, selection, selectionArgs);
 //			break;
@@ -796,36 +820,36 @@ public class AquaNotesDbProvider extends ContentProvider {
 ////					new String[]{controllerId});
 //			break;
 //		}
-//		case CONTROLLERS_ID_PROBEDATA_AT: {
-//			// Delete all the probe data older than x (in days)
-//			String controllerId = uri.getPathSegments().get(1);
-//			long ageDays = Long.parseLong(uri.getPathSegments().get(3));
-//			long now = System.currentTimeMillis();
-//			String cutoff = Long.toString(now- (ageDays*DateUtils.DAY_IN_MILLIS));
-//			count += db.delete(Tables.DATA, 
-////					Data.CONTROLLER_ID + "= ? and " +
-//							Data.TYPE + "= ? and " +
-//							Data.TIMESTAMP + "< ?", 
-//							new String[]{/*controllerId,*/ "1", cutoff});
-//			break;
-//		}
-//		case CONTROLLERS_ID_OUTLETDATA_AT: {
-//			// Delete all the probe data older than x
-//			String controllerId = uri.getPathSegments().get(1);
-//			long age = Long.parseLong(uri.getPathSegments().get(3));
-//			long now = System.currentTimeMillis();
-//			String cutoff = Long.toString(now-age);
-//			count += db.delete(Tables.DATA, 
-////					ProbeDataColumns.CONTROLLER_ID + "= ?  and " +
-//							Data.TYPE + "= ? and " +
-//							Data.TIMESTAMP + "< ?",
-//							new String[]{/*controllerId,*/ "0", cutoff});
-//			break;
-//		}
-//		default:
+		case CONTROLLERS_ID_PROBEDATA_AT: {
+			// Delete all the probe data older than x (in days)
+			String controllerId = uri.getPathSegments().get(1);
+			long ageDays = Long.parseLong(uri.getPathSegments().get(3));
+			long now = System.currentTimeMillis();
+			String cutoff = Long.toString(now- (ageDays*DateUtils.DAY_IN_MILLIS));
+			count += db.delete(Tables.DATA, 
+//					Data.CONTROLLER_ID + "= ? and " +
+							Data.TYPE + "= ? and " +
+							Data.TIMESTAMP + "< ?", 
+							new String[]{/*controllerId,*/ "1", cutoff});
+			break;
+		}
+		case CONTROLLERS_ID_OUTLETDATA_AT: {
+			// Delete all the probe data older than x
+			String controllerId = uri.getPathSegments().get(1);
+			long age = Long.parseLong(uri.getPathSegments().get(3));
+			long now = System.currentTimeMillis();
+			String cutoff = Long.toString(now-age);
+			count += db.delete(Tables.DATA, 
+//					ProbeDataColumns.CONTROLLER_ID + "= ?  and " +
+							Data.TYPE + "= ? and " +
+							Data.TIMESTAMP + "< ?",
+							new String[]{/*controllerId,*/ "0", cutoff});
+			break;
+		}
+		default:
 	        final SelectionBuilder builder = buildSimpleSelection(uri);
 	        count = builder.where(selection, selectionArgs).delete(db);
-//		}
+		}
 //
 //		
 //		
@@ -884,68 +908,68 @@ public class AquaNotesDbProvider extends ContentProvider {
     		/** TODO: I sure hope this is escaped! */
             return builder.table(Tables.CONTROLLERS)
                     .where(Controllers.WIDGET + "=?", controllerWID);
-        }
-        case BLOCKS: {
-            return builder.table(Tables.BLOCKS);
-        }
-            case BLOCKS_ID: {
-                final String blockId = Blocks.getBlockId(uri);
-                return builder.table(Tables.BLOCKS)
-                        .where(Blocks.BLOCK_ID + "=?", blockId);
-            }
-            case TRACKS: {
-                return builder.table(Tables.TRACKS);
-            }
-            case TRACKS_ID: {
-                final String trackId = Tracks.getTrackId(uri);
-                return builder.table(Tables.TRACKS)
-                        .where(Tracks.TRACK_ID + "=?", trackId);
-            }
-            case ROOMS: {
-                return builder.table(Tables.ROOMS);
-            }
-            case ROOMS_ID: {
-                final String roomId = Rooms.getRoomId(uri);
-                return builder.table(Tables.ROOMS)
-                        .where(Rooms.ROOM_ID + "=?", roomId);
-            }
-            case SESSIONS: {
-                return builder.table(Tables.SESSIONS);
-            }
-            case SESSIONS_ID: {
-                final String sessionId = Sessions.getSessionId(uri);
-                return builder.table(Tables.SESSIONS)
-                        .where(Sessions.SESSION_ID + "=?", sessionId);
-            }
-            case SESSIONS_ID_SPEAKERS: {
-                final String sessionId = Sessions.getSessionId(uri);
-                return builder.table(Tables.SESSIONS_SPEAKERS)
-                        .where(Sessions.SESSION_ID + "=?", sessionId);
-            }
-            case SESSIONS_ID_TRACKS: {
-                final String sessionId = Sessions.getSessionId(uri);
-                return builder.table(Tables.SESSIONS_TRACKS)
-                        .where(Sessions.SESSION_ID + "=?", sessionId);
-            }
-            case SPEAKERS: {
-                return builder.table(Tables.SPEAKERS);
-            }
-            case SPEAKERS_ID: {
-                final String speakerId = Speakers.getSpeakerId(uri);
-                return builder.table(Tables.SPEAKERS)
-                        .where(Speakers.SPEAKER_ID + "=?", speakerId);
-            }
-            case VENDORS: {
-                return builder.table(Tables.VENDORS);
-            }
-            case VENDORS_ID: {
-                final String vendorId = Vendors.getVendorId(uri);
-                return builder.table(Tables.VENDORS)
-                        .where(Vendors.VENDOR_ID + "=?", vendorId);
-            }
-            case SEARCH_SUGGEST: {
-                return builder.table(Tables.SEARCH_SUGGEST);
-            }
+        } 
+//        case BLOCKS: {
+//            return builder.table(Tables.BLOCKS);
+//        }
+//            case BLOCKS_ID: {
+//                final String blockId = Blocks.getBlockId(uri);
+//                return builder.table(Tables.BLOCKS)
+//                        .where(Blocks.BLOCK_ID + "=?", blockId);
+//            }
+//            case TRACKS: {
+//                return builder.table(Tables.TRACKS);
+//            }
+//            case TRACKS_ID: {
+//                final String trackId = Tracks.getTrackId(uri);
+//                return builder.table(Tables.TRACKS)
+//                        .where(Tracks.TRACK_ID + "=?", trackId);
+//            }
+//            case ROOMS: {
+//                return builder.table(Tables.ROOMS);
+//            }
+//            case ROOMS_ID: {
+//                final String roomId = Rooms.getRoomId(uri);
+//                return builder.table(Tables.ROOMS)
+//                        .where(Rooms.ROOM_ID + "=?", roomId);
+//            }
+//            case SESSIONS: {
+//                return builder.table(Tables.SESSIONS);
+//            }
+//            case SESSIONS_ID: {
+//                final String sessionId = Sessions.getSessionId(uri);
+//                return builder.table(Tables.SESSIONS)
+//                        .where(Sessions.SESSION_ID + "=?", sessionId);
+//            }
+//            case SESSIONS_ID_SPEAKERS: {
+//                final String sessionId = Sessions.getSessionId(uri);
+//                return builder.table(Tables.SESSIONS_SPEAKERS)
+//                        .where(Sessions.SESSION_ID + "=?", sessionId);
+//            }
+//            case SESSIONS_ID_TRACKS: {
+//                final String sessionId = Sessions.getSessionId(uri);
+//                return builder.table(Tables.SESSIONS_TRACKS)
+//                        .where(Sessions.SESSION_ID + "=?", sessionId);
+//            }
+//            case SPEAKERS: {
+//                return builder.table(Tables.SPEAKERS);
+//            }
+//            case SPEAKERS_ID: {
+//                final String speakerId = Speakers.getSpeakerId(uri);
+//                return builder.table(Tables.SPEAKERS)
+//                        .where(Speakers.SPEAKER_ID + "=?", speakerId);
+//            }
+//            case VENDORS: {
+//                return builder.table(Tables.VENDORS);
+//            }
+//            case VENDORS_ID: {
+//                final String vendorId = Vendors.getVendorId(uri);
+//                return builder.table(Tables.VENDORS)
+//                        .where(Vendors.VENDOR_ID + "=?", vendorId);
+//            }
+//            case SEARCH_SUGGEST: {
+//                return builder.table(Tables.SEARCH_SUGGEST);
+//            }
             default: {
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
             }
@@ -960,8 +984,6 @@ public class AquaNotesDbProvider extends ContentProvider {
     private SelectionBuilder buildExpandedSelection(Uri uri, int match) {
         final SelectionBuilder builder = new SelectionBuilder();
         switch (match) {
-
-//        // I just don't get this yet, I have a view for the join anyway...
    
         case CONTROLLERS: {
             return builder.table(Tables.CONTROLLERS);
@@ -1032,179 +1054,213 @@ public class AquaNotesDbProvider extends ContentProvider {
 			.where(Data.TYPE + "=?", "0");
         }
       
+		case CONTROLLERS_ID_PROBEDATA: {
+			// Delete all the probe data older than x (in days)
+			String controllerId = uri.getPathSegments().get(1);
+//			String timestamp = uri.getPathSegments().get(3);
+        	return builder.table(Tables.PDATA_VIEW)
+        			.where(ProbeDataView.TYPE + "=?", "1")
+        			.where(ProbeDataView.CONTROLLER_ID + "=?", controllerId);
+		}
+		case CONTROLLERS_ID_OUTLETDATA: {
+			// Delete all the probe data older than x (in days)
+			String controllerId = uri.getPathSegments().get(1);
+//			String timestamp = uri.getPathSegments().get(3);
+        	return builder.table(Tables.ODATA_VIEW)
+        			.where(OutletDataView.TYPE + "=?", "0")
+        			.where(OutletDataView.CONTROLLER_ID + "=?", controllerId);
+		}
+		case CONTROLLERS_ID_PROBEDATA_AT: {
+			// Delete all the probe data older than x (in days)
+			String controllerId = uri.getPathSegments().get(1);
+			String timestamp = uri.getPathSegments().get(3);
+        	return builder.table(Tables.PDATA_VIEW)
+        			.where(ProbeDataView.TYPE + "=?", "1")
+        			.where(ProbeDataView.CONTROLLER_ID + "=?", controllerId)
+        			.where(ProbeDataView.TIMESTAMP + "=?", timestamp);
+		}
+		case CONTROLLERS_ID_OUTLETDATA_AT: {
+			// Delete all the probe data older than x (in days)
+			String controllerId = uri.getPathSegments().get(1);
+			String timestamp = uri.getPathSegments().get(3);
+        	return builder.table(Tables.ODATA_VIEW)
+        			.where(OutletDataView.TYPE + "=?", "0")
+        			.where(OutletDataView.CONTROLLER_ID + "=?", controllerId)
+        			.where(OutletDataView.TIMESTAMP + "=?", timestamp);
+		}
 
-        case BLOCKS: {
-                return builder.table(Tables.BLOCKS);
-            }
-            case BLOCKS_BETWEEN: {
-                final List<String> segments = uri.getPathSegments();
-                final String startTime = segments.get(2);
-                final String endTime = segments.get(3);
-                return builder.table(Tables.BLOCKS)
-                        .map(Blocks.SESSIONS_COUNT, Subquery.BLOCK_SESSIONS_COUNT)
-                        .map(Blocks.CONTAINS_STARRED, Subquery.BLOCK_CONTAINS_STARRED)
-                        .where(Blocks.BLOCK_START + ">=?", startTime)
-                        .where(Blocks.BLOCK_START + "<=?", endTime);
-            }
-            case BLOCKS_ID: {
-                final String blockId = Blocks.getBlockId(uri);
-                return builder.table(Tables.BLOCKS)
-                        .map(Blocks.SESSIONS_COUNT, Subquery.BLOCK_SESSIONS_COUNT)
-                        .map(Blocks.CONTAINS_STARRED, Subquery.BLOCK_CONTAINS_STARRED)
-                        .where(Blocks.BLOCK_ID + "=?", blockId);
-            }
-            case BLOCKS_ID_SESSIONS: {
-                final String blockId = Blocks.getBlockId(uri);
-                return builder.table(Tables.SESSIONS_JOIN_BLOCKS_ROOMS)
-                        .map(Blocks.SESSIONS_COUNT, Subquery.BLOCK_SESSIONS_COUNT)
-                        .map(Blocks.CONTAINS_STARRED, Subquery.BLOCK_CONTAINS_STARRED)
-                        .mapToTable(Sessions._ID, Tables.SESSIONS)
-                        .mapToTable(Sessions.SESSION_ID, Tables.SESSIONS)
-                        .mapToTable(Sessions.BLOCK_ID, Tables.SESSIONS)
-                        .mapToTable(Sessions.ROOM_ID, Tables.SESSIONS)
-                        .where(Qualified.SESSIONS_BLOCK_ID + "=?", blockId);
-            }
-            case TRACKS: {
-                return builder.table(Tables.TRACKS)
-                        .map(Tracks.SESSIONS_COUNT, Subquery.TRACK_SESSIONS_COUNT)
-                        .map(Tracks.VENDORS_COUNT, Subquery.TRACK_VENDORS_COUNT);
-            }
-            case TRACKS_ID: {
-                final String trackId = Tracks.getTrackId(uri);
-                return builder.table(Tables.TRACKS)
-                        .where(Tracks.TRACK_ID + "=?", trackId);
-            }
-            case TRACKS_ID_SESSIONS: {
-                final String trackId = Tracks.getTrackId(uri);
-                return builder.table(Tables.SESSIONS_TRACKS_JOIN_SESSIONS_BLOCKS_ROOMS)
-                        .mapToTable(Sessions._ID, Tables.SESSIONS)
-                        .mapToTable(Sessions.SESSION_ID, Tables.SESSIONS)
-                        .mapToTable(Sessions.BLOCK_ID, Tables.SESSIONS)
-                        .mapToTable(Sessions.ROOM_ID, Tables.SESSIONS)
-                        .where(Qualified.SESSIONS_TRACKS_TRACK_ID + "=?", trackId);
-            }
-            case TRACKS_ID_VENDORS: {
-                final String trackId = Tracks.getTrackId(uri);
-                return builder.table(Tables.VENDORS_JOIN_TRACKS)
-                        .mapToTable(Vendors._ID, Tables.VENDORS)
-                        .mapToTable(Vendors.TRACK_ID, Tables.VENDORS)
-                        .where(Qualified.VENDORS_TRACK_ID + "=?", trackId);
-            }
-            case ROOMS: {
-                return builder.table(Tables.ROOMS);
-            }
-            case ROOMS_ID: {
-                final String roomId = Rooms.getRoomId(uri);
-                return builder.table(Tables.ROOMS)
-                        .where(Rooms.ROOM_ID + "=?", roomId);
-            }
-            case ROOMS_ID_SESSIONS: {
-                final String roomId = Rooms.getRoomId(uri);
-                return builder.table(Tables.SESSIONS_JOIN_BLOCKS_ROOMS)
-                        .mapToTable(Sessions._ID, Tables.SESSIONS)
-                        .mapToTable(Sessions.BLOCK_ID, Tables.SESSIONS)
-                        .mapToTable(Sessions.ROOM_ID, Tables.SESSIONS)
-                        .where(Qualified.SESSIONS_ROOM_ID + "=?", roomId);
-            }
-            case SESSIONS: {
-                return builder.table(Tables.SESSIONS_JOIN_BLOCKS_ROOMS)
-                        .mapToTable(Sessions._ID, Tables.SESSIONS)
-                        .mapToTable(Sessions.BLOCK_ID, Tables.SESSIONS)
-                        .mapToTable(Sessions.ROOM_ID, Tables.SESSIONS);
-            }
-            case SESSIONS_STARRED: {
-                return builder.table(Tables.SESSIONS_JOIN_BLOCKS_ROOMS)
-                        .mapToTable(Sessions._ID, Tables.SESSIONS)
-                        .mapToTable(Sessions.BLOCK_ID, Tables.SESSIONS)
-                        .mapToTable(Sessions.ROOM_ID, Tables.SESSIONS)
-                        .where(Sessions.SESSION_STARRED + "=1");
-            }
-            case SESSIONS_SEARCH: {
-                final String query = Sessions.getSearchQuery(uri);
-                return builder.table(Tables.SESSIONS_SEARCH_JOIN_SESSIONS_BLOCKS_ROOMS)
-                        .map(Sessions.SEARCH_SNIPPET, Subquery.SESSIONS_SNIPPET)
-                        .mapToTable(Sessions._ID, Tables.SESSIONS)
-                        .mapToTable(Sessions.SESSION_ID, Tables.SESSIONS)
-                        .mapToTable(Sessions.BLOCK_ID, Tables.SESSIONS)
-                        .mapToTable(Sessions.ROOM_ID, Tables.SESSIONS)
-                        .where(SessionsSearchColumns.BODY + " MATCH ?", query);
-            }
-            case SESSIONS_AT: {
-                final List<String> segments = uri.getPathSegments();
-                final String time = segments.get(2);
-                return builder.table(Tables.SESSIONS_JOIN_BLOCKS_ROOMS)
-                        .mapToTable(Sessions._ID, Tables.SESSIONS)
-                        .mapToTable(Sessions.BLOCK_ID, Tables.SESSIONS)
-                        .mapToTable(Sessions.ROOM_ID, Tables.SESSIONS)
-                        .where(Sessions.BLOCK_START + "<=?", time)
-                        .where(Sessions.BLOCK_END + ">=?", time);
-            }
-            case SESSIONS_ID: {
-                final String sessionId = Sessions.getSessionId(uri);
-                return builder.table(Tables.SESSIONS_JOIN_BLOCKS_ROOMS)
-                        .mapToTable(Sessions._ID, Tables.SESSIONS)
-                        .mapToTable(Sessions.BLOCK_ID, Tables.SESSIONS)
-                        .mapToTable(Sessions.ROOM_ID, Tables.SESSIONS)
-                        .where(Qualified.SESSIONS_SESSION_ID + "=?", sessionId);
-            }
-            case SESSIONS_ID_SPEAKERS: {
-                final String sessionId = Sessions.getSessionId(uri);
-                return builder.table(Tables.SESSIONS_SPEAKERS_JOIN_SPEAKERS)
-                        .mapToTable(Speakers._ID, Tables.SPEAKERS)
-                        .mapToTable(Speakers.SPEAKER_ID, Tables.SPEAKERS)
-                        .where(Qualified.SESSIONS_SPEAKERS_SESSION_ID + "=?", sessionId);
-            }
-            case SESSIONS_ID_TRACKS: {
-                final String sessionId = Sessions.getSessionId(uri);
-                return builder.table(Tables.SESSIONS_TRACKS_JOIN_TRACKS)
-                        .mapToTable(Tracks._ID, Tables.TRACKS)
-                        .mapToTable(Tracks.TRACK_ID, Tables.TRACKS)
-                        .where(Qualified.SESSIONS_TRACKS_SESSION_ID + "=?", sessionId);
-            }
-            case SPEAKERS: {
-                return builder.table(Tables.SPEAKERS);
-            }
-            case SPEAKERS_ID: {
-                final String speakerId = Speakers.getSpeakerId(uri);
-                return builder.table(Tables.SPEAKERS)
-                        .where(Speakers.SPEAKER_ID + "=?", speakerId);
-            }
-            case SPEAKERS_ID_SESSIONS: {
-                final String speakerId = Speakers.getSpeakerId(uri);
-                return builder.table(Tables.SESSIONS_SPEAKERS_JOIN_SESSIONS_BLOCKS_ROOMS)
-                        .mapToTable(Sessions._ID, Tables.SESSIONS)
-                        .mapToTable(Sessions.SESSION_ID, Tables.SESSIONS)
-                        .mapToTable(Sessions.BLOCK_ID, Tables.SESSIONS)
-                        .mapToTable(Sessions.ROOM_ID, Tables.SESSIONS)
-                        .where(Qualified.SESSIONS_SPEAKERS_SPEAKER_ID + "=?", speakerId);
-            }
-            case VENDORS: {
-                return builder.table(Tables.VENDORS_JOIN_TRACKS)
-                        .mapToTable(Vendors._ID, Tables.VENDORS)
-                        .mapToTable(Vendors.TRACK_ID, Tables.VENDORS);
-            }
-            case VENDORS_STARRED: {
-                return builder.table(Tables.VENDORS_JOIN_TRACKS)
-                        .mapToTable(Vendors._ID, Tables.VENDORS)
-                        .mapToTable(Vendors.TRACK_ID, Tables.VENDORS)
-                        .where(Vendors.VENDOR_STARRED + "=1");
-            }
-            case VENDORS_SEARCH: {
-                final String query = Vendors.getSearchQuery(uri);
-                return builder.table(Tables.VENDORS_SEARCH_JOIN_VENDORS_TRACKS)
-                        .map(Vendors.SEARCH_SNIPPET, Subquery.VENDORS_SNIPPET)
-                        .mapToTable(Vendors._ID, Tables.VENDORS)
-                        .mapToTable(Vendors.VENDOR_ID, Tables.VENDORS)
-                        .mapToTable(Vendors.TRACK_ID, Tables.VENDORS)
-                        .where(VendorsSearchColumns.BODY + " MATCH ?", query);
-            }
-            case VENDORS_ID: {
-                final String vendorId = Vendors.getVendorId(uri);
-                return builder.table(Tables.VENDORS_JOIN_TRACKS)
-                        .mapToTable(Vendors._ID, Tables.VENDORS)
-                        .mapToTable(Vendors.TRACK_ID, Tables.VENDORS)
-                        .where(Vendors.VENDOR_ID + "=?", vendorId);
-            }
+//        case BLOCKS: {
+//                return builder.table(Tables.BLOCKS);
+//            }
+//            case BLOCKS_BETWEEN: {
+//                final List<String> segments = uri.getPathSegments();
+//                final String startTime = segments.get(2);
+//                final String endTime = segments.get(3);
+//                return builder.table(Tables.BLOCKS)
+//                        .map(Blocks.SESSIONS_COUNT, Subquery.BLOCK_SESSIONS_COUNT)
+//                        .map(Blocks.CONTAINS_STARRED, Subquery.BLOCK_CONTAINS_STARRED)
+//                        .where(Blocks.BLOCK_START + ">=?", startTime)
+//                        .where(Blocks.BLOCK_START + "<=?", endTime);
+//            }
+//            case BLOCKS_ID: {
+//                final String blockId = Blocks.getBlockId(uri);
+//                return builder.table(Tables.BLOCKS)
+//                        .map(Blocks.SESSIONS_COUNT, Subquery.BLOCK_SESSIONS_COUNT)
+//                        .map(Blocks.CONTAINS_STARRED, Subquery.BLOCK_CONTAINS_STARRED)
+//                        .where(Blocks.BLOCK_ID + "=?", blockId);
+//            }
+//            case BLOCKS_ID_SESSIONS: {
+//                final String blockId = Blocks.getBlockId(uri);
+//                return builder.table(Tables.SESSIONS_JOIN_BLOCKS_ROOMS)
+//                        .map(Blocks.SESSIONS_COUNT, Subquery.BLOCK_SESSIONS_COUNT)
+//                        .map(Blocks.CONTAINS_STARRED, Subquery.BLOCK_CONTAINS_STARRED)
+//                        .mapToTable(Sessions._ID, Tables.SESSIONS)
+//                        .mapToTable(Sessions.SESSION_ID, Tables.SESSIONS)
+//                        .mapToTable(Sessions.BLOCK_ID, Tables.SESSIONS)
+//                        .mapToTable(Sessions.ROOM_ID, Tables.SESSIONS)
+//                        .where(Qualified.SESSIONS_BLOCK_ID + "=?", blockId);
+//            }
+//            case TRACKS: {
+//                return builder.table(Tables.TRACKS)
+//                        .map(Tracks.SESSIONS_COUNT, Subquery.TRACK_SESSIONS_COUNT)
+//                        .map(Tracks.VENDORS_COUNT, Subquery.TRACK_VENDORS_COUNT);
+//            }
+//            case TRACKS_ID: {
+//                final String trackId = Tracks.getTrackId(uri);
+//                return builder.table(Tables.TRACKS)
+//                        .where(Tracks.TRACK_ID + "=?", trackId);
+//            }
+//            case TRACKS_ID_SESSIONS: {
+//                final String trackId = Tracks.getTrackId(uri);
+//                return builder.table(Tables.SESSIONS_TRACKS_JOIN_SESSIONS_BLOCKS_ROOMS)
+//                        .mapToTable(Sessions._ID, Tables.SESSIONS)
+//                        .mapToTable(Sessions.SESSION_ID, Tables.SESSIONS)
+//                        .mapToTable(Sessions.BLOCK_ID, Tables.SESSIONS)
+//                        .mapToTable(Sessions.ROOM_ID, Tables.SESSIONS)
+//                        .where(Qualified.SESSIONS_TRACKS_TRACK_ID + "=?", trackId);
+//            }
+//            case TRACKS_ID_VENDORS: {
+//                final String trackId = Tracks.getTrackId(uri);
+//                return builder.table(Tables.VENDORS_JOIN_TRACKS)
+//                        .mapToTable(Vendors._ID, Tables.VENDORS)
+//                        .mapToTable(Vendors.TRACK_ID, Tables.VENDORS)
+//                        .where(Qualified.VENDORS_TRACK_ID + "=?", trackId);
+//            }
+//            case ROOMS: {
+//                return builder.table(Tables.ROOMS);
+//            }
+//            case ROOMS_ID: {
+//                final String roomId = Rooms.getRoomId(uri);
+//                return builder.table(Tables.ROOMS)
+//                        .where(Rooms.ROOM_ID + "=?", roomId);
+//            }
+//            case ROOMS_ID_SESSIONS: {
+//                final String roomId = Rooms.getRoomId(uri);
+//                return builder.table(Tables.SESSIONS_JOIN_BLOCKS_ROOMS)
+//                        .mapToTable(Sessions._ID, Tables.SESSIONS)
+//                        .mapToTable(Sessions.BLOCK_ID, Tables.SESSIONS)
+//                        .mapToTable(Sessions.ROOM_ID, Tables.SESSIONS)
+//                        .where(Qualified.SESSIONS_ROOM_ID + "=?", roomId);
+//            }
+//            case SESSIONS: {
+//                return builder.table(Tables.SESSIONS_JOIN_BLOCKS_ROOMS)
+//                        .mapToTable(Sessions._ID, Tables.SESSIONS)
+//                        .mapToTable(Sessions.BLOCK_ID, Tables.SESSIONS)
+//                        .mapToTable(Sessions.ROOM_ID, Tables.SESSIONS);
+//            }
+//            case SESSIONS_STARRED: {
+//                return builder.table(Tables.SESSIONS_JOIN_BLOCKS_ROOMS)
+//                        .mapToTable(Sessions._ID, Tables.SESSIONS)
+//                        .mapToTable(Sessions.BLOCK_ID, Tables.SESSIONS)
+//                        .mapToTable(Sessions.ROOM_ID, Tables.SESSIONS)
+//                        .where(Sessions.SESSION_STARRED + "=1");
+//            }
+//            case SESSIONS_SEARCH: {
+//                final String query = Sessions.getSearchQuery(uri);
+//                return builder.table(Tables.SESSIONS_SEARCH_JOIN_SESSIONS_BLOCKS_ROOMS)
+//                        .map(Sessions.SEARCH_SNIPPET, Subquery.SESSIONS_SNIPPET)
+//                        .mapToTable(Sessions._ID, Tables.SESSIONS)
+//                        .mapToTable(Sessions.SESSION_ID, Tables.SESSIONS)
+//                        .mapToTable(Sessions.BLOCK_ID, Tables.SESSIONS)
+//                        .mapToTable(Sessions.ROOM_ID, Tables.SESSIONS)
+//                        .where(SessionsSearchColumns.BODY + " MATCH ?", query);
+//            }
+//            case SESSIONS_AT: {
+//                final List<String> segments = uri.getPathSegments();
+//                final String time = segments.get(2);
+//                return builder.table(Tables.SESSIONS_JOIN_BLOCKS_ROOMS)
+//                        .mapToTable(Sessions._ID, Tables.SESSIONS)
+//                        .mapToTable(Sessions.BLOCK_ID, Tables.SESSIONS)
+//                        .mapToTable(Sessions.ROOM_ID, Tables.SESSIONS)
+//                        .where(Sessions.BLOCK_START + "<=?", time)
+//                        .where(Sessions.BLOCK_END + ">=?", time);
+//            }
+//            case SESSIONS_ID: {
+//                final String sessionId = Sessions.getSessionId(uri);
+//                return builder.table(Tables.SESSIONS_JOIN_BLOCKS_ROOMS)
+//                        .mapToTable(Sessions._ID, Tables.SESSIONS)
+//                        .mapToTable(Sessions.BLOCK_ID, Tables.SESSIONS)
+//                        .mapToTable(Sessions.ROOM_ID, Tables.SESSIONS)
+//                        .where(Qualified.SESSIONS_SESSION_ID + "=?", sessionId);
+//            }
+//            case SESSIONS_ID_SPEAKERS: {
+//                final String sessionId = Sessions.getSessionId(uri);
+//                return builder.table(Tables.SESSIONS_SPEAKERS_JOIN_SPEAKERS)
+//                        .mapToTable(Speakers._ID, Tables.SPEAKERS)
+//                        .mapToTable(Speakers.SPEAKER_ID, Tables.SPEAKERS)
+//                        .where(Qualified.SESSIONS_SPEAKERS_SESSION_ID + "=?", sessionId);
+//            }
+//            case SESSIONS_ID_TRACKS: {
+//                final String sessionId = Sessions.getSessionId(uri);
+//                return builder.table(Tables.SESSIONS_TRACKS_JOIN_TRACKS)
+//                        .mapToTable(Tracks._ID, Tables.TRACKS)
+//                        .mapToTable(Tracks.TRACK_ID, Tables.TRACKS)
+//                        .where(Qualified.SESSIONS_TRACKS_SESSION_ID + "=?", sessionId);
+//            }
+//            case SPEAKERS: {
+//                return builder.table(Tables.SPEAKERS);
+//            }
+//            case SPEAKERS_ID: {
+//                final String speakerId = Speakers.getSpeakerId(uri);
+//                return builder.table(Tables.SPEAKERS)
+//                        .where(Speakers.SPEAKER_ID + "=?", speakerId);
+//            }
+//            case SPEAKERS_ID_SESSIONS: {
+//                final String speakerId = Speakers.getSpeakerId(uri);
+//                return builder.table(Tables.SESSIONS_SPEAKERS_JOIN_SESSIONS_BLOCKS_ROOMS)
+//                        .mapToTable(Sessions._ID, Tables.SESSIONS)
+//                        .mapToTable(Sessions.SESSION_ID, Tables.SESSIONS)
+//                        .mapToTable(Sessions.BLOCK_ID, Tables.SESSIONS)
+//                        .mapToTable(Sessions.ROOM_ID, Tables.SESSIONS)
+//                        .where(Qualified.SESSIONS_SPEAKERS_SPEAKER_ID + "=?", speakerId);
+//            }
+//            case VENDORS: {
+//                return builder.table(Tables.VENDORS_JOIN_TRACKS)
+//                        .mapToTable(Vendors._ID, Tables.VENDORS)
+//                        .mapToTable(Vendors.TRACK_ID, Tables.VENDORS);
+//            }
+//            case VENDORS_STARRED: {
+//                return builder.table(Tables.VENDORS_JOIN_TRACKS)
+//                        .mapToTable(Vendors._ID, Tables.VENDORS)
+//                        .mapToTable(Vendors.TRACK_ID, Tables.VENDORS)
+//                        .where(Vendors.VENDOR_STARRED + "=1");
+//            }
+//            case VENDORS_SEARCH: {
+//                final String query = Vendors.getSearchQuery(uri);
+//                return builder.table(Tables.VENDORS_SEARCH_JOIN_VENDORS_TRACKS)
+//                        .map(Vendors.SEARCH_SNIPPET, Subquery.VENDORS_SNIPPET)
+//                        .mapToTable(Vendors._ID, Tables.VENDORS)
+//                        .mapToTable(Vendors.VENDOR_ID, Tables.VENDORS)
+//                        .mapToTable(Vendors.TRACK_ID, Tables.VENDORS)
+//                        .where(VendorsSearchColumns.BODY + " MATCH ?", query);
+//            }
+//            case VENDORS_ID: {
+//                final String vendorId = Vendors.getVendorId(uri);
+//                return builder.table(Tables.VENDORS_JOIN_TRACKS)
+//                        .mapToTable(Vendors._ID, Tables.VENDORS)
+//                        .mapToTable(Vendors.TRACK_ID, Tables.VENDORS)
+//                        .where(Vendors.VENDOR_ID + "=?", vendorId);
+//            }
             default: {
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
             }

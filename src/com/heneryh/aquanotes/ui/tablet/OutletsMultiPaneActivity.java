@@ -22,7 +22,7 @@ import com.heneryh.aquanotes.provider.ScheduleContract;
 import com.heneryh.aquanotes.ui.BaseMultiPaneActivity;
 import com.heneryh.aquanotes.ui.SessionDetailFragment;
 import com.heneryh.aquanotes.ui.OutletsXFragment;
-import com.heneryh.aquanotes.ui.OutletsFragment;
+import com.heneryh.aquanotes.ui.OutletsDataFragment;
 import com.heneryh.aquanotes.ui.phone.SessionDetailActivity;
 import com.heneryh.aquanotes.ui.phone.SessionsActivity;
 
@@ -49,7 +49,7 @@ public class OutletsMultiPaneActivity extends BaseMultiPaneActivity {
 
 //        Intent intent = new Intent();
 //        intent.setData(ScheduleContract.Tracks.CONTENT_URI);
-////        intent.putExtra(OutletsFragment.EXTRA_NEXT_TYPE, OutletsFragment.NEXT_TYPE_SESSIONS);
+////        intent.putExtra(OutletsDataFragment.EXTRA_NEXT_TYPE, OutletsDataFragment.NEXT_TYPE_SESSIONS);
         Intent intent = new Intent();
         intent.setData(AquaNotesDbContract.Outlets.CONTENT_URI);
 //        intent.putExtra(Intent.EXTRA_TITLE, getString(R.string.title_outlets_tracks));

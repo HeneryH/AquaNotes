@@ -17,7 +17,7 @@
 package com.heneryh.aquanotes.ui.phone;
 
 import com.heneryh.aquanotes.ui.BaseSinglePaneActivity;
-import com.heneryh.aquanotes.ui.OutletsFragment;
+import com.heneryh.aquanotes.ui.OutletsDataFragment;
 import com.heneryh.aquanotes.ui.OutletsXFragment;
 
 import android.os.Bundle;
