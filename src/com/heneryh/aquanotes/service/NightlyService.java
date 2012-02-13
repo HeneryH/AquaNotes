@@ -134,7 +134,7 @@ public class NightlyService extends IntentService {
 		/**
 		 * helper class for defaultHttpClient seen below
 		 */
-        final HttpClient httpClient = getHttpClient(this);
+//        final HttpClient httpClient = getHttpClient(this);
 
 		/**
 		 * Interface to the database which is passed into the remoteExecutor.  Is there an advantage to
@@ -148,7 +148,7 @@ public class NightlyService extends IntentService {
 		 * Create the executor for the controller of choice.  Now it is just the apex but I can see using
 		 * other ones like the DA.  Pass in the http client and database resolver it will need to do its job.
 		 */
-		mRemoteExecutor = new ApexExecutor(this, httpClient, dbResolverNightlySrvc);
+//		mRemoteExecutor = new ApexExecutor(this, httpClient, dbResolverNightlySrvc);
 
 		mNightlyServiceContext = this;
 }

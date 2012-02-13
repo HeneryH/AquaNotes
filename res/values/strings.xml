@@ -161,6 +161,11 @@
     <string name="widget_name_2x1">Apex Short</string>
     <string name="widget_name_2x2">Apex Tall</string>
     <string name="widget_loading">&quot;Loading\nApex status\u2026&quot;</string>
-        
+    <string-array name="outlet_spinner">
+        <item>Auto</item>
+        <item>Off</item>
+        <item>On</item>
+    </string-array>
+    
         
 </resources>

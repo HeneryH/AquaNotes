@@ -16,26 +16,60 @@
 
 package com.heneryh.aquanotes.ui;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
+import java.util.zip.GZIPInputStream;
+
+import org.apache.http.Header;
+import org.apache.http.HeaderElement;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpRequest;
+import org.apache.http.HttpRequestInterceptor;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpResponseInterceptor;
+import org.apache.http.client.HttpClient;
+import org.apache.http.entity.HttpEntityWrapper;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
+import org.apache.http.params.HttpProtocolParams;
+import org.apache.http.protocol.HttpContext;
 
 import com.heneryh.aquanotes.R;
+import com.heneryh.aquanotes.io.ApexExecutor;
+import com.heneryh.aquanotes.io.NewXmlHandler.HandlerException;
 import com.heneryh.aquanotes.provider.AquaNotesDbContract;
 import com.heneryh.aquanotes.provider.ScheduleContract;
+import com.heneryh.aquanotes.provider.AquaNotesDbContract.Controllers;
 
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Context;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Resources;
 import android.database.ContentObserver;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.os.Handler;
 import android.provider.BaseColumns;
+import android.text.format.DateUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.ArrayAdapter;
 import android.widget.CursorAdapter;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 /**
@@ -48,12 +82,18 @@ public class OutletsDataAdapter extends CursorAdapter {
     private boolean mHasAllItem;
     private int mPositionDisplacement;
     private boolean mIsSessions = true;
-
+    String[] outletStates;
+    ArrayAdapter<String> adapter;
+    
     public OutletsDataAdapter(Activity activity) {
-        super(activity, null);
+    	super(activity, null);
         mActivity = activity;
       mHasAllItem = false;
       mPositionDisplacement =  0;
+      Resources res = mActivity.getResources();
+      outletStates = res.getStringArray(R.array.outlet_spinner);
+      adapter=new ArrayAdapter<String>(mActivity, android.R.layout.simple_spinner_item, outletStates);
+      adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
     }
 
     public void setHasAllItem(boolean hasAllItem) {
@@ -70,27 +110,54 @@ public class OutletsDataAdapter extends CursorAdapter {
         return super.getCount() + mPositionDisplacement;
     }
 
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        if (mHasAllItem && position == 0) {
-            if (convertView == null) {
-                convertView = mActivity.getLayoutInflater().inflate(
-                        R.layout.list_item_outlet, parent, false);
-            }
-
-            // Custom binding for the first item
-            ((TextView) convertView.findViewById(android.R.id.text1)).setText(
-                    "(" + mActivity.getResources().getString(mIsSessions
-                            ? R.string.all_sessions_title
-                            : R.string.all_sandbox_title)
-                            + ")");
-            convertView.findViewById(android.R.id.icon1).setVisibility(View.INVISIBLE);
-
-            return convertView;
-        }
-        return super.getView(position - mPositionDisplacement, convertView, parent);
+    public class ViewHolder
+    {
+    	ImageView icon;
+    	Spinner spinner;
+    	TextView title;
+    	TextView subtitle;
     }
 
+//	ViewHolder viewHolder;
+//
+//	if (convertView == null) {
+//		convertView = mActivity.getLayoutInflater().inflate(
+//				R.layout.list_item_outlet, parent, false);
+//		viewHolder=new ViewHolder();
+//		viewHolder.icon    = (ImageView)convertView.findViewById(android.R.id.icon1);
+//		viewHolder.spinner = (Spinner)convertView.findViewById(R.id.spin);
+//		viewHolder.spinner.setAdapter(adapter);
+//		viewHolder.title = (TextView)convertView.findViewById(android.R.id.text1);
+//		viewHolder.subtitle = (TextView)convertView.findViewById(R.id.outlet_subtitle);
+//		convertView.setTag(viewHolder);
+//	} else
+//	{
+//		viewHolder=(ViewHolder)convertView.getTag();
+//	}
+//	return convertView;
+//
+//    @Override
+//    public View getView(int position, View convertView, ViewGroup parent) {
+//        if (mHasAllItem && position == 0) {
+//            if (convertView == null) {
+//                convertView = mActivity.getLayoutInflater().inflate(
+//                        R.layout.list_item_outlet, parent, false);
+//            }
+//
+//            // Custom binding for the first item
+//            ((TextView) convertView.findViewById(android.R.id.text1)).setText(
+//                    "(" + mActivity.getResources().getString(mIsSessions
+//                            ? R.string.all_sessions_title
+//                            : R.string.all_sandbox_title)
+//                            + ")");
+//            convertView.findViewById(android.R.id.icon1).setVisibility(View.INVISIBLE);
+//
+//            return convertView;
+//        }
+//        return super.getView(position - mPositionDisplacement, convertView, parent);
+//
+//    }
+    
     @Override
     public Object getItem(int position) {
         if (mHasAllItem && position == 0) {
@@ -139,30 +206,70 @@ public class OutletsDataAdapter extends CursorAdapter {
     /** {@inheritDoc} */
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
-        final TextView textView = (TextView) view.findViewById(android.R.id.text1);
-        String titleText = cursor.getString(OutletDataViewQuery.NAME) + " (" + cursor.getString(OutletDataViewQuery.DEVICE_ID)+ ")";
-        textView.setText(titleText);
+
+    	String outletName = cursor.getString(OutletDataViewQuery.NAME);
+    	((TextView) view.findViewById(R.id.outlet_title)).setText(outletName);
+
+    	String deviceId = cursor.getString(OutletDataViewQuery.DEVICE_ID);
+        ((TextView) view.findViewById(R.id.outlet_subtitle)).setText(deviceId);
+
+        Spinner spinner = (Spinner)view.findViewById(R.id.spin);
+		spinner.setAdapter(adapter);
+		
+	   	Integer controllerId = cursor.getInt(OutletDataViewQuery.CONTROLLER_ID);
+		
+		spinner.setOnItemSelectedListener(new myOnItemSelectedListener(outletName, controllerId));
+		
 
         // Assign track color to visible block
         String val = cursor.getString(OutletDataViewQuery.VALUE);
         final ImageView iconView = (ImageView) view.findViewById(android.R.id.icon1);
         Resources res = mActivity.getResources();
-        if(val.equalsIgnoreCase("ON")) {
+        
+		////  Axx = Auto-On or Auto-Off
+		////  OFF = Manual Off
+		////  ON = Manual On
+
+        if (val.equalsIgnoreCase("AON")) {
         	iconView.setImageDrawable(res.getDrawable(R.drawable.on));
-        	//iconView = (ImageView) view.findViewById(R.drawable.on);
-        } else if (val.equalsIgnoreCase("AON")) {
-        	iconView.setImageDrawable(res.getDrawable(R.drawable.on));
+        	spinner.setSelection(0);
         } else if (val.equalsIgnoreCase("AOF")) {
         	iconView.setImageDrawable(res.getDrawable(R.drawable.off));
+        	spinner.setSelection(0);
         } else if (val.equalsIgnoreCase("OFF")) {
         	iconView.setImageDrawable(res.getDrawable(R.drawable.off));
+        	spinner.setSelection(1);
+        } else if(val.equalsIgnoreCase("ON")) {
+        	iconView.setImageDrawable(res.getDrawable(R.drawable.on));
+        	spinner.setSelection(2);
         } else  {
         	iconView.setImageDrawable(new ColorDrawable(Color.BLUE));
        }
     }
         
         
-
+    public class myOnItemSelectedListener implements OnItemSelectedListener {
+    	Boolean initialDisplay = true;
+    	String name;
+    	int cid;
+    	
+    	myOnItemSelectedListener(String x, int controllerId) {
+    		name=x;
+    		cid=controllerId;
+    	}
+    	@Override
+    	public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+    		// your code here
+    		if(!initialDisplay){
+    			((ControllersActivity) mActivity).outletUpdate(cid, name, position);
+    		}
+    		initialDisplay=false;
+    	}
+    	@Override
+    	public void onNothingSelected(AdapterView<?> parentView) {
+    		// your code here
+    	}
+    }
         public interface OutletDataViewQuery {
 
             int _TOKEN = 0x1;
@@ -203,5 +310,46 @@ public class OutletsDataAdapter extends CursorAdapter {
             int RESOURCE_ID = 7;
             int CONTROLLER_ID = 8;
          }
-
+        
+        private interface ControllersQuery {
+            String[] PROJECTION = {
+//                  String CONTROLLER_ID = "_id";
+//                  String TITLE = "title";
+//                  String WAN_URL = "wan_url";
+//                  String LAN_URL = "wifi_url";
+//                  String WIFI_SSID = "wifi_ssid";
+//                  String USER = "user";
+//                  String PW = "pw";
+//                  String LAST_UPDATED = "last_updated";
+//                  String UPDATE_INTERVAL = "update_i";
+//                  String DB_SAVE_DAYS = "db_save_days";
+//                  String CONTROLLER_TYPE = "controller_type";
+                    BaseColumns._ID,
+                    AquaNotesDbContract.Controllers.TITLE,
+                    AquaNotesDbContract.Controllers.WAN_URL,
+                    AquaNotesDbContract.Controllers.LAN_URL,
+                    AquaNotesDbContract.Controllers.WIFI_SSID,
+                    AquaNotesDbContract.Controllers.USER,
+                    AquaNotesDbContract.Controllers.PW,
+                    AquaNotesDbContract.Controllers.LAST_UPDATED,
+                    AquaNotesDbContract.Controllers.UPDATE_INTERVAL,
+                    AquaNotesDbContract.Controllers.DB_SAVE_DAYS,
+                    AquaNotesDbContract.Controllers.MODEL,
+                    AquaNotesDbContract.Controllers.WIDGET,
+            };
+            
+            int _ID = 0;
+            int TITLE = 1;
+            int WAN_URL = 2;
+            int LAN_URL = 3;
+            int WIFI_SSID = 4;
+            int USER = 5;
+            int PW = 6;
+            int LAST_UPDATED = 7;
+            int UPDATE_INTERVAL = 8;
+            int DB_SAVE_DAYS = 9;
+            int MODEL = 10;
+            int WIDGET = 11;
+        }
+        
 }

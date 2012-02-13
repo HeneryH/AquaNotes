@@ -1,17 +1,7 @@
 /*
- * Copyright 2011 Google Inc.
+ * Copyright 2012 
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Licensed under the xxxx
  */
 
 package com.heneryh.aquanotes.ui;
@@ -29,6 +19,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -43,8 +34,8 @@ import android.widget.Toast;
 public class HomeActivity extends BaseActivity {
     private static final String TAG = "HomeActivity";
 
-    private TagStreamFragment mTagStreamFragment;
     private SyncStatusUpdaterFragment mSyncStatusUpdaterFragment;
+    boolean createdNewSyncFrag = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,16 +52,13 @@ public class HomeActivity extends BaseActivity {
 
         FragmentManager fm = getSupportFragmentManager();
 
-        mTagStreamFragment = (TagStreamFragment) fm.findFragmentById(R.id.fragment_tag_stream);
-
         mSyncStatusUpdaterFragment = (SyncStatusUpdaterFragment) fm
                 .findFragmentByTag(SyncStatusUpdaterFragment.TAG);
         if (mSyncStatusUpdaterFragment == null) {
             mSyncStatusUpdaterFragment = new SyncStatusUpdaterFragment();
             fm.beginTransaction().add(mSyncStatusUpdaterFragment,
                     SyncStatusUpdaterFragment.TAG).commit();
-
-            triggerRefresh();
+            createdNewSyncFrag = true;  // had to move the refresh() down to postCreate due to a race condition with the fragment starting
         }
         
         final Intent intent = new Intent(this, NightlyService.class);
@@ -83,8 +71,14 @@ public class HomeActivity extends BaseActivity {
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
         getActivityHelper().setupHomeActivity();
+        triggerRefresh();
     }
 
+	/**
+	 * 
+	 * @param menu
+	 * @return
+	 */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.refresh_menu_items, menu);
@@ -92,6 +86,11 @@ public class HomeActivity extends BaseActivity {
         return true;
     }
 
+	/**
+	 * If the user hits the 'Refresh Spinner' kick off a new polling event.
+	 * @param item
+	 * @return
+	 */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.menu_refresh) {
@@ -105,15 +104,12 @@ public class HomeActivity extends BaseActivity {
         final Intent intent = new Intent(Intent.ACTION_SYNC, null, this, SyncService.class);
         intent.putExtra(SyncService.EXTRA_STATUS_RECEIVER, mSyncStatusUpdaterFragment.mReceiver);
         startService(intent);
-
-        if (mTagStreamFragment != null) {
-            mTagStreamFragment.refresh();
-        }
     }
 
-    private void updateRefreshStatus(boolean refreshing) {
+    void updateRefreshStatus(boolean refreshing) {
         getActivityHelper().setRefreshActionButtonCompatState(refreshing);
     }
+    
 
     /**
      * A non-UI fragment, retained across configuration changes, that updates its activity's UI
@@ -159,7 +155,6 @@ public class HomeActivity extends BaseActivity {
                     break;
                 }
             }
-
             activity.updateRefreshStatus(mSyncing);
         }
 

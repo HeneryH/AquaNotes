@@ -16,20 +16,35 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="?android:attr/listPreferredItemHeight"
-    style="@style/SimpleListItem">
-
-    <com.heneryh.aquanotes.ui.widget.BezelImageView android:id="@android:id/icon1"
-        android:layout_alignParentRight="true"
-        android:layout_margin="@dimen/outlet_icon_padding"
+    style="@style/SimpleListItem"><com.heneryh.aquanotes.ui.widget.BezelImageView
+        android:id="@android:id/icon1"
         android:layout_width="@dimen/outlet_icon_width"
-        android:layout_height="fill_parent" />
+        android:layout_height="fill_parent"
+        android:layout_alignParentRight="true"
+        android:layout_margin="@dimen/outlet_icon_padding" />
 
-    <TextView android:id="@android:id/text1"
-        style="@android:style/TextAppearance.Large"
+    <Spinner
+        android:id="@+id/spin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@android:id/icon1"
+        android:layout_weight="0.5" />
+
+    <TextView
+        android:id="@+id/outlet_title"
+        style="@style/ListItemTitle"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
         android:layout_alignParentLeft="true"
+        android:layout_toLeftOf="@+id/spin" />
+
+    <TextView
+        android:id="@+id/outlet_subtitle"
+        style="@style/ListItemSubtitle"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/outlet_title"
         android:layout_toLeftOf="@android:id/icon1" />
 
 </RelativeLayout>

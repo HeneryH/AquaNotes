@@ -200,18 +200,24 @@ public class ApexStateXMLParser extends DefaultHandler {
 		try { versionNumber = Float.valueOf(versionSubstring);}
 		catch (NumberFormatException e) {} // need to error checking here.
 		
-		if (deviceType.equalsIgnoreCase("AC4") && versionNumber.compareTo(minVersion)<0) {
-			// Update the database to tag the fact that the firmware is old and not supported
-			ContentValues values = new ContentValues();
-	        values.clear();
-			values.put(AquaNotesDbContract.Controllers.MODEL, "Apex-old");
-			try {
-				mResolver.update(controllerUri, values, null, null);
-			} catch (SQLException e) {
-				Log.e(LOG_TAG, "Updating controller to old version, tagging the database.", e);
-			}
-		}
 		
+		// Update the database with the new timestamp
+		ContentValues values = new ContentValues();
+        values.clear();
+        values.put(AquaNotesDbContract.Controllers.LAST_UPDATED, timeStamp.getTime());
+        if (deviceType.equalsIgnoreCase("AC4") && versionNumber.compareTo(minVersion)<0) 
+        	values.put(AquaNotesDbContract.Controllers.MODEL, "Apex-old");
+        else
+        	values.put(AquaNotesDbContract.Controllers.MODEL, deviceType);
+        try {
+        	mResolver.update(controllerUri, values, null, null);
+        } catch (SQLException e) {
+        	Log.e(LOG_TAG, "Updating controller timestamp", e);
+        }
+		
+
+
+
 	}
 
 	/** Gets be called on opening tags like:
@@ -346,7 +352,12 @@ public class ApexStateXMLParser extends DefaultHandler {
 
 //				Uri activeOutletsUri = Uri.withAppendedPath(controllerUri, Probes.TWIG_OUTLETS_DEVICE_ID);
 //				Uri outletByDevIdUri = Uri.withAppendedPath(activeOutletsUri,Uri.encode(currentDeviceID));
-				Uri outletByDevIdUri = Outlets.buildQueryOutletXByDeviceIdUri(controllerUri, currentDeviceID);
+				Uri outletByDevIdUri;
+				if(deviceType.equalsIgnoreCase("AC3"))
+					outletByDevIdUri = Outlets.buildQueryOutletXByDeviceIdUri(controllerUri, currentName);
+				else
+					outletByDevIdUri = Outlets.buildQueryOutletXByDeviceIdUri(controllerUri, currentDeviceID);
+					
 				
 				int controllerId = Integer.parseInt(controllerUri.getPathSegments().get(1));
 
@@ -433,16 +444,6 @@ public class ApexStateXMLParser extends DefaultHandler {
 		}else if (localName.equalsIgnoreCase("serial")) {
 			//	<serial>AC4:01405</serial>
 			deviceType=currentName=builder.toString().trim().substring(0, 3);
-			
-			ContentValues values = new ContentValues();
-	        values.clear();
-			values.put(AquaNotesDbContract.Controllers.MODEL, deviceType);
-			try {
-				mResolver.update(controllerUri, values, null, null);
-			} catch (SQLException e) {
-				Log.e(LOG_TAG, "Updating controller type", e);
-			}
-
 			this.in_serial_tag = false;
 		}else if (localName.equalsIgnoreCase("date")) {
 			// <date>04/13/2010 09:43:44</date>
@@ -453,20 +454,8 @@ public class ApexStateXMLParser extends DefaultHandler {
 				Log.e("XML Parser", "Couldn't parse the returned date field", e);
 				timeStamp.setTime(0);
 			}
-			
-			// Update the database with the new timestamp
-			ContentValues values = new ContentValues();
-	        values.clear();
-			values.put(AquaNotesDbContract.Controllers.LAST_UPDATED, timeStamp.getTime());
-			try {
-				mResolver.update(controllerUri, values, null, null);
-			} catch (SQLException e) {
-				Log.e(LOG_TAG, "Updating controller timestamp", e);
-			}
-
 			this.in_date_tag = false;
 		}
-
 		builder.setLength(0);    
 	}
 

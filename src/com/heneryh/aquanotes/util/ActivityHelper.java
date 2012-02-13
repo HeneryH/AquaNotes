@@ -75,9 +75,9 @@ public class ActivityHelper {
 
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.menu_search:
-                goSearch();
-                return true;
+//            case R.id.menu_search:
+//                goSearch();
+//                return true;
         }
         return false;
     }

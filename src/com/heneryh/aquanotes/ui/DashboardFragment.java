@@ -20,7 +20,6 @@ import com.heneryh.aquanotes.R;
 import com.heneryh.aquanotes.configure.ConfigurePrefs;
 import com.heneryh.aquanotes.provider.AquaNotesDbContract;
 import com.heneryh.aquanotes.provider.ScheduleContract;
-import com.heneryh.aquanotes.ui.phone.ScheduleActivity;
 import com.heneryh.aquanotes.ui.tablet.ScheduleMultiPaneActivity;
 import com.heneryh.aquanotes.ui.tablet.OutletsMultiPaneActivity;
 import com.heneryh.aquanotes.ui.tablet.ProbesMultiPaneActivity;

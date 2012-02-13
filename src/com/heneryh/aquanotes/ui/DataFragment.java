@@ -240,11 +240,11 @@ public class DataFragment extends ListFragment implements
 			Date timestampD = new Date(timeL);
 			SimpleDateFormat formatter = new SimpleDateFormat("M/d/yy h:mm a");
 			String timestampS = "       " + formatter.format(timestampD);
-            ((TextView) view.findViewById(R.id.probe_timestamp)).setText(timestampS);
+//            ((TextView) view.findViewById(R.id.probe_timestamp)).setText(timestampS);
 
-            final boolean starred = false /*cursor.getInt(VendorsQuery.STARRED) != 0*/;
-            view.findViewById(R.id.star_button).setVisibility(
-                    starred ? View.VISIBLE : View.INVISIBLE);
+//            final boolean starred = false /*cursor.getInt(VendorsQuery.STARRED) != 0*/;
+//            view.findViewById(R.id.star_button).setVisibility(
+//                    starred ? View.VISIBLE : View.INVISIBLE);
         }
     }
 

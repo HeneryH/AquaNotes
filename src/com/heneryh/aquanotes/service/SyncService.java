@@ -1,36 +1,14 @@
 /*
- * Copyright 2011 Google Inc.
+ * Copyright 2012 
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Licensed under the xxxx
  */
 
 package com.heneryh.aquanotes.service;
 
-import com.heneryh.aquanotes.R;
 import com.heneryh.aquanotes.io.ApexExecutor;
 import com.heneryh.aquanotes.io.ApexStateXMLParser;
-import com.heneryh.aquanotes.io.LocalBlocksHandler;
-import com.heneryh.aquanotes.io.LocalExecutor;
-import com.heneryh.aquanotes.io.LocalRoomsHandler;
-import com.heneryh.aquanotes.io.LocalSearchSuggestHandler;
-import com.heneryh.aquanotes.io.LocalSessionsHandler;
-import com.heneryh.aquanotes.io.LocalTracksHandler;
 import com.heneryh.aquanotes.io.NewXmlHandler.HandlerException;
-import com.heneryh.aquanotes.io.RemoteExecutor;
-import com.heneryh.aquanotes.io.RemoteSessionsHandler;
-import com.heneryh.aquanotes.io.RemoteSpeakersHandler;
-import com.heneryh.aquanotes.io.RemoteVendorsHandler;
-import com.heneryh.aquanotes.io.RemoteWorksheetsHandler;
 import com.heneryh.aquanotes.provider.AquaNotesDbContract;
 import com.heneryh.aquanotes.provider.AquaNotesDbContract.Controllers;
 import com.heneryh.aquanotes.provider.AquaNotesDbProvider;
@@ -85,7 +63,10 @@ import android.widget.RemoteViews;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 import java.util.zip.GZIPInputStream;
 
@@ -125,11 +106,11 @@ public class SyncService extends IntentService {
     private static final String HEADER_ACCEPT_ENCODING = "Accept-Encoding";
     private static final String ENCODING_GZIP = "gzip";
 
-    private LocalExecutor mLocalExecutor;
 	private ApexExecutor mRemoteExecutor;
 
 	private ContentResolver dbResolverSyncSrvc;
-	private ResultReceiver guiStatusReceiver;
+	
+	private List<ResultReceiver> guiReceivers = new ArrayList<ResultReceiver>();
 
 	Context mSyncServiceContext;
 
@@ -155,8 +136,6 @@ public class SyncService extends IntentService {
 		 * Seems like the answer is that you need the context to get the resolver
 		 */
 		dbResolverSyncSrvc = getContentResolver();
-
-//        mLocalExecutor = new LocalExecutor(getResources(), dbResolverSyncSrvc);
 
         /**
 		 * Create the executor for the controller of choice.  Now it is just the apex but I can see using
@@ -196,8 +175,22 @@ public class SyncService extends IntentService {
 			}
 		} else if (ACTION_UPDATE_SINGLE.equals(intent.getAction())) { // This came from the a widget update, id is in the queue
 
-		} else if(Intent.ACTION_SYNC.equals(intent.getAction())) { // this came from the main GUI
-			guiStatusReceiver = intent.getParcelableExtra(EXTRA_STATUS_RECEIVER);
+		} else 
+        if(Intent.ACTION_SYNC.equals(intent.getAction())) { // this came from the main GUI
+        	ResultReceiver guiStatusReceiver = intent.getParcelableExtra(EXTRA_STATUS_RECEIVER);
+        	
+			// Look for this controller already in the list
+			boolean alreadyThere = false;
+			Iterator<ResultReceiver> iterator = guiReceivers.iterator();
+			while (iterator.hasNext()) {
+				ResultReceiver thisRcvr = iterator.next();
+				if(thisRcvr==guiStatusReceiver) 
+					alreadyThere=true;
+			}
+			if(!alreadyThere)
+				guiReceivers.add(guiStatusReceiver);
+        	
+        	
 			try {
 				Uri controllersQueryUri = Controllers.buildQueryControllersUri();
 				cursor = dbResolverSyncSrvc.query(controllersQueryUri, ControllersQuery.PROJECTION, null, null, null);
@@ -247,8 +240,11 @@ public class SyncService extends IntentService {
 		 */
 		@Override
 		protected void onPreExecute() {
-			if (guiStatusReceiver != null) 
-				guiStatusReceiver.send(STATUS_RUNNING, Bundle.EMPTY);	
+			Iterator<ResultReceiver> iterator = guiReceivers.iterator();
+			while (iterator.hasNext()) {
+				ResultReceiver thisRcvr = iterator.next();
+				 thisRcvr.send(STATUS_RUNNING, Bundle.EMPTY);
+			}
 		}
 
 		/**
@@ -358,12 +354,15 @@ public class SyncService extends IntentService {
 					} catch (SQLException e) {
 						Log.e(TAG, "Checking if the controller is configured", e);
 						resultFailedFlag=true;
-						if (guiStatusReceiver != null) {
-							// Pass back error to surface listener
-							final Bundle bundle = new Bundle();
-							bundle.putString(Intent.EXTRA_TEXT, e.toString());
-							guiStatusReceiver.send(STATUS_ERROR, bundle);
+						
+						final Bundle bundle = new Bundle();
+						bundle.putString(Intent.EXTRA_TEXT, e.toString());
+						Iterator<ResultReceiver> iterator = guiReceivers.iterator();
+						while (iterator.hasNext()) {
+							ResultReceiver thisRcvr = iterator.next();
+							 thisRcvr.send(STATUS_ERROR, bundle);
 						}
+
 					} finally {
 						if (cursor != null) {
 							cursor.close();
@@ -417,11 +416,12 @@ public class SyncService extends IntentService {
 						} catch (HandlerException e) {
 							Log.e(TAG, "Problem while syncing", e);
 							resultFailedFlag=true;
-							if (guiStatusReceiver != null) {
-								// Pass back error to surface listener
-								final Bundle bundle = new Bundle();
-								bundle.putString(Intent.EXTRA_TEXT, e.toString());
-								guiStatusReceiver.send(STATUS_ERROR, bundle);
+							final Bundle bundle = new Bundle();
+							bundle.putString(Intent.EXTRA_TEXT, e.toString());
+							Iterator<ResultReceiver> iterator = guiReceivers.iterator();
+							while (iterator.hasNext()) {
+								ResultReceiver thisRcvr = iterator.next();
+								 thisRcvr.send(STATUS_ERROR, bundle);
 							}
 						} // end of catch
 					} // end of if(should update)
@@ -480,15 +480,19 @@ public class SyncService extends IntentService {
 		@Override
 		protected void onPostExecute(Boolean resultFailedFlag) {
 	        // Announce success to any surface listener
-			if (guiStatusReceiver != null && !resultFailedFlag) {
-				guiStatusReceiver.send(STATUS_FINISHED, Bundle.EMPTY); 
+			if (resultFailedFlag) {
+				Iterator<ResultReceiver> iterator = guiReceivers.iterator();
+				while (iterator.hasNext()) {
+					ResultReceiver thisRcvr = iterator.next();
+					 thisRcvr.send(STATUS_ERROR, Bundle.EMPTY);
+				}
 			}
-			else if (guiStatusReceiver != null && resultFailedFlag) {
-//              // Pass back error to surface listener
-//              final Bundle bundle = new Bundle();
-//              bundle.putString(Intent.EXTRA_TEXT, e.toString());
-				// how do we get the error back here?? 
-				guiStatusReceiver.send(STATUS_ERROR, Bundle.EMPTY);
+			else {
+				Iterator<ResultReceiver> iterator = guiReceivers.iterator();
+				while (iterator.hasNext()) {
+					ResultReceiver thisRcvr = iterator.next();
+					 thisRcvr.send(STATUS_FINISHED, Bundle.EMPTY);
+				}
 			}
 
 			// No updates remaining, so stop service

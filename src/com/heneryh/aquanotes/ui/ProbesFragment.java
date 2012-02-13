@@ -19,6 +19,8 @@ package com.heneryh.aquanotes.ui;
 import com.heneryh.aquanotes.R;
 import com.heneryh.aquanotes.provider.AquaNotesDbContract;
 import com.heneryh.aquanotes.provider.ScheduleContract;
+import com.heneryh.aquanotes.provider.AquaNotesDbContract.Controllers;
+import com.heneryh.aquanotes.provider.AquaNotesDbContract.Outlets;
 import com.heneryh.aquanotes.util.ActivityHelper;
 import com.heneryh.aquanotes.util.AnalyticsUtils;
 import com.heneryh.aquanotes.util.NotifyingAsyncQueryHandler;
@@ -55,6 +57,8 @@ public class ProbesFragment extends ListFragment implements
     private CursorAdapter mAdapter;
     private int mCheckedPosition = -1;
     private boolean mHasSetEmptyText = false;
+    private Uri probesUri;
+    private Uri controllerUri;
 
     private NotifyingAsyncQueryHandler mHandler;
 
@@ -92,7 +96,8 @@ public class ProbesFragment extends ListFragment implements
 
         // Load new arguments
         final Intent intent = BaseActivity.fragmentArgumentsToIntent(arguments);
-        final Uri probesUri = intent.getData();
+        probesUri = intent.getData();
+        controllerUri = Controllers.buildQueryControllerXUri(Integer.valueOf(Outlets.getControllerId(probesUri)));
         final int probeDataQueryToken;
 
         if (probesUri == null) {
@@ -110,6 +115,22 @@ public class ProbesFragment extends ListFragment implements
         mHandler.startQuery(probeDataQueryToken, null, probesUri, projection, null, null,
                 AquaNotesDbContract.ProbeDataView.DEFAULT_SORT);
     }
+    
+    public void reloadSelf(Uri newProbesUri) {
+    	probesUri = newProbesUri;
+
+    	if (probesUri == null) {
+    		return;
+    	}
+
+    	// Start background query to load outlets
+    	String[] projection = ProbeDataViewQuery.PROJECTION;
+    	String selection = null;
+    	mHandler.startQuery(probesUri, projection, selection, null,
+    			AquaNotesDbContract.Probes.DEFAULT_SORT);
+    }
+    
+
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -165,17 +186,17 @@ public class ProbesFragment extends ListFragment implements
     @Override
     public void onResume() {
         super.onResume();
-        getActivity().getContentResolver().registerContentObserver(
-                AquaNotesDbContract.Controllers.CONTENT_URI, true, mProbeChangesObserver);
-//        if (mCursor != null) {
-//            mCursor.requery();
-//        }
+//        getActivity().getContentResolver().registerContentObserver(
+//                controllerUri, false, mProbeChangesObserver);
+        if (mCursor != null) {
+            mCursor.requery();
+        }
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        getActivity().getContentResolver().unregisterContentObserver(mProbeChangesObserver);
+//        getActivity().getContentResolver().unregisterContentObserver(mProbeChangesObserver);
     }
 
     @Override
@@ -230,8 +251,8 @@ public class ProbesFragment extends ListFragment implements
             		cursor.getString(ProbeDataViewQuery.VALUE));
 
             final boolean starred = false /*cursor.getInt(VendorsQuery.STARRED) != 0*/;
-            view.findViewById(R.id.star_button).setVisibility(
-                    starred ? View.VISIBLE : View.INVISIBLE);
+//            view.findViewById(R.id.star_button).setVisibility(
+//                    starred ? View.VISIBLE : View.INVISIBLE);
         }
     }
 

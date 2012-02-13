@@ -18,38 +18,31 @@
     android:layout_height="wrap_content"
     style="@style/ListItemContainer">
 
-    <ImageView android:id="@+id/star_button"
+<!--     <ImageView android:id="@+id/star_button"
         android:layout_gravity="top|right"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/indicator_starred" />
-
-    <RelativeLayout android:id="@+id/list_item_probe"
+ -->
+ 
+   <RelativeLayout android:id="@+id/list_item_probe"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         style="@style/ListItemContent">
 
         <TextView android:id="@+id/probe_name"
-            android:layout_toLeftOf="@id/star_button"
             android:layout_alignParentLeft="true"
-            android:layout_width="fill_parent"
+            android:layout_alignParentTop="true"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             style="@style/ListItemTitle" />
 
         <TextView android:id="@+id/probe_value"
-            android:layout_below="@id/probe_name"
-            android:layout_toLeftOf="@id/star_button"
-            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            style="@style/ListItemSubtitle" />
+            style="@style/ListItemTitle" />
         
-        <TextView android:id="@+id/probe_timestamp"
-            android:layout_below="@id/probe_name"
-            android:layout_toRightOf="@+id/probe_value"
-            android:layout_alignParentLeft="false"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            style="@style/ListItemSubtitle" />
         </RelativeLayout>
 </FrameLayout>

@@ -21,16 +21,22 @@ import org.apache.http.HttpRequest;
 import org.apache.http.HttpRequestInterceptor;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.NameValuePair;
+import org.apache.http.StatusLine;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.params.ClientPNames;
 import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.impl.client.AbstractHttpClient;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HttpContext;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
@@ -55,6 +61,8 @@ import android.util.Log;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -193,6 +201,111 @@ public class ApexExecutor {
             throw new HandlerException("Problem reading remote response for "
                     + request.getRequestLine(), e);
         }
+    }
+    
+    public void updateOutlet(String wanUri,String lanUri,String ssid, String user, String pw, String name,int position) throws HandlerException {
+    	// Uhg, WifiManager stuff below crashes in AVD if wifi not enabled so first we have to check if on wifi
+    	ConnectivityManager cm  = (ConnectivityManager) mActContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+    	NetworkInfo nInfo = cm.getActiveNetworkInfo();
+    	String apexBaseURL;
+
+    	if(nInfo.getType()==ConnectivityManager.TYPE_WIFI) {
+    		// Get the currently connected SSID, if it matches the 'Home' one then use the local WiFi URL rather than the public one
+    		WifiManager wm = (WifiManager) mActContext.getSystemService(Context.WIFI_SERVICE);
+    		WifiInfo wInfo = wm.getConnectionInfo();
+
+    		// somewhere read this was a quoted string but appears not to be
+    		if(wInfo.getSSID().equalsIgnoreCase(ssid)) {  // the ssid will be quoted in the info class
+    			apexBaseURL=lanUri;
+    		} else {
+    			apexBaseURL=wanUri;
+    		}
+    	} else {
+    		apexBaseURL=wanUri;
+
+    	}
+
+    	// for this function we need to append to the URL.  I should really
+    	// check if the "/" was put on the end by the user here to avoid 
+    	// possible errors.
+    	if(!apexBaseURL.endsWith("/")) {
+    		String tmp = apexBaseURL + "/";
+    		apexBaseURL = tmp;
+    	}
+
+    	// oh, we should also check if it starts with an "http://"
+    	if(!apexBaseURL.toLowerCase().startsWith("http://")) {
+    		String tmp = "http://" + apexBaseURL;
+    		apexBaseURL = tmp;
+    	}
+
+    	// oh, we should also check if it ends with an "status.sht" on the end and remove it.
+
+    	/********************/
+    	// This used to be common for both the Apex and ACiii but during
+    	// the 4.04 beta Apex release it seemed to have broke and forced
+    	// me to use status.sht for the Apex.  Maybe it was fixed but I 
+    	// haven't checked it.
+    	// edit - this was not needed for the longest while but now that we are pushing just one
+    	// outlet, the different methods seem to be needed again.  Really not sure why.
+    	String apexURL;
+    	apexURL = apexBaseURL + "status.sht";
+
+    	//Create credentials for basic auth
+    	// create a basic credentials provider and pass the credentials
+    	// Set credentials provider for our default http client so it will use those credentials
+    	UsernamePasswordCredentials c = new UsernamePasswordCredentials(user,pw);
+    	BasicCredentialsProvider cP = new BasicCredentialsProvider();
+    	cP.setCredentials(AuthScope.ANY, c );
+    	((DefaultHttpClient) mHttpClient).setCredentialsProvider(cP);
+
+    	// Build the POST update which looks like this:
+    	// form="status"
+    	// method="post"
+    	// action="status.sht"
+    	//
+    	// name="T5s_state", value="0"   (0=Auto, 1=Man Off, 2=Man On)
+    	// submit -> name="Update", value="Update"
+    	// -- or
+    	// name="FeedSel", value="0"   (0=A, 1=B)
+    	// submit -> name="FeedCycle", value="Feed"
+    	// -- or
+    	// submit -> name="FeedCycle", value="Feed Cancel"
+
+//    	final HttpUriRequest httppost = new HttpPost(apexURL);
+    	HttpPost httppost = new HttpPost(apexURL);
+
+    	List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2); 
+
+    	// Add your data  
+    	nameValuePairs.add(new BasicNameValuePair("name","status"));  
+    	nameValuePairs.add(new BasicNameValuePair("method","post"));  
+    	nameValuePairs.add(new BasicNameValuePair("action","status.sht"));  
+
+    	String pendingStateS = String.valueOf(position);
+    	nameValuePairs.add(new BasicNameValuePair(name+"_state", pendingStateS));
+
+    	nameValuePairs.add(new BasicNameValuePair("Update","Update"));  
+    	try {  	
+
+    		httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));  
+ 
+    		HttpResponse resp = mHttpClient.execute(httppost);
+    		final int status = resp.getStatusLine().getStatusCode();
+    		if (status != HttpStatus.SC_OK) {
+    			throw new HandlerException("Unexpected server response " + resp.getStatusLine()
+    					+ " for " + httppost.getRequestLine());
+    		}
+    	} catch (HandlerException e) {
+    		throw e;
+    	} catch (ClientProtocolException e) {
+    		throw new HandlerException("Problem reading remote response for "
+    				+ httppost.getRequestLine(), e);
+    	} catch (IOException e) {
+    		throw new HandlerException("Problem reading remote response for "
+    				+ httppost.getRequestLine(), e);
+    	}
+
     }
     
     private interface ControllersQuery {
