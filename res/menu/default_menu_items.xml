@@ -16,9 +16,9 @@
   limitations under the License.
   -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-<!--     <item android:id="@+id/menu_search"
-        android:icon="@drawable/ic_title_search"
-        android:title="@string/description_search"
-        android:orderInCategory="100"
+    <item android:id="@+id/menu_refresh"
+        android:icon="@drawable/ic_title_refresh"
+        android:title="@string/description_refresh"
+        android:orderInCategory="1"
         android:showAsAction="ifRoom" />
- --></menu>
+ </menu>

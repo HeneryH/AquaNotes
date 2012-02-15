@@ -72,25 +72,26 @@ import java.util.zip.GZIPInputStream;
 
 /**
  * Background {@link Service} that synchronizes data living in
- * {@link AquaNotesDbProvider}. Reads data from both local {@link Resources} and
- * from remote sources, such as a spreadsheet.
+ * {@link AquaNotesDbProvider}. Reads data from remote controllers.
  */
 public class SyncService extends IntentService {
-    private static final String TAG = "SyncService";
+	private static final String TAG = "SyncService";
 
 	/**
 	 * Intent actions and extras
 	 */
-    public static final String EXTRA_STATUS_RECEIVER = "com.heneryh.aquanotes.extra.STATUS_RECEIVER";
 	public static final String ACTION_UPDATE_SINGLE = "com.heneryh.aquanotes.UPDATE_SINGLE";
 	public static final String ACTION_UPDATE_ALL = "com.heneryh.aquanotes.UPDATE_ALL";
+
+	public static final String STATUS_UPDATE = "com.heneryh.aquanotes.STATUS_UPDATE";
+	public static final String STATUS_RESULT = "result";
 
 	/**
 	 * Status flags to be sent back to the calling activity via the receiver
 	 */
-    public static final int STATUS_RUNNING = 0x1;
-    public static final int STATUS_ERROR = 0x2;
-    public static final int STATUS_FINISHED = 0x3;
+	public static final int STATUS_RUNNING = 0x1;
+	public static final int STATUS_ERROR = 0x2;
+	public static final int STATUS_FINISHED = 0x3;
 
 	/**
 	 * Flag if there is an update thread already running. We only launch a new
@@ -103,32 +104,30 @@ public class SyncService extends IntentService {
 	/**
 	 * There is an embedded http client helper below
 	 */
-    private static final String HEADER_ACCEPT_ENCODING = "Accept-Encoding";
-    private static final String ENCODING_GZIP = "gzip";
+	private static final String HEADER_ACCEPT_ENCODING = "Accept-Encoding";
+	private static final String ENCODING_GZIP = "gzip";
 
 	private ApexExecutor mRemoteExecutor;
 
 	private ContentResolver dbResolverSyncSrvc;
-	
-	private List<ResultReceiver> guiReceivers = new ArrayList<ResultReceiver>();
 
 	Context mSyncServiceContext;
 
 	/**
 	 * Main service methods
 	 */
-    public SyncService() {
-        super(TAG);
-    }
+	public SyncService() {
+		super(TAG);
+	}
 
-    @Override
-    public void onCreate() {
-        super.onCreate();
+	@Override
+	public void onCreate() {
+		super.onCreate();
 
 		/**
 		 * helper class for defaultHttpClient seen below
 		 */
-        final HttpClient httpClient = getHttpClient(this);
+		final HttpClient httpClient = getHttpClient(this);
 
 		/**
 		 * Interface to the database which is passed into the remoteExecutor.  Is there an advantage to
@@ -137,32 +136,34 @@ public class SyncService extends IntentService {
 		 */
 		dbResolverSyncSrvc = getContentResolver();
 
-        /**
+		/**
 		 * Create the executor for the controller of choice.  Now it is just the apex but I can see using
 		 * other ones like the DA.  Pass in the http client and database resolver it will need to do its job.
 		 */
 		mRemoteExecutor = new ApexExecutor(this, httpClient, dbResolverSyncSrvc);
 
 		mSyncServiceContext = this;
-}
+	}
 
-    @Override
-    protected void onHandleIntent(Intent intent) {
-        Log.d(TAG, "onHandleIntent(intent=" + intent.toString() + ")");
+	@Override
+	protected void onHandleIntent(Intent intent) {
+		Log.d(TAG, "onHandleIntent(intent=" + intent.toString() + ")");
 
 		/**
 		 * Using the intent, we can tell why we are running this service
 		 */
- 		Cursor cursor = null;
-		if (ACTION_UPDATE_ALL.equals(intent.getAction())) { // This came from the timer expiring, get all widgets onto queue
+		Cursor cursor = null;
+
+		// This came from the timer expiring or from the gui, either way, push all controllers onto the queue.
+		if (ACTION_UPDATE_ALL.equals(intent.getAction()) || Intent.ACTION_SYNC.equals(intent.getAction())) {
 			try {
 				Uri controllersQueryUri = Controllers.buildQueryControllersUri();
 				cursor = dbResolverSyncSrvc.query(controllersQueryUri, ControllersQuery.PROJECTION, null, null, null);
 				if (cursor != null && cursor.moveToFirst()) {
-	   				while (!cursor.isAfterLast()) {
-	    				Integer controllerId = cursor.getInt(ControllersQuery._ID); 
-	    				requestUpdate(controllerId);
-	    				cursor.moveToNext();
+					while (!cursor.isAfterLast()) {
+						Integer controllerId = cursor.getInt(ControllersQuery._ID); 
+						requestUpdate(controllerId);
+						cursor.moveToNext();
 					}
 				}
 			} catch (SQLException e) {
@@ -175,41 +176,7 @@ public class SyncService extends IntentService {
 			}
 		} else if (ACTION_UPDATE_SINGLE.equals(intent.getAction())) { // This came from the a widget update, id is in the queue
 
-		} else 
-        if(Intent.ACTION_SYNC.equals(intent.getAction())) { // this came from the main GUI
-        	ResultReceiver guiStatusReceiver = intent.getParcelableExtra(EXTRA_STATUS_RECEIVER);
-        	
-			// Look for this controller already in the list
-			boolean alreadyThere = false;
-			Iterator<ResultReceiver> iterator = guiReceivers.iterator();
-			while (iterator.hasNext()) {
-				ResultReceiver thisRcvr = iterator.next();
-				if(thisRcvr==guiStatusReceiver) 
-					alreadyThere=true;
-			}
-			if(!alreadyThere)
-				guiReceivers.add(guiStatusReceiver);
-        	
-        	
-			try {
-				Uri controllersQueryUri = Controllers.buildQueryControllersUri();
-				cursor = dbResolverSyncSrvc.query(controllersQueryUri, ControllersQuery.PROJECTION, null, null, null);
-				if (cursor != null && cursor.moveToFirst()) {
-	   				while (!cursor.isAfterLast()) {
-	    				Integer controllerId = cursor.getInt(ControllersQuery._ID); 
-	    				requestUpdate(controllerId);
-	    				cursor.moveToNext();
-					}
-				}
-			} catch (SQLException e) {
-				Log.e(TAG, "getting controller list", e);	
-				// need a little more here!
-			} finally {
-				if (cursor != null) {
-					cursor.close();
-				}
-			}
-		}
+		} 
 
 		/**
 		 *  Only start processing thread if not already running, if the thread was running it would
@@ -222,7 +189,7 @@ public class SyncService extends IntentService {
 			}
 		}
 	} // end of onHandleIntent()
-    
+
 	/**
 	 * Background task to handle Apex lookups. This correctly shows and
 	 * hides the loading animation from the GUI thread before starting a
@@ -240,11 +207,9 @@ public class SyncService extends IntentService {
 		 */
 		@Override
 		protected void onPreExecute() {
-			Iterator<ResultReceiver> iterator = guiReceivers.iterator();
-			while (iterator.hasNext()) {
-				ResultReceiver thisRcvr = iterator.next();
-				 thisRcvr.send(STATUS_RUNNING, Bundle.EMPTY);
-			}
+			Intent result = new Intent(STATUS_UPDATE);
+			result.putExtra(STATUS_RESULT,STATUS_RUNNING);
+			sendBroadcast(result);
 		}
 
 		/**
@@ -256,7 +221,7 @@ public class SyncService extends IntentService {
 		@Override
 		protected Boolean doInBackground(String... args) {
 			Log.d(TAG, "Processing thread started");
-			
+
 			/**
 			 * We can only pass a single result back to the main thread which will then report status
 			 * to the gui.
@@ -264,33 +229,7 @@ public class SyncService extends IntentService {
 			boolean resultFailedFlag=false;
 			ContentResolver dbResolverSyncSrvcThread = getContentResolver();
 
-			final SharedPreferences prefs = getSharedPreferences(Prefs.IOSCHED_SYNC,
-					Context.MODE_PRIVATE);
-
 			try {
-				// Bulk of sync work, performed by executing several fetches from
-				// local and online sources.
-
-//				final long startLocal = System.currentTimeMillis();
-//				final boolean localParse = true;
-//				if (localParse) {
-//					// Load static local data
-//					mLocalExecutor.execute(R.xml.blocks, new LocalBlocksHandler());
-//					mLocalExecutor.execute(R.xml.rooms, new LocalRoomsHandler());
-//					mLocalExecutor.execute(R.xml.tracks, new LocalTracksHandler());
-//					mLocalExecutor.execute(R.xml.search_suggest, new LocalSearchSuggestHandler());
-//					mLocalExecutor.execute(R.xml.sessions, new LocalSessionsHandler());
-//
-//					// Parse values from local cache first, since spreadsheet copy
-//					// or network might be down.
-//					mLocalExecutor.execute(mSyncServiceContext, "cache-sessions.xml", new RemoteSessionsHandler());
-//					mLocalExecutor.execute(mSyncServiceContext, "cache-speakers.xml", new RemoteSpeakersHandler());
-//					mLocalExecutor.execute(mSyncServiceContext, "cache-vendors.xml", new RemoteVendorsHandler());
-//
-//				} // end of localParse
-//				Log.d(TAG, "local sync took " + (System.currentTimeMillis() - startLocal) + "ms");
-
-				// Always hit remote spreadsheet for any updates
 				final long startRemote = System.currentTimeMillis();
 
 				/**
@@ -354,27 +293,24 @@ public class SyncService extends IntentService {
 					} catch (SQLException e) {
 						Log.e(TAG, "Checking if the controller is configured", e);
 						resultFailedFlag=true;
-						
-						final Bundle bundle = new Bundle();
-						bundle.putString(Intent.EXTRA_TEXT, e.toString());
-						Iterator<ResultReceiver> iterator = guiReceivers.iterator();
-						while (iterator.hasNext()) {
-							ResultReceiver thisRcvr = iterator.next();
-							 thisRcvr.send(STATUS_ERROR, bundle);
-						}
 
+						Intent result = new Intent(STATUS_UPDATE);
+						final Bundle bundle = new Bundle();
+						bundle.putInt(STATUS_RESULT,STATUS_ERROR);
+						bundle.putString(Intent.EXTRA_TEXT, e.toString());
+						sendBroadcast(result);
 					} finally {
 						if (cursor != null) {
 							cursor.close();
 						}
 					}
 
-				  if (shouldUpdate) {
+					if (shouldUpdate) {
 						try {
 							Log.d(TAG, "Going to perform an update");
 
 							// Last update is outside throttle window, so update again
-							
+
 							// The logic for handling status, data and programs similarly is not fully hashed out yet...
 							DefaultHandler  xmlParser = new ApexStateXMLParser(dbResolverSyncSrvcThread, controllerUri);
 							mRemoteExecutor.executeGet(controllerUri, xmlParser);
@@ -386,312 +322,301 @@ public class SyncService extends IntentService {
 							// Process this update through the correct provider
 							AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(mSyncServiceContext);
 
-							if(widgetId>0) {
-								AppWidgetProviderInfo info = appWidgetManager.getAppWidgetInfo(widgetId);
-								String providerName = info.provider.getClassName();   // <--- there are crash reports of null pointer here.  How?
-								RemoteViews updateViews = null;
-								Log.d(TAG, "Build a graphical update whatever type of widget this is.");
-								if (providerName.equals(Widget2x1.class.getName())) {
-									Log.d(TAG, "Building a 2x1 widget, ID = " + controllerId + ".");
-									Log.d(TAG, "Building a 2x1 widget, Uri = " + controllerUri + ".");
-									updateViews = Widget2x1.buildUpdate(mSyncServiceContext, controllerUri);
-								} else if (providerName.equals(Widget2x2.class.getName())) {
-									Log.d(TAG, "Building a 2x2 widget, ID = " + controllerId + ".");
-									Log.d(TAG, "Building a 2x2 widget, Uri = " + controllerUri + ".");
-									updateViews = Widget2x2.buildUpdate(mSyncServiceContext, controllerUri);
-								} else if (providerName.equals(Widget1x1.class.getName())) {
-									Log.d(TAG, "Building a 1x1 widget, ID = " + controllerId + ".");
-									Log.d(TAG, "Building a 1x1 widget, Uri = " + controllerUri + ".");
-									updateViews = Widget1x1.buildUpdate(mSyncServiceContext, controllerUri);
-								}
+							//							if(widgetId>0) {
+							//								AppWidgetProviderInfo info = appWidgetManager.getAppWidgetInfo(widgetId);
+							//								String providerName = info.provider.getClassName();   // <--- there are crash reports of null pointer here.  How?
+							//								RemoteViews updateViews = null;
+							//								Log.d(TAG, "Build a graphical update whatever type of widget this is.");
+							//								if (providerName.equals(Widget2x1.class.getName())) {
+							//									Log.d(TAG, "Building a 2x1 widget, ID = " + controllerId + ".");
+							//									Log.d(TAG, "Building a 2x1 widget, Uri = " + controllerUri + ".");
+							//									updateViews = Widget2x1.buildUpdate(mSyncServiceContext, controllerUri);
+							//								} else if (providerName.equals(Widget2x2.class.getName())) {
+							//									Log.d(TAG, "Building a 2x2 widget, ID = " + controllerId + ".");
+							//									Log.d(TAG, "Building a 2x2 widget, Uri = " + controllerUri + ".");
+							//									updateViews = Widget2x2.buildUpdate(mSyncServiceContext, controllerUri);
+							//								} else if (providerName.equals(Widget1x1.class.getName())) {
+							//									Log.d(TAG, "Building a 1x1 widget, ID = " + controllerId + ".");
+							//									Log.d(TAG, "Building a 1x1 widget, Uri = " + controllerUri + ".");
+							//									updateViews = Widget1x1.buildUpdate(mSyncServiceContext, controllerUri);
+							//								}
+							//
+							//								// Push this update to surface
+							//								if (updateViews != null) {
+							//									Log.d(TAG, "Pushing update to the surface, ID = " + controllerId + ".");
+							//									appWidgetManager.updateAppWidget(controllerId, updateViews);
+							//								} else {
+							//									Log.e(TAG, "Some problem building the view, not pushed to the surface.");
+							//								}
+							//						}
+					} catch (HandlerException e) {
+						Log.e(TAG, "Problem while syncing", e);
+						resultFailedFlag=true;							
+						Intent result = new Intent(STATUS_UPDATE);
+						final Bundle bundle = new Bundle();
+						bundle.putInt(STATUS_RESULT,STATUS_ERROR);
+						bundle.putString(Intent.EXTRA_TEXT, e.toString());
+						sendBroadcast(result);
+					} // end of catch
+				} // end of if(should update)
+			} // end of while(more updates)
 
-								// Push this update to surface
-								if (updateViews != null) {
-									Log.d(TAG, "Pushing update to the surface, ID = " + controllerId + ".");
-									appWidgetManager.updateAppWidget(controllerId, updateViews);
-								} else {
-									Log.e(TAG, "Some problem building the view, not pushed to the surface.");
-								}
-							}
-						} catch (HandlerException e) {
-							Log.e(TAG, "Problem while syncing", e);
-							resultFailedFlag=true;
-							final Bundle bundle = new Bundle();
-							bundle.putString(Intent.EXTRA_TEXT, e.toString());
-							Iterator<ResultReceiver> iterator = guiReceivers.iterator();
-							while (iterator.hasNext()) {
-								ResultReceiver thisRcvr = iterator.next();
-								 thisRcvr.send(STATUS_ERROR, bundle);
-							}
-						} // end of catch
-					} // end of if(should update)
-				} // end of while(more updates)
+			// Schedule next update alarm.  updateFreqMins will be 99 if not at least one configured
+			// updateFreqMins will be set from the last widget updated above
+			if(updateIntervalMins!=99 && updateIntervalMins!=0) {
+				updateIntervalMillis = updateIntervalMins * DateUtils.MINUTE_IN_MILLIS;
 
-				// Schedule next update alarm.  updateFreqMins will be 99 if not at least one configured
-				// updateFreqMins will be set from the last widget updated above
-				if(updateIntervalMins!=99 && updateIntervalMins!=0) {
-					updateIntervalMillis = updateIntervalMins * DateUtils.MINUTE_IN_MILLIS;
+				Time nextTime = new Time();
+				nextTime.set(now + updateIntervalMillis);
+				long nextUpdate = nextTime.toMillis(false);
 
-					Time nextTime = new Time();
-					nextTime.set(now + updateIntervalMillis);
-					long nextUpdate = nextTime.toMillis(false);
+				float deltaMinutes = (float)(nextUpdate - now) / (float)DateUtils.MINUTE_IN_MILLIS;
+				Log.d(TAG, "Requesting next update in " + deltaMinutes + " min");
 
-					float deltaMinutes = (float)(nextUpdate - now) / (float)DateUtils.MINUTE_IN_MILLIS;
-					Log.d(TAG, "Requesting next update in " + deltaMinutes + " min");
+				Intent updateIntent = new Intent(ACTION_UPDATE_ALL);
+				updateIntent.setClass(mSyncServiceContext, SyncService.class);
 
-					Intent updateIntent = new Intent(ACTION_UPDATE_ALL);
-					updateIntent.setClass(mSyncServiceContext, SyncService.class);
+				PendingIntent pendingIntent = PendingIntent.getService(mSyncServiceContext, 0, updateIntent, 0);
 
-					PendingIntent pendingIntent = PendingIntent.getService(mSyncServiceContext, 0, updateIntent, 0);
+				//The following is a hack for some failure condition that causes the alarm
+				// to not get reset
+				long repeatInterval = updateIntervalMillis + 1*DateUtils.MINUTE_IN_MILLIS;
 
-					//The following is a hack for some failure condition that causes the alarm
-					// to not get reset
-					long repeatInterval = updateIntervalMillis + 1*DateUtils.MINUTE_IN_MILLIS;
-
-					// Schedule alarm, and force the device awake for this update
-					AlarmManager alarmManager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
-					//alarmManager.set(AlarmManager.RTC_WAKEUP, nextUpdate, pendingIntent);
-					alarmManager.setRepeating(AlarmManager.RTC, nextUpdate, repeatInterval, pendingIntent);
+				// Schedule alarm, and force the device awake for this update
+				AlarmManager alarmManager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
+				//alarmManager.set(AlarmManager.RTC_WAKEUP, nextUpdate, pendingIntent);
+				alarmManager.setRepeating(AlarmManager.RTC, nextUpdate, repeatInterval, pendingIntent);
 				Log.d(TAG, "remote sync took " + (System.currentTimeMillis() - startRemote) + "ms");
-				}
-			} catch (Exception e) {
-				Log.e(TAG, "Problem while syncing", e);
-				resultFailedFlag = true;
-			} // end of catch exception
-			return resultFailedFlag;
-		} // end of doInBackgrount
-
-		/**
-		 * Our progress update pushes a timestamp/error update.
-		 * 
-		 * This method is executed in the UI thread space.
-		 */
-		@Override
-		protected void onProgressUpdate(Integer... arg) {
-			//if (guiStatusReceiver != null) guiStatusReceiver.send(STATUS_RUNNING, Bundle.EMPTY);	
-		}
-
-		/**
-		 * When finished, push the newly-found entry content into our
-		 * {@link WebView} and hide the {@link ProgressBar}.
-		 * 
-		 * This method is executed in the UI thread space.
-		 */
-		@Override
-		protected void onPostExecute(Boolean resultFailedFlag) {
-	        // Announce success to any surface listener
-			if (resultFailedFlag) {
-				Iterator<ResultReceiver> iterator = guiReceivers.iterator();
-				while (iterator.hasNext()) {
-					ResultReceiver thisRcvr = iterator.next();
-					 thisRcvr.send(STATUS_ERROR, Bundle.EMPTY);
-				}
 			}
-			else {
-				Iterator<ResultReceiver> iterator = guiReceivers.iterator();
-				while (iterator.hasNext()) {
-					ResultReceiver thisRcvr = iterator.next();
-					 thisRcvr.send(STATUS_FINISHED, Bundle.EMPTY);
-				}
-			}
+		} catch (Exception e) {
+			Log.e(TAG, "Problem while syncing", e);
+			resultFailedFlag = true;
+		} // end of catch exception
+		return resultFailedFlag;
+	} // end of doInBackgrount
 
-			// No updates remaining, so stop service
-			stopSelf();
-		}
+	/**
+	 * Our progress update pushes a timestamp/error update.
+	 * 
+	 * This method is executed in the UI thread space.
+	 */
+	@Override
+	protected void onProgressUpdate(Integer... arg) {
+		//if (guiStatusReceiver != null) guiStatusReceiver.send(STATUS_RUNNING, Bundle.EMPTY);	
 	}
 
-    /**
-     * Generate and return a {@link HttpClient} configured for general use,
-     * including setting an application-specific user-agent string.
-     */
-	public static HttpClient getHttpClient(Context context) {
-		final HttpParams params = new BasicHttpParams();
+	/**
+	 * When finished, push the newly-found entry content into our
+	 * {@link WebView} and hide the {@link ProgressBar}.
+	 * 
+	 * This method is executed in the UI thread space.
+	 */
+	@Override
+	protected void onPostExecute(Boolean resultFailedFlag) {
+		// Announce success to any surface listener
+		final Bundle bundle = new Bundle();
+		Intent result = new Intent(STATUS_UPDATE);
+		if (resultFailedFlag) {
+			bundle.putInt(STATUS_RESULT,STATUS_ERROR);
+		}
+		else {
+			bundle.putInt(STATUS_RESULT,STATUS_FINISHED);
+		}
+		sendBroadcast(result);
 
-		// Use generous timeouts for slow mobile networks
-		HttpConnectionParams.setConnectionTimeout(params, 20 * SECOND_IN_MILLIS);
-		HttpConnectionParams.setSoTimeout(params, 20 * SECOND_IN_MILLIS);
+		// No updates remaining, so stop service
+		stopSelf();
+	}
+}
 
-		HttpConnectionParams.setSocketBufferSize(params, 8192);
-		HttpProtocolParams.setUserAgent(params, buildUserAgent(context));
+/**
+ * Generate and return a {@link HttpClient} configured for general use,
+ * including setting an application-specific user-agent string.
+ */
+public static HttpClient getHttpClient(Context context) {
+	final HttpParams params = new BasicHttpParams();
 
-		final DefaultHttpClient client = new DefaultHttpClient(params);
+	// Use generous timeouts for slow mobile networks
+	HttpConnectionParams.setConnectionTimeout(params, 20 * SECOND_IN_MILLIS);
+	HttpConnectionParams.setSoTimeout(params, 20 * SECOND_IN_MILLIS);
 
-		client.addRequestInterceptor(new HttpRequestInterceptor() {
-			public void process(HttpRequest request, HttpContext context) {
-				// Add header to accept gzip content
-				if (!request.containsHeader(HEADER_ACCEPT_ENCODING)) {
-					request.addHeader(HEADER_ACCEPT_ENCODING, ENCODING_GZIP);
-				}
+	HttpConnectionParams.setSocketBufferSize(params, 8192);
+	HttpProtocolParams.setUserAgent(params, buildUserAgent(context));
+
+	final DefaultHttpClient client = new DefaultHttpClient(params);
+
+	client.addRequestInterceptor(new HttpRequestInterceptor() {
+		public void process(HttpRequest request, HttpContext context) {
+			// Add header to accept gzip content
+			if (!request.containsHeader(HEADER_ACCEPT_ENCODING)) {
+				request.addHeader(HEADER_ACCEPT_ENCODING, ENCODING_GZIP);
 			}
-		});
+		}
+	});
 
-		client.addResponseInterceptor(new HttpResponseInterceptor() {
-			public void process(HttpResponse response, HttpContext context) {
-				// Inflate any responses compressed with gzip
-				final HttpEntity entity = response.getEntity();
-				final Header encoding = entity.getContentEncoding();
-				if (encoding != null) {
-					for (HeaderElement element : encoding.getElements()) {
-						if (element.getName().equalsIgnoreCase(ENCODING_GZIP)) {
-							response.setEntity(new InflatingEntity(response.getEntity()));
-							break;
-						}
+	client.addResponseInterceptor(new HttpResponseInterceptor() {
+		public void process(HttpResponse response, HttpContext context) {
+			// Inflate any responses compressed with gzip
+			final HttpEntity entity = response.getEntity();
+			final Header encoding = entity.getContentEncoding();
+			if (encoding != null) {
+				for (HeaderElement element : encoding.getElements()) {
+					if (element.getName().equalsIgnoreCase(ENCODING_GZIP)) {
+						response.setEntity(new InflatingEntity(response.getEntity()));
+						break;
 					}
 				}
 			}
-		});
-		return client;
-	}
-
-    /**
-     * Build and return a user-agent string that can identify this application
-     * to remote servers. Contains the package name and version code.
-     */
-    private static String buildUserAgent(Context context) {
-        try {
-            final PackageManager manager = context.getPackageManager();
-            final PackageInfo info = manager.getPackageInfo(context.getPackageName(), 0);
-
-            // Some APIs require "(gzip)" in the user-agent string.
-            return info.packageName + "/" + info.versionName
-                    + " (" + info.versionCode + ") (gzip)";
-        } catch (NameNotFoundException e) {
-            return null;
-        }
-    }
-
-    /**
-     * Simple {@link HttpEntityWrapper} that inflates the wrapped
-     * {@link HttpEntity} by passing it through {@link GZIPInputStream}.
-     */
-    private static class InflatingEntity extends HttpEntityWrapper {
-        public InflatingEntity(HttpEntity wrapped) {
-            super(wrapped);
-        }
-
-        @Override
-        public InputStream getContent() throws IOException {
-            return new GZIPInputStream(wrappedEntity.getContent());
-        }
-
-        @Override
-        public long getContentLength() {
-            return -1;
-        }
-    }
-
-    private interface Prefs {
-        String IOSCHED_SYNC = "iosched_sync";
-        String LOCAL_VERSION = "local_version";
-    }
-    
-	/**
-	 * Maintain a queue of widgets that are requesting update.  
-	 * 
-	 */
-	
-	/**
-	 * Lock used when maintaining queue of requested updates.
-	 */
-	private static Object sLock = new Object();
-
-	/**
-	 * Internal queue of requested widget updates. You <b>must</b> access
-	 * through {@link #requestUpdate(int[])} or {@link #getNextUpdate()} to make
-	 * sure your access is correctly synchronized.
-	 */
-	private static Queue<Integer> sControllerIds = new LinkedList<Integer>();
-
-	/**
-	 * Request updates for the given widgets. Will only queue them up, you are
-	 * still responsible for starting a processing thread if needed, usually by
-	 * starting the parent service.
-	 */
-	public static void requestUpdate(int[] controllerIds) {
-		synchronized (sLock) {
-			for (int controllerId : controllerIds) {
-				sControllerIds.add(controllerId);
-			}
 		}
+	});
+	return client;
+}
+
+/**
+ * Build and return a user-agent string that can identify this application
+ * to remote servers. Contains the package name and version code.
+ */
+private static String buildUserAgent(Context context) {
+	try {
+		final PackageManager manager = context.getPackageManager();
+		final PackageInfo info = manager.getPackageInfo(context.getPackageName(), 0);
+
+		// Some APIs require "(gzip)" in the user-agent string.
+		return info.packageName + "/" + info.versionName
+				+ " (" + info.versionCode + ") (gzip)";
+	} catch (NameNotFoundException e) {
+		return null;
+	}
+}
+
+/**
+ * Simple {@link HttpEntityWrapper} that inflates the wrapped
+ * {@link HttpEntity} by passing it through {@link GZIPInputStream}.
+ */
+private static class InflatingEntity extends HttpEntityWrapper {
+	public InflatingEntity(HttpEntity wrapped) {
+		super(wrapped);
 	}
 
-	/**
-	 * Request updates for the given widgets. Will only queue them up, you are
-	 * still responsible for starting a processing thread if needed, usually by
-	 * starting the parent service.
-	 */
-	public static void requestUpdate(int controllerId) {
-		synchronized (sLock) {
+	@Override
+	public InputStream getContent() throws IOException {
+		return new GZIPInputStream(wrappedEntity.getContent());
+	}
+
+	@Override
+	public long getContentLength() {
+		return -1;
+	}
+}
+
+
+/**
+ * Maintain a queue of widgets that are requesting update.  
+ * 
+ */
+
+/**
+ * Lock used when maintaining queue of requested updates.
+ */
+private static Object sLock = new Object();
+
+/**
+ * Internal queue of requested widget updates. You <b>must</b> access
+ * through {@link #requestUpdate(int[])} or {@link #getNextUpdate()} to make
+ * sure your access is correctly synchronized.
+ */
+private static Queue<Integer> sControllerIds = new LinkedList<Integer>();
+
+/**
+ * Request updates for the given widgets. Will only queue them up, you are
+ * still responsible for starting a processing thread if needed, usually by
+ * starting the parent service.
+ */
+public static void requestUpdate(int[] controllerIds) {
+	synchronized (sLock) {
+		for (int controllerId : controllerIds) {
 			sControllerIds.add(controllerId);
 		}
 	}
+}
 
-	/**
-	 * Peek if we have more updates to perform. This method is special because
-	 * it assumes you're calling from the update thread, and that you will
-	 * terminate if no updates remain. (It atomically resets
-	 * {@link #sThreadRunning} when none remain to prevent race conditions.)
-	 */
-	private static boolean hasMoreUpdates() {
-		synchronized (sLock) {
-			boolean hasMore = !sControllerIds.isEmpty();
-			if (!hasMore) {
-				sThreadRunning = false;
-			}
-			return hasMore;
+/**
+ * Request updates for the given widgets. Will only queue them up, you are
+ * still responsible for starting a processing thread if needed, usually by
+ * starting the parent service.
+ */
+public static void requestUpdate(int controllerId) {
+	synchronized (sLock) {
+		sControllerIds.add(controllerId);
+	}
+}
+
+/**
+ * Peek if we have more updates to perform. This method is special because
+ * it assumes you're calling from the update thread, and that you will
+ * terminate if no updates remain. (It atomically resets
+ * {@link #sThreadRunning} when none remain to prevent race conditions.)
+ */
+private static boolean hasMoreUpdates() {
+	synchronized (sLock) {
+		boolean hasMore = !sControllerIds.isEmpty();
+		if (!hasMore) {
+			sThreadRunning = false;
+		}
+		return hasMore;
+	}
+}
+
+/**
+ * Poll the next widget update in the queue.
+ */
+private static int getNextUpdate() {
+	synchronized (sLock) {
+		if (sControllerIds.peek() == null) {
+			return AppWidgetManager.INVALID_APPWIDGET_ID;
+		} else {
+			return sControllerIds.poll();
 		}
 	}
+}
+private interface ControllersQuery {
+	String[] PROJECTION = {
+			//              String CONTROLLER_ID = "_id";
+			//              String TITLE = "title";
+			//              String WAN_URL = "wan_url";
+			//              String LAN_URL = "wifi_url";
+			//              String WIFI_SSID = "wifi_ssid";
+			//              String USER = "user";
+			//              String PW = "pw";
+			//              String LAST_UPDATED = "last_updated";
+			//              String UPDATE_INTERVAL = "update_i";
+			//              String DB_SAVE_DAYS = "db_save_days";
+			//              String CONTROLLER_TYPE = "controller_type";
+			BaseColumns._ID,
+			AquaNotesDbContract.Controllers.TITLE,
+			AquaNotesDbContract.Controllers.WAN_URL,
+			AquaNotesDbContract.Controllers.LAN_URL,
+			AquaNotesDbContract.Controllers.WIFI_SSID,
+			AquaNotesDbContract.Controllers.USER,
+			AquaNotesDbContract.Controllers.PW,
+			AquaNotesDbContract.Controllers.LAST_UPDATED,
+			AquaNotesDbContract.Controllers.UPDATE_INTERVAL,
+			AquaNotesDbContract.Controllers.DB_SAVE_DAYS,
+			AquaNotesDbContract.Controllers.MODEL,
+			AquaNotesDbContract.Controllers.WIDGET,
+	};
 
-	/**
-	 * Poll the next widget update in the queue.
-	 */
-	private static int getNextUpdate() {
-		synchronized (sLock) {
-			if (sControllerIds.peek() == null) {
-				return AppWidgetManager.INVALID_APPWIDGET_ID;
-			} else {
-				return sControllerIds.poll();
-			}
-		}
-	}
-    private interface ControllersQuery {
-        String[] PROJECTION = {
-//              String CONTROLLER_ID = "_id";
-//              String TITLE = "title";
-//              String WAN_URL = "wan_url";
-//              String LAN_URL = "wifi_url";
-//              String WIFI_SSID = "wifi_ssid";
-//              String USER = "user";
-//              String PW = "pw";
-//              String LAST_UPDATED = "last_updated";
-//              String UPDATE_INTERVAL = "update_i";
-//              String DB_SAVE_DAYS = "db_save_days";
-//              String CONTROLLER_TYPE = "controller_type";
-                BaseColumns._ID,
-                AquaNotesDbContract.Controllers.TITLE,
-                AquaNotesDbContract.Controllers.WAN_URL,
-                AquaNotesDbContract.Controllers.LAN_URL,
-                AquaNotesDbContract.Controllers.WIFI_SSID,
-                AquaNotesDbContract.Controllers.USER,
-                AquaNotesDbContract.Controllers.PW,
-                AquaNotesDbContract.Controllers.LAST_UPDATED,
-                AquaNotesDbContract.Controllers.UPDATE_INTERVAL,
-                AquaNotesDbContract.Controllers.DB_SAVE_DAYS,
-                AquaNotesDbContract.Controllers.MODEL,
-                AquaNotesDbContract.Controllers.WIDGET,
-        };
-        
-        int _ID = 0;
-        int TITLE = 1;
-        int WAN_URL = 2;
-        int LAN_URL = 3;
-        int WIFI_SSID = 4;
-        int USER = 5;
-        int PW = 6;
-        int LAST_UPDATED = 7;
-        int UPDATE_INTERVAL = 8;
-        int DB_SAVE_DAYS = 9;
-        int MODEL = 10;
-        int WIDGET = 11;
-    }
+	int _ID = 0;
+	int TITLE = 1;
+	int WAN_URL = 2;
+	int LAN_URL = 3;
+	int WIFI_SSID = 4;
+	int USER = 5;
+	int PW = 6;
+	int LAST_UPDATED = 7;
+	int UPDATE_INTERVAL = 8;
+	int DB_SAVE_DAYS = 9;
+	int MODEL = 10;
+	int WIDGET = 11;
+}
 }

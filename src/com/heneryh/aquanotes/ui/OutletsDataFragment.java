@@ -77,6 +77,8 @@ public class OutletsDataFragment extends ListFragment implements
     private Cursor mCursor;
     private Uri outletsUri;
     private Uri controllerUri;
+    
+    boolean hackBailOut = true; // this is a bug in my code for when the dashboard updates and call this fragments refreshSelf but this is not in foreground
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -133,7 +135,7 @@ public class OutletsDataFragment extends ListFragment implements
     public void reloadSelf(Uri newOutletsUri) {
     	outletsUri = newOutletsUri;
 
-    	if (outletsUri == null) {
+    	if (outletsUri == null || hackBailOut) {
     		return;
     	}
 
@@ -158,11 +160,13 @@ public class OutletsDataFragment extends ListFragment implements
         if (mCursor != null) {
             mCursor.requery();
         }
+        hackBailOut=false;
     }
 
     @Override
     public void onPause() {
         super.onPause();
+        hackBailOut=true;
 //        getActivity().getContentResolver().unregisterContentObserver(mOutletsChangesObserver);
     }
 
@@ -180,19 +184,19 @@ public class OutletsDataFragment extends ListFragment implements
 
     /** {@inheritDoc} */
     public void onQueryComplete(int token, Object cookie, Cursor cursor) {
-        if (mCursor != null) {
-            // In case cancelOperation() doesn't work and we end up with consecutive calls to this
-            // callback.
-            getActivity().stopManagingCursor(mCursor);
-            mCursor = null;
-        }
+    		if (mCursor != null) {
+    			// In case cancelOperation() doesn't work and we end up with consecutive calls to this
+    			// callback.
+    			getActivity().stopManagingCursor(mCursor);
+    			mCursor = null;
+    		}
 
-        mCursor = cursor;
-        getActivity().startManagingCursor(mCursor);
-        mAdapter.changeCursor(mCursor);
-//        if (mCheckedPosition >= 0 && getView() != null) {
-//            getListView().setItemChecked(mCheckedPosition, true);
-//        }
+    		mCursor = cursor;
+    		getActivity().startManagingCursor(mCursor);
+    		mAdapter.changeCursor(mCursor);
+    		//        if (mCheckedPosition >= 0 && getView() != null) {
+    		//            getListView().setItemChecked(mCheckedPosition, true);
+    		//        }
     }
 
     /** {@inheritDoc} */

@@ -39,7 +39,7 @@ import com.heneryh.aquanotes.provider.AquaNotesDbContract;
 import com.heneryh.aquanotes.provider.AquaNotesDbContract.Controllers;
 import com.heneryh.aquanotes.provider.AquaNotesDbContract.Data;
 import com.heneryh.aquanotes.service.SyncService;
-import com.heneryh.aquanotes.ui.HomeActivity.SyncStatusUpdaterFragment;
+import com.heneryh.aquanotes.ui.HomeActivity.MyIntentReceiver;
 import com.heneryh.aquanotes.ui.widget.BlockView;
 import com.heneryh.aquanotes.ui.widget.ObservableScrollView;
 import com.heneryh.aquanotes.ui.widget.Workspace;
@@ -47,9 +47,12 @@ import com.heneryh.aquanotes.util.AnalyticsUtils;
 import com.heneryh.aquanotes.util.DetachableResultReceiver;
 import com.heneryh.aquanotes.util.MotionEventUtils;
 import com.heneryh.aquanotes.util.NotifyingAsyncQueryHandler;
+
+import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
@@ -68,6 +71,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -90,7 +94,9 @@ public class ControllersActivity extends BaseMultiPaneActivity implements
 								NotifyingAsyncQueryHandler.AsyncQueryListener,
 								View.OnClickListener  {
 
-    private SyncStatusUpdaterFragment mSyncStatusUpdaterFragment;
+//  private SyncStatusUpdaterFragment mSyncStatusUpdaterFragment; // Using broadcast receiver now for sync status updates
+	Context controllerActContext;
+    MyIntentReceiver statusIntentReceiver;
 
     /**
 	 * Base tags for the tabs in each controller.  The actual tag will be the base+id.
@@ -157,7 +163,7 @@ public class ControllersActivity extends BaseMultiPaneActivity implements
 
 		private OutletsDataFragment mOutletsFragment;
 		private ProbesFragment mProbesFragment;
-//        private NotesFragment mNotesFragment;
+//      private NotesFragment mNotesFragment; // alternate way of managing tabs
 
 		private Integer mControllerId;
 		private Uri mControllerUri;
@@ -171,10 +177,10 @@ public class ControllersActivity extends BaseMultiPaneActivity implements
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		controllerActContext = this;
 
         AnalyticsUtils.getInstance(this).trackPageView("/Controllers");
-
-        getActivityHelper().setupActionBar(null, 0);
 
 		/**
 		 * The handler in this case only gets the list of active controllers
@@ -190,6 +196,8 @@ public class ControllersActivity extends BaseMultiPaneActivity implements
 		mWorkspaceTitleView = (TextView) findViewById(R.id.controller_ws_title);
 		mRightIndicator = findViewById(R.id.indicator_right);
 		mWorkspace = (Workspace) findViewById(R.id.workspace);
+
+        getActivityHelper().setupActionBar("empty", 0);
 
 		/**
 		 * Add click listeners for the scroll buttons.
@@ -264,16 +272,18 @@ public class ControllersActivity extends BaseMultiPaneActivity implements
 		  */
 		 mRemoteExecutor = new ApexExecutor(this, httpClient, dbResolverControllerAct);
 
-		 
-		 FragmentManager fm = getSupportFragmentManager();
 
-		 mSyncStatusUpdaterFragment = (SyncStatusUpdaterFragment) fm
-				 .findFragmentByTag(SyncStatusUpdaterFragment.TAG);
-		 if (mSyncStatusUpdaterFragment == null) {
-			 mSyncStatusUpdaterFragment = new SyncStatusUpdaterFragment();
-			 fm.beginTransaction().add(mSyncStatusUpdaterFragment,
-					 SyncStatusUpdaterFragment.TAG).commit();
-		 }
+	        statusIntentReceiver = new MyIntentReceiver();
+
+//		 FragmentManager fm = getSupportFragmentManager();
+//
+//		 mSyncStatusUpdaterFragment = (SyncStatusUpdaterFragment) fm
+//				 .findFragmentByTag(SyncStatusUpdaterFragment.TAG);
+//		 if (mSyncStatusUpdaterFragment == null) {
+//			 mSyncStatusUpdaterFragment = new SyncStatusUpdaterFragment();
+//			 fm.beginTransaction().add(mSyncStatusUpdaterFragment,
+//					 SyncStatusUpdaterFragment.TAG).commit();
+//		 }
 
 	}
 
@@ -287,17 +297,39 @@ public class ControllersActivity extends BaseMultiPaneActivity implements
 		getActivityHelper().setupSubActivity();
 	}
 
+	@Override
+	public void onResume() {
+		super.onResume();
+
+	    IntentFilter intentFilter = new IntentFilter(SyncService.STATUS_UPDATE);
+	    registerReceiver(statusIntentReceiver, intentFilter); 
+
+		// Since we build our views manually instead of using an adapter, we
+		// need to manually requery every time launched.
+		requery();
+	}
+
+	@Override
+	public void onPause() {
+		super.onPause();
+//		// De-register any listeners that we want
+//		getContentResolver().unregisterContentObserver(mControllerChangesObserver);
+	
+		unregisterReceiver(statusIntentReceiver);
+
+	}
+
+
 	/**
 	 * 
 	 * @param menu
 	 * @return
 	 */
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.refresh_menu_items, menu);
-		super.onCreateOptionsMenu(menu);
-		return true;
-	}
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+        return true;
+    }
 
 	/**
 	 * If the user hits the 'Refresh Spinner' kick off a new polling event.
@@ -319,7 +351,7 @@ public class ControllersActivity extends BaseMultiPaneActivity implements
 	 */
 	private void triggerRefresh() {
 		final Intent intent = new Intent(Intent.ACTION_SYNC, null, this, SyncService.class);
-        intent.putExtra(SyncService.EXTRA_STATUS_RECEIVER, mSyncStatusUpdaterFragment.mReceiver);
+//      intent.putExtra(SyncService.EXTRA_STATUS_RECEIVER, mSyncStatusUpdaterFragment.mReceiver);
 		startService(intent);
 	}
 
@@ -338,7 +370,7 @@ public class ControllersActivity extends BaseMultiPaneActivity implements
 
 		Ctlr ctlr = mCtlrs.get(ctlrIndex);
 		mWorkspaceTitleView.setText(ctlr.mTitleString);
-		//getActivityHelper().setupActionBar(ctlr.mTitleString/*getTitle()*/, 0);
+        getActivityHelper().setActionBarTitle(ctlr.mTitleString);
 
 		mLeftIndicator
 		.setVisibility((ctlrIndex != 0) ? View.VISIBLE : View.INVISIBLE);
@@ -374,14 +406,14 @@ public class ControllersActivity extends BaseMultiPaneActivity implements
 		ctlr.mStarredView.setFocusable(true);
 		ctlr.mStarredView.setClickable(true);
 
-//        	ctlr.mTabHost = (TabHost) findViewById(android.R.id.tabhost);
-//        	ctlr.mTabWidget = (TabWidget) findViewById(android.R.id.tabs);
-//        	ctlr.mTabHost.setup();
+//      ctlr.mTabHost = (TabHost) findViewById(android.R.id.tabhost);
+//      ctlr.mTabWidget = (TabWidget) findViewById(android.R.id.tabs);
+//      ctlr.mTabHost.setup();
 
 		ctlr.mTabHost = (TabHost) ctlr.mRootView.findViewById(android.R.id.tabhost);
 		ctlr.mTabWidget = (TabWidget) ctlr.mRootView.findViewById(android.R.id.tabs);
 		ctlr.mTabHost.setup();
-//        	ctlr.mTabManager = new TabManager(this, ctlr.mTabHost, R.id.realtabcontent);
+//      ctlr.mTabManager = new TabManager(this, ctlr.mTabHost, R.id.realtabcontent);
 		
 		ctlr.index = mCtlrs.size();
 		if(cursor!=null) {
@@ -459,12 +491,11 @@ public class ControllersActivity extends BaseMultiPaneActivity implements
 		}
 		ctlr.probeFragmentContainer = new FrameLayout(this);
 		ctlr.probeFragmentContainer.setId(Rid);
-//            ctlr.probeFragmentContainer.setLayoutParams(
+//      ctlr.probeFragmentContainer.setLayoutParams(
 //                    new ViewGroup.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT,
 //                            ViewGroup.LayoutParams.FILL_PARENT));
 		((ViewGroup) ctlr.mRootView.findViewById(android.R.id.tabcontent)).addView(ctlr.probeFragmentContainer);
 
-//            final Intent intent = new Intent(Intent.ACTION_VIEW, Probes.buildQueryProbesUri(ctlr.mControllerUri));
 		final Intent intent = new Intent(Intent.ACTION_VIEW, Data.buildQueryPDataAtUri(ctlr.mControllerId, ctlr.mTimestamp));
 
 		final FragmentManager fm = getSupportFragmentManager();
@@ -538,13 +569,13 @@ public class ControllersActivity extends BaseMultiPaneActivity implements
 		// TODO: this is very inefficient and messy, clean it up
 		ctlr.outletFragmentContainer = new FrameLayout(this);
 		ctlr.outletFragmentContainer.setId(Rid);
-//        ctlr.outletFragmentContainer.setLayoutParams(
+//      ctlr.outletFragmentContainer.setLayoutParams(
 //                new ViewGroup.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT,
 //                        ViewGroup.LayoutParams.FILL_PARENT));
 		((ViewGroup) ctlr.mRootView.findViewById(android.R.id.tabcontent)).addView(ctlr.outletFragmentContainer);
 
 		final Intent intent = new Intent(Intent.ACTION_VIEW, Data.buildQueryODataAtUri(ctlr.mControllerId, ctlr.mTimestamp));
-//        final Intent intent = new Intent(Intent.ACTION_VIEW, Data.buildQueryAllOutletDataUri(ctlr.mControllerId));
+//      final Intent intent = new Intent(Intent.ACTION_VIEW, Data.buildQueryAllOutletDataUri(ctlr.mControllerId));
 
 
 		final FragmentManager fm = getSupportFragmentManager();
@@ -620,35 +651,12 @@ public class ControllersActivity extends BaseMultiPaneActivity implements
 			updateWorkspaceHeader(cntl.index);
 
 		} finally {
-//            cursor.close();
+//			cursor.close();  closed a level above
 		}
 	}
 
 
 
-	@Override
-	public void onResume() {
-		super.onResume();
-
-		// Since we build our views manually instead of using an adapter, we
-		// need to manually requery every time launched.
-		requery();
-
-		// Re-register any listeners that we want
-		Iterator<Ctlr> iterator = mCtlrs.iterator();
-		while (iterator.hasNext()) {
-			Ctlr ctlr = iterator.next();
-			if(ctlr.mControllerUri!=null)
-				getContentResolver().registerContentObserver(ctlr.mControllerUri, false, mControllerChangesObserver);
-		}
-	}
-
-	@Override
-	public void onPause() {
-		super.onPause();
-		// De-register any listeners that we want
-		getContentResolver().unregisterContentObserver(mControllerChangesObserver);
-	}
 
 	public void onScrollChanged(ObservableScrollView view) {
 		// Keep each day view at the same vertical scroll offset.
@@ -688,11 +696,6 @@ public class ControllersActivity extends BaseMultiPaneActivity implements
 
 	public void onControllersQueryComplete(Cursor cursor) {
 
-		// BlocksView is like our TabHost, there is one per day or one per controller
-
-		// The sample picked up the current day from a cookie but we'll need
-		// to find the controller from the database record
-
 		try {
 			/** For each controller in the database, */
 			while (cursor.moveToNext()) {
@@ -707,6 +710,7 @@ public class ControllersActivity extends BaseMultiPaneActivity implements
 					if(ctlr.mControllerId==controllerId) 
 						index=ctlr.index;
 				}
+				
 				// Depending on whether or not this controller has already been
 				// registered with the tab-host we'll act differently
 
@@ -716,28 +720,24 @@ public class ControllersActivity extends BaseMultiPaneActivity implements
 					thisCtlr = new Ctlr();
 					setupCtlr(thisCtlr, cursor);
 				}
-				else 
-
-					if (index == -1) {
-						// else if it is not found, create a new one
-						thisCtlr = new Ctlr();
-						setupCtlr(thisCtlr, cursor);
-					}
-					else {
-						// otherwise it must be in there somewhere
-						thisCtlr = mCtlrs.get(index);
-					}
+				else if (index == -1) {
+					// else if it is not found, create a new one
+					thisCtlr = new Ctlr();
+					setupCtlr(thisCtlr, cursor);
+				}
+				else {
+					// otherwise it must be in there somewhere
+					thisCtlr = mCtlrs.get(index);
+				}
 				updateControllerTabs(thisCtlr, cursor);
 
 			} // end of while()
 		} finally {
 			cursor.close();
 		}
-
-
+		
 		//Can't seem to force the tab to the proper heading so just go to last or first
 		updateWorkspaceHeader(0 /*mCtlrs.size()-1*/);
-		//    	mWorkspace.setCurrentScreenNow(mCtlrs.size()-1);
 	}
 
 	//    @Override
@@ -877,17 +877,17 @@ public class ControllersActivity extends BaseMultiPaneActivity implements
 		int _TOKEN = 0x1;
 
 		String[] PROJECTION = {
-				//              String CONTROLLER_ID = "_id";
-				//              String TITLE = "title";
-				//              String WAN_URL = "wan_url";
-				//              String LAN_URL = "wifi_url";
-				//              String WIFI_SSID = "wifi_ssid";
-				//              String USER = "user";
-				//              String PW = "pw";
-				//              String LAST_UPDATED = "last_updated";
-				//              String UPDATE_INTERVAL = "update_i";
-				//              String DB_SAVE_DAYS = "db_save_days";
-				//              String CONTROLLER_TYPE = "controller_type";
+//              String CONTROLLER_ID = "_id";
+//              String TITLE = "title";
+//              String WAN_URL = "wan_url";
+//              String LAN_URL = "wifi_url";
+//              String WIFI_SSID = "wifi_ssid";
+//              String USER = "user";
+//              String PW = "pw";
+//              String LAST_UPDATED = "last_updated";
+//              String UPDATE_INTERVAL = "update_i";
+//              String DB_SAVE_DAYS = "db_save_days";
+//              String CONTROLLER_TYPE = "controller_type";
 				BaseColumns._ID,
 				AquaNotesDbContract.Controllers.TITLE,
 				AquaNotesDbContract.Controllers.WAN_URL,
@@ -929,6 +929,13 @@ public class ControllersActivity extends BaseMultiPaneActivity implements
 		}
 	}
 
+	/**
+	 * This is an activity method that will get called from the outlet tab fragment.  I had to push the functionality
+	 * up here to the activity level for it to work properly.
+	 * @param cid
+	 * @param name
+	 * @param position
+	 */
 	void outletUpdate(int cid, String name, int position) {
 		Cursor cursor = null;
 		try {
@@ -989,8 +996,11 @@ public class ControllersActivity extends BaseMultiPaneActivity implements
 			triggerRefresh();
 		}	
 	}
+	
+	
 	/**
-	 * There is an embedded http client helper below
+	 * There is an embedded http client helper below.  Why do I need to keep copies of this in each activity
+	 * that uses the remote executor?  I should be able to have a single copy.  No time to figure it out now...
 	 */
 	private static final String HEADER_ACCEPT_ENCODING = "Accept-Encoding";
 	private static final String ENCODING_GZIP = "gzip";
@@ -1076,59 +1086,87 @@ public class ControllersActivity extends BaseMultiPaneActivity implements
 		}
 	}
 
-	
-    /**
-     * A non-UI fragment, retained across configuration changes, that updates its activity's UI
-     * when sync status changes.
-     */
-    public static class SyncStatusUpdaterFragment extends Fragment
-            implements DetachableResultReceiver.Receiver {
-        public static final String TAG = SyncStatusUpdaterFragment.class.getName()+"_2";
-
-        private boolean mSyncing = false;
-        private DetachableResultReceiver mReceiver;
-
-        @Override
-        public void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            setRetainInstance(true);
-            mReceiver = new DetachableResultReceiver(new Handler());
-            mReceiver.setReceiver(this);
-        }
-
-        /** {@inheritDoc} */
-        public void onReceiveResult(int resultCode, Bundle resultData) {
-            ControllersActivity activity = (ControllersActivity) getActivity();
-            if (activity == null) {
-                return;
-            }
-
-            switch (resultCode) {
-                case SyncService.STATUS_RUNNING: {
-                    mSyncing = true;
-                    break;
-                }
-                case SyncService.STATUS_FINISHED: {
-                    mSyncing = false;
-                    break;
-                }
-                case SyncService.STATUS_ERROR: {
-                    // Error happened down in SyncService, show as toast.
-                    mSyncing = false;
-                    final String errorText = getString(R.string.toast_sync_error, resultData
-                            .getString(Intent.EXTRA_TEXT));
-                    Toast.makeText(activity, errorText, Toast.LENGTH_LONG).show();
-                    break;
-                }
-            }
-            activity.updateRefreshStatus(mSyncing);
-        }
-
-        @Override
-        public void onActivityCreated(Bundle savedInstanceState) {
-            super.onActivityCreated(savedInstanceState);
-            ((ControllersActivity) getActivity()).updateRefreshStatus(mSyncing);
-        }
+    public class MyIntentReceiver extends BroadcastReceiver {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			Bundle resultData = intent.getExtras();
+			int resultCode = intent.getIntExtra(SyncService.STATUS_RESULT, 0);
+			boolean mSyncing = false;
+			switch (resultCode) {
+			case SyncService.STATUS_RUNNING: {
+				mSyncing = true;
+				break;
+			}
+			case SyncService.STATUS_FINISHED: {
+				mSyncing = false;
+				break;
+			}
+			case SyncService.STATUS_ERROR: {
+				// Error happened down in SyncService, show as toast.
+				mSyncing = false;
+				final String errorText = getString(R.string.toast_sync_error, resultData
+						.getString(Intent.EXTRA_TEXT));
+				Toast.makeText(controllerActContext, errorText, Toast.LENGTH_LONG).show();
+				break;
+			}
+			}
+			updateRefreshStatus(mSyncing);
+		}
     }
+    
+	
+//    /**
+//     * A non-UI fragment, retained across configuration changes, that updates its activity's UI
+//     * when sync status changes.
+//     */
+//    public static class SyncStatusUpdaterFragment extends Fragment
+//            implements DetachableResultReceiver.Receiver {
+//        public static final String TAG = SyncStatusUpdaterFragment.class.getName()+"_2";
+//
+//        private boolean mSyncing = false;
+//        private DetachableResultReceiver mReceiver;
+//
+//        @Override
+//        public void onCreate(Bundle savedInstanceState) {
+//            super.onCreate(savedInstanceState);
+//            setRetainInstance(true);
+//            mReceiver = new DetachableResultReceiver(new Handler());
+//            mReceiver.setReceiver(this);
+//        }
+//
+//        /** {@inheritDoc} */
+//        public void onReceiveResult(int resultCode, Bundle resultData) {
+//            ControllersActivity activity = (ControllersActivity) getActivity();
+//            if (activity == null) {
+//                return;
+//            }
+//
+//            switch (resultCode) {
+//                case SyncService.STATUS_RUNNING: {
+//                    mSyncing = true;
+//                    break;
+//                }
+//                case SyncService.STATUS_FINISHED: {
+//                    mSyncing = false;
+//                    break;
+//                }
+//                case SyncService.STATUS_ERROR: {
+//                    // Error happened down in SyncService, show as toast.
+//                    mSyncing = false;
+//                    final String errorText = getString(R.string.toast_sync_error, resultData
+//                            .getString(Intent.EXTRA_TEXT));
+//                    Toast.makeText(activity, errorText, Toast.LENGTH_LONG).show();
+//                    break;
+//                }
+//            }
+//            activity.updateRefreshStatus(mSyncing);
+//        }
+//
+//        @Override
+//        public void onActivityCreated(Bundle savedInstanceState) {
+//            super.onActivityCreated(savedInstanceState);
+//            ((ControllersActivity) getActivity()).updateRefreshStatus(mSyncing);
+//        }
+//    }
 
 }

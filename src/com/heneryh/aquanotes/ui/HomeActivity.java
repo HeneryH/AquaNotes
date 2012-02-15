@@ -14,7 +14,10 @@ import com.heneryh.aquanotes.util.DetachableResultReceiver;
 import com.heneryh.aquanotes.util.EulaHelper;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -34,12 +37,15 @@ import android.widget.Toast;
 public class HomeActivity extends BaseActivity {
     private static final String TAG = "HomeActivity";
 
-    private SyncStatusUpdaterFragment mSyncStatusUpdaterFragment;
-    boolean createdNewSyncFrag = false;
+//  private SyncStatusUpdaterFragment mSyncStatusUpdaterFragment;  // Using broadcast receiver now for sync status updates
+    Context homeActContext;
+    MyIntentReceiver statusIntentReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        
+        homeActContext = this;
 
         if (!EulaHelper.hasAcceptedEula(this)) {
             EulaHelper.showEula(false, this);
@@ -48,22 +54,24 @@ public class HomeActivity extends BaseActivity {
         AnalyticsUtils.getInstance(this).trackPageView("/Home");
 
         setContentView(R.layout.activity_home);
-        getActivityHelper().setupActionBar(null, 0);
+        getActivityHelper().setupActionBar(null, 0);  /** no-op on post GB, implicit since the ActionBarCompat == null */
 
-        FragmentManager fm = getSupportFragmentManager();
+//        FragmentManager fm = getSupportFragmentManager();
+//
+//        mSyncStatusUpdaterFragment = (SyncStatusUpdaterFragment) fm
+//                .findFragmentByTag(SyncStatusUpdaterFragment.TAG);
+//        if (mSyncStatusUpdaterFragment == null) {
+//            mSyncStatusUpdaterFragment = new SyncStatusUpdaterFragment();
+//            fm.beginTransaction().add(mSyncStatusUpdaterFragment,
+//                    SyncStatusUpdaterFragment.TAG).commit();
+//            createdNewSyncFrag = true;  // had to move the refresh() down to postCreate due to a race condition with the fragment starting
+//        }
 
-        mSyncStatusUpdaterFragment = (SyncStatusUpdaterFragment) fm
-                .findFragmentByTag(SyncStatusUpdaterFragment.TAG);
-        if (mSyncStatusUpdaterFragment == null) {
-            mSyncStatusUpdaterFragment = new SyncStatusUpdaterFragment();
-            fm.beginTransaction().add(mSyncStatusUpdaterFragment,
-                    SyncStatusUpdaterFragment.TAG).commit();
-            createdNewSyncFrag = true;  // had to move the refresh() down to postCreate due to a race condition with the fragment starting
-        }
         
         final Intent intent = new Intent(this, NightlyService.class);
         startService(intent);
-
+        
+        statusIntentReceiver = new MyIntentReceiver();
     }
 
 
@@ -74,6 +82,20 @@ public class HomeActivity extends BaseActivity {
         triggerRefresh();
     }
 
+ 
+    @Override
+	public void onResume() {
+		super.onResume();		
+	    IntentFilter intentFilter = new IntentFilter(SyncService.STATUS_UPDATE);
+	    registerReceiver(statusIntentReceiver, intentFilter); 
+	}
+ 
+	@Override
+	public void onPause() {
+		super.onPause();
+		unregisterReceiver(statusIntentReceiver);
+	}
+
 	/**
 	 * 
 	 * @param menu
@@ -81,7 +103,6 @@ public class HomeActivity extends BaseActivity {
 	 */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.refresh_menu_items, menu);
         super.onCreateOptionsMenu(menu);
         return true;
     }
@@ -102,7 +123,7 @@ public class HomeActivity extends BaseActivity {
 
     private void triggerRefresh() {
         final Intent intent = new Intent(Intent.ACTION_SYNC, null, this, SyncService.class);
-        intent.putExtra(SyncService.EXTRA_STATUS_RECEIVER, mSyncStatusUpdaterFragment.mReceiver);
+//      intent.putExtra(SyncService.EXTRA_STATUS_RECEIVER, mSyncStatusUpdaterFragment.mReceiver);
         startService(intent);
     }
 
@@ -110,58 +131,86 @@ public class HomeActivity extends BaseActivity {
         getActivityHelper().setRefreshActionButtonCompatState(refreshing);
     }
     
-
-    /**
-     * A non-UI fragment, retained across configuration changes, that updates its activity's UI
-     * when sync status changes.
-     */
-    public static class SyncStatusUpdaterFragment extends Fragment
-            implements DetachableResultReceiver.Receiver {
-        public static final String TAG = SyncStatusUpdaterFragment.class.getName();
-
-        private boolean mSyncing = false;
-        private DetachableResultReceiver mReceiver;
-
-        @Override
-        public void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            setRetainInstance(true);
-            mReceiver = new DetachableResultReceiver(new Handler());
-            mReceiver.setReceiver(this);
-        }
-
-        /** {@inheritDoc} */
-        public void onReceiveResult(int resultCode, Bundle resultData) {
-            HomeActivity activity = (HomeActivity) getActivity();
-            if (activity == null) {
-                return;
-            }
-
-            switch (resultCode) {
-                case SyncService.STATUS_RUNNING: {
-                    mSyncing = true;
-                    break;
-                }
-                case SyncService.STATUS_FINISHED: {
-                    mSyncing = false;
-                    break;
-                }
-                case SyncService.STATUS_ERROR: {
-                    // Error happened down in SyncService, show as toast.
-                    mSyncing = false;
-                    final String errorText = getString(R.string.toast_sync_error, resultData
-                            .getString(Intent.EXTRA_TEXT));
-                    Toast.makeText(activity, errorText, Toast.LENGTH_LONG).show();
-                    break;
-                }
-            }
-            activity.updateRefreshStatus(mSyncing);
-        }
-
-        @Override
-        public void onActivityCreated(Bundle savedInstanceState) {
-            super.onActivityCreated(savedInstanceState);
-            ((HomeActivity) getActivity()).updateRefreshStatus(mSyncing);
-        }
+    
+    public class MyIntentReceiver extends BroadcastReceiver {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			Bundle resultData = intent.getExtras();
+			int resultCode = intent.getIntExtra(SyncService.STATUS_RESULT, 0);
+			boolean mSyncing = false;
+			switch (resultCode) {
+			case SyncService.STATUS_RUNNING: {
+				mSyncing = true;
+				break;
+			}
+			case SyncService.STATUS_FINISHED: {
+				mSyncing = false;
+				break;
+			}
+			case SyncService.STATUS_ERROR: {
+				// Error happened down in SyncService, show as toast.
+				mSyncing = false;
+				final String errorText = getString(R.string.toast_sync_error, resultData
+						.getString(Intent.EXTRA_TEXT));
+				Toast.makeText(homeActContext, errorText, Toast.LENGTH_LONG).show();
+				break;
+			}
+			}
+			updateRefreshStatus(mSyncing);
+		}
     }
+    
+//    /**
+//     * A non-UI fragment, retained across configuration changes, that updates its activity's UI
+//     * when sync status changes.
+//     */
+//    public static class SyncStatusUpdaterFragment extends Fragment
+//            implements DetachableResultReceiver.Receiver {
+//        public static final String TAG = SyncStatusUpdaterFragment.class.getName();
+//
+//        private boolean mSyncing = false;
+//        private DetachableResultReceiver mReceiver;
+//
+//        @Override
+//        public void onCreate(Bundle savedInstanceState) {
+//            super.onCreate(savedInstanceState);
+//            setRetainInstance(true);
+//            mReceiver = new DetachableResultReceiver(new Handler());
+//            mReceiver.setReceiver(this);
+//        }
+//
+//        /** {@inheritDoc} */
+//        public void onReceiveResult(int resultCode, Bundle resultData) {
+//            HomeActivity activity = (HomeActivity) getActivity();
+//            if (activity == null) {
+//                return;
+//            }
+//
+//            switch (resultCode) {
+//                case SyncService.STATUS_RUNNING: {
+//                    mSyncing = true;
+//                    break;
+//                }
+//                case SyncService.STATUS_FINISHED: {
+//                    mSyncing = false;
+//                    break;
+//                }
+//                case SyncService.STATUS_ERROR: {
+//                    // Error happened down in SyncService, show as toast.
+//                    mSyncing = false;
+//                    final String errorText = getString(R.string.toast_sync_error, resultData
+//                            .getString(Intent.EXTRA_TEXT));
+//                    Toast.makeText(activity, errorText, Toast.LENGTH_LONG).show();
+//                    break;
+//                }
+//            }
+//            activity.updateRefreshStatus(mSyncing);
+//        }
+//
+//        @Override
+//        public void onActivityCreated(Bundle savedInstanceState) {
+//            super.onActivityCreated(savedInstanceState);
+//            ((HomeActivity) getActivity()).updateRefreshStatus(mSyncing);
+//        }
+//    }
 }

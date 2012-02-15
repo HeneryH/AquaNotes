@@ -59,6 +59,8 @@ public class ProbesFragment extends ListFragment implements
     private boolean mHasSetEmptyText = false;
     private Uri probesUri;
     private Uri controllerUri;
+    
+    boolean hackBailOut = true; // this is a bug in my code for when the dashboard updates and call this fragments refreshSelf but this is not in foreground
 
     private NotifyingAsyncQueryHandler mHandler;
 
@@ -119,7 +121,7 @@ public class ProbesFragment extends ListFragment implements
     public void reloadSelf(Uri newProbesUri) {
     	probesUri = newProbesUri;
 
-    	if (probesUri == null) {
+    	if (probesUri == null || hackBailOut) {
     		return;
     	}
 
@@ -191,11 +193,13 @@ public class ProbesFragment extends ListFragment implements
         if (mCursor != null) {
             mCursor.requery();
         }
+        hackBailOut=false;
     }
 
     @Override
     public void onPause() {
         super.onPause();
+        hackBailOut=true;
 //        getActivity().getContentResolver().unregisterContentObserver(mProbeChangesObserver);
     }
 

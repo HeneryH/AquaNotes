@@ -145,7 +145,7 @@
     <string name="conf_controller_wifi_url_instr">Enter a local URL for this controller when home (LAN):</string>
     <string name="conf_controller_wifi_url_default">http://192.168.1.50/</string>
     <string name="conf_controller_wifi_sid_instr">WiFi access point to detect when home:</string>
-    <string name="conf_controller_wifi_sid_default">Home_F</string>
+    <string name="conf_controller_wifi_sid_default">your_ssid</string>
     <string name="conf_controller_user_instr">Enter a username for this controller:</string>
     <string name="conf_controller_user_default">admin</string>
     <string name="conf_controller_password_instr">Enter a password for this controller:</string>

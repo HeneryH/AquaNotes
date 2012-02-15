@@ -90,14 +90,16 @@ public class ActivityHelperHoneycomb extends ActivityHelper {
             mActivity.getActionBar().setDisplayOptions(
                     0,
                     ActionBar.DISPLAY_HOME_AS_UP | ActionBar.DISPLAY_USE_LOGO);
+        	//mActivity.getActionBar().set   (R.drawable.ic_title_home);
         }
     }
 
     /**
-     * No-op on Honeycomb. The action bar title always remains the same.
+     * No-op on Honeycomb. The action bar title always remains the same. jjf I changed this.
      */
     @Override
     public void setActionBarTitle(CharSequence title) {
+    	mActivity.getActionBar().setTitle(title);
     }
 
     /**
