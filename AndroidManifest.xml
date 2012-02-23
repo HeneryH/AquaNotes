@@ -17,8 +17,8 @@
 <manifest
     xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.heneryh.aquanotes"
-    android:versionCode="27"
-    android:versionName="0.27"
+    android:versionCode="30"
+    android:versionName="0.30"
     android:installLocation="auto">
 
     <uses-sdk
@@ -189,7 +189,8 @@
         
         <provider
             android:name=".provider.AquaNotesDbProvider"
-            android:authorities="com.heneryh.aquanotes" />
+            android:authorities="com.heneryh.aquanotes"
+            android:writePermission="com.heneryh.aquanotes.permission.WRITE_SCHEDULE" />
 
     </application>
 </manifest>

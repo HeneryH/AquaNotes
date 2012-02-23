@@ -70,7 +70,7 @@
                 android:layout_weight="1">
                 <include android:id="@+id/tab_session_summary"
                     layout="@layout/tab_session_summary" />
-                <include android:id="@+id/tab_session_notes" layout="@layout/tab_session_notes" />
+                <include android:id="@+id/tab_session_notes" layout="@layout/tab_controller_notes" />
                 <include android:id="@+id/tab_session_links" layout="@layout/tab_session_links" />
             </FrameLayout>
         </LinearLayout>

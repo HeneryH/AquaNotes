@@ -19,6 +19,19 @@
     <item type="id" name="actionbar_compat_logo" />
     <item type="id" name="actionbar_compat_text" />
 
+    <item type="id" name="fragment_probes_0" />
+    <item type="id" name="fragment_probes_1" />
+    <item type="id" name="fragment_probes_2" />
+    <item type="id" name="fragment_probes_3" />
+    <item type="id" name="fragment_probes_4" />
+    <item type="id" name="fragment_probes_5" />
+    <item type="id" name="fragment_probes_6" />
+    <item type="id" name="fragment_probes_7" />
+    <item type="id" name="fragment_probes_8" />
+    <item type="id" name="fragment_probes_9" />
+    
+    <item type="id" name="fragment_probe_detail" />
+
     <item type="id" name="fragment_outlets_0" />
     <item type="id" name="fragment_outlets_1" />
     <item type="id" name="fragment_outlets_2" />
@@ -32,18 +45,31 @@
     
     <item type="id" name="fragment_outlet_detail" />
     
-    <item type="id" name="fragment_probes_0" />
-    <item type="id" name="fragment_probes_1" />
-    <item type="id" name="fragment_probes_2" />
-    <item type="id" name="fragment_probes_3" />
-    <item type="id" name="fragment_probes_4" />
-    <item type="id" name="fragment_probes_5" />
-    <item type="id" name="fragment_probes_6" />
-    <item type="id" name="fragment_probes_7" />
-    <item type="id" name="fragment_probes_8" />
-    <item type="id" name="fragment_probes_9" />
+    <item type="id" name="fragment_graphs_0" />
+    <item type="id" name="fragment_graphs_1" />
+    <item type="id" name="fragment_graphs_2" />
+    <item type="id" name="fragment_graphs_3" />
+    <item type="id" name="fragment_graphs_4" />
+    <item type="id" name="fragment_graphs_5" />
+    <item type="id" name="fragment_graphs_6" />
+    <item type="id" name="fragment_graphs_7" />
+    <item type="id" name="fragment_graphs_8" />
+    <item type="id" name="fragment_graphs_9" />
     
-    <item type="id" name="fragment_probe_detail" />
+    <item type="id" name="fragment_graph_detail" />
+
+    <item type="id" name="fragment_notes_0" />
+    <item type="id" name="fragment_notes_1" />
+    <item type="id" name="fragment_notes_2" />
+    <item type="id" name="fragment_notes_3" />
+    <item type="id" name="fragment_notes_4" />
+    <item type="id" name="fragment_notes_5" />
+    <item type="id" name="fragment_notes_6" />
+    <item type="id" name="fragment_notes_7" />
+    <item type="id" name="fragment_notes_8" />
+    <item type="id" name="fragment_notes_9" />
+    
+    <item type="id" name="fragment_notes_detail" />
 
     <item type="id" name="menu_refresh_progress" />
 

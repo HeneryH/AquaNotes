@@ -19,10 +19,6 @@ package com.heneryh.aquanotes.ui;
 import com.heneryh.aquanotes.R;
 import com.heneryh.aquanotes.provider.AquaNotesDbContract.Outlets;
 import com.heneryh.aquanotes.provider.AquaNotesDbContract.Probes;
-import com.heneryh.aquanotes.provider.ScheduleContract.Sessions;
-import com.heneryh.aquanotes.provider.ScheduleContract.Vendors;
-import com.heneryh.aquanotes.ui.phone.SessionDetailActivity;
-import com.heneryh.aquanotes.ui.phone.ProbesDetailActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -102,7 +98,7 @@ public class DBMaintActivity extends BaseMultiPaneActivity {
 
         // Sessions content comes from reused activity
         mTabHost.addTab(mTabHost.newTabSpec(TAG_OUTLETS)
-                .setIndicator(buildIndicator(R.string.starred_sessions))
+                .setIndicator(buildIndicator(R.string.outlets_tab_title))
                 .setContent(R.id.fragment_outlets_0));
     }
 
@@ -133,7 +129,7 @@ public class DBMaintActivity extends BaseMultiPaneActivity {
 
         // Vendors content comes from reused activity
         mTabHost.addTab(mTabHost.newTabSpec(TAG_PROBES)
-                .setIndicator(buildIndicator(R.string.starred_vendors))
+                .setIndicator(buildIndicator(R.string.probes_tab_title))
                 .setContent(R.id.fragment_probes_0));
     }
 
@@ -150,23 +146,23 @@ public class DBMaintActivity extends BaseMultiPaneActivity {
 
     @Override
     public FragmentReplaceInfo onSubstituteFragmentForActivityLaunch(String activityClassName) {
-        if (findViewById(R.id.fragment_container_starred_detail) != null) {
-            // The layout we currently have has a detail container, we can add fragments there.
-            findViewById(android.R.id.empty).setVisibility(View.GONE);
-            if (SessionDetailActivity.class.getName().equals(activityClassName)) {
-                clearSelectedItems();
-                return new FragmentReplaceInfo(
-                        SessionDetailFragment.class,
-                        "session_detail",
-                        R.id.fragment_container_starred_detail);
-            } else if (ProbesDetailActivity.class.getName().equals(activityClassName)) {
-                clearSelectedItems();
-                return new FragmentReplaceInfo(
-                        ProbesDetailFragment.class,
-                        "vendor_detail",
-                        R.id.fragment_container_starred_detail);
-            }
-        }
+//        if (findViewById(R.id.fragment_container_starred_detail) != null) {
+//            // The layout we currently have has a detail container, we can add fragments there.
+//            findViewById(android.R.id.empty).setVisibility(View.GONE);
+//            if (SessionDetailActivity.class.getName().equals(activityClassName)) {
+//                clearSelectedItems();
+//                return new FragmentReplaceInfo(
+//                        SessionDetailFragment.class,
+//                        "session_detail",
+//                        R.id.fragment_container_starred_detail);
+//            } else if (ProbesDetailActivity.class.getName().equals(activityClassName)) {
+//                clearSelectedItems();
+//                return new FragmentReplaceInfo(
+//                        ProbesDetailFragment.class,
+//                        "vendor_detail",
+//                        R.id.fragment_container_starred_detail);
+//            }
+//        }
         return null;
     }
 

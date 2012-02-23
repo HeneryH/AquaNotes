@@ -18,7 +18,6 @@ package com.heneryh.aquanotes.ui;
 
 import com.heneryh.aquanotes.R;
 import com.heneryh.aquanotes.provider.AquaNotesDbContract;
-import com.heneryh.aquanotes.provider.ScheduleContract;
 import com.heneryh.aquanotes.provider.AquaNotesDbContract.Controllers;
 import com.heneryh.aquanotes.provider.AquaNotesDbContract.Outlets;
 import com.heneryh.aquanotes.util.ActivityHelper;

@@ -57,7 +57,7 @@
  
  <FrameLayout
      xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/controllers_scroll"
+    android:id="@+id/controllers_tab_holder_frame"
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">

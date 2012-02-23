@@ -41,7 +41,6 @@ import com.heneryh.aquanotes.io.ApexExecutor;
 import com.heneryh.aquanotes.io.NewXmlHandler.HandlerException;
 import com.heneryh.aquanotes.provider.AquaNotesDbContract;
 import com.heneryh.aquanotes.provider.AquaNotesDbContract.Outlets;
-import com.heneryh.aquanotes.provider.ScheduleContract;
 import com.heneryh.aquanotes.provider.AquaNotesDbContract.Controllers;
 import com.heneryh.aquanotes.util.AnalyticsUtils;
 import com.heneryh.aquanotes.util.NotifyingAsyncQueryHandler;

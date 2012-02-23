@@ -42,7 +42,6 @@ import com.heneryh.aquanotes.R;
 import com.heneryh.aquanotes.io.ApexExecutor;
 import com.heneryh.aquanotes.io.NewXmlHandler.HandlerException;
 import com.heneryh.aquanotes.provider.AquaNotesDbContract;
-import com.heneryh.aquanotes.provider.ScheduleContract;
 import com.heneryh.aquanotes.provider.AquaNotesDbContract.Controllers;
 
 import android.app.Activity;

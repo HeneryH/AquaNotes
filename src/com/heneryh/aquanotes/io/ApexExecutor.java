@@ -17,12 +17,9 @@
 package com.heneryh.aquanotes.io;
 
 
-import org.apache.http.HttpRequest;
-import org.apache.http.HttpRequestInterceptor;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
-import org.apache.http.StatusLine;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.ClientProtocolException;
@@ -31,19 +28,11 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.client.params.ClientPNames;
-import org.apache.http.conn.ClientConnectionManager;
-import org.apache.http.impl.client.AbstractHttpClient;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.protocol.HttpContext;
-import org.xml.sax.InputSource;
-import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
-
 import com.heneryh.aquanotes.io.NewXmlHandler.HandlerException;
 import com.heneryh.aquanotes.provider.AquaNotesDbContract;
 
@@ -57,15 +46,10 @@ import android.net.Uri;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.provider.BaseColumns;
-import android.util.Log;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
 
 /**
  * Executes an {@link HttpUriRequest} and passes the result as an
@@ -203,7 +187,15 @@ public class ApexExecutor {
         }
     }
     
-    public void updateOutlet(String wanUri,String lanUri,String ssid, String user, String pw, String name,int position) throws HandlerException {
+    public void updateOutlet(Cursor cursor, String outletName,int position) throws HandlerException {
+    	
+    	String lanUri = cursor.getString(ControllersQuery.LAN_URL);
+    	String wanUri = cursor.getString(ControllersQuery.WAN_URL);
+    	String user = cursor.getString(ControllersQuery.USER);
+    	String pw = cursor.getString(ControllersQuery.PW);
+    	String ssid = cursor.getString(ControllersQuery.WIFI_SSID);
+    	String model = cursor.getString(ControllersQuery.MODEL);
+    	
     	// Uhg, WifiManager stuff below crashes in AVD if wifi not enabled so first we have to check if on wifi
     	ConnectivityManager cm  = (ConnectivityManager) mActContext.getSystemService(Context.CONNECTIVITY_SERVICE);
     	NetworkInfo nInfo = cm.getActiveNetworkInfo();
@@ -248,8 +240,12 @@ public class ApexExecutor {
     	// haven't checked it.
     	// edit - this was not needed for the longest while but now that we are pushing just one
     	// outlet, the different methods seem to be needed again.  Really not sure why.
-    	String apexURL;
-    	apexURL = apexBaseURL + "status.sht";
+		String apexURL;
+		if(model.equalsIgnoreCase("AC4")) {
+			apexURL = apexBaseURL + "status.sht";
+		} else {
+			apexURL = apexBaseURL + "cgi-bin/status.cgi";
+		}
 
     	//Create credentials for basic auth
     	// create a basic credentials provider and pass the credentials
@@ -280,10 +276,15 @@ public class ApexExecutor {
     	// Add your data  
     	nameValuePairs.add(new BasicNameValuePair("name","status"));  
     	nameValuePairs.add(new BasicNameValuePair("method","post"));  
-    	nameValuePairs.add(new BasicNameValuePair("action","status.sht"));  
+		nameValuePairs.add(new BasicNameValuePair("method","post"));  
+		if(model.equalsIgnoreCase("AC4")) {
+			nameValuePairs.add(new BasicNameValuePair("action","status.sht"));  
+		} else {
+			nameValuePairs.add(new BasicNameValuePair("action","/cgi-bin/status.cgi"));  
+		}
 
     	String pendingStateS = String.valueOf(position);
-    	nameValuePairs.add(new BasicNameValuePair(name+"_state", pendingStateS));
+    	nameValuePairs.add(new BasicNameValuePair(outletName+"_state", pendingStateS));
 
     	nameValuePairs.add(new BasicNameValuePair("Update","Update"));  
     	try {  	
@@ -308,8 +309,11 @@ public class ApexExecutor {
 
     }
     
-    private interface ControllersQuery {
-        String[] PROJECTION = {
+	private interface ControllersQuery {
+
+		int _TOKEN = 0x1;
+
+		String[] PROJECTION = {
 //              String CONTROLLER_ID = "_id";
 //              String TITLE = "title";
 //              String WAN_URL = "wan_url";
@@ -321,29 +325,28 @@ public class ApexExecutor {
 //              String UPDATE_INTERVAL = "update_i";
 //              String DB_SAVE_DAYS = "db_save_days";
 //              String CONTROLLER_TYPE = "controller_type";
-                BaseColumns._ID,
-                AquaNotesDbContract.Controllers.TITLE,
-                AquaNotesDbContract.Controllers.WAN_URL,
-                AquaNotesDbContract.Controllers.LAN_URL,
-                AquaNotesDbContract.Controllers.WIFI_SSID,
-                AquaNotesDbContract.Controllers.USER,
-                AquaNotesDbContract.Controllers.PW,
-                AquaNotesDbContract.Controllers.LAST_UPDATED,
-                AquaNotesDbContract.Controllers.UPDATE_INTERVAL,
-                AquaNotesDbContract.Controllers.DB_SAVE_DAYS,
-                AquaNotesDbContract.Controllers.MODEL,
-        };
-        
-        int _ID = 0;
-        int TITLE = 1;
-        int WAN_URL = 2;
-        int LAN_URL = 3;
-        int WIFI_SSID = 4;
-        int USER = 5;
-        int PW = 6;
-        int LAST_UPDATED = 7;
-        int UPDATE_INTERVAL = 8;
-        int DB_SAVE_DAYS = 9;
-        int MODEL = 10;
-    }
+				BaseColumns._ID,
+				AquaNotesDbContract.Controllers.TITLE,
+				AquaNotesDbContract.Controllers.WAN_URL,
+				AquaNotesDbContract.Controllers.LAN_URL,
+				AquaNotesDbContract.Controllers.WIFI_SSID,
+				AquaNotesDbContract.Controllers.USER,
+				AquaNotesDbContract.Controllers.PW,
+				AquaNotesDbContract.Controllers.LAST_UPDATED,
+				AquaNotesDbContract.Controllers.UPDATE_INTERVAL,
+				AquaNotesDbContract.Controllers.DB_SAVE_DAYS,
+				AquaNotesDbContract.Controllers.MODEL,
+		};
+		int _ID = 0;
+		int TITLE = 1;
+		int WAN_URL = 2;
+		int LAN_URL = 3;
+		int WIFI_SSID = 4;
+		int USER = 5;
+		int PW = 6;
+		int LAST_UPDATED = 7;
+		int UPDATE_INTERVAL = 8;
+		int DB_SAVE_DAYS = 9;
+		int MODEL = 10;
+	}
 }

@@ -18,7 +18,6 @@ package com.heneryh.aquanotes.ui;
 
 import com.heneryh.aquanotes.R;
 import com.heneryh.aquanotes.provider.AquaNotesDbContract;
-import com.heneryh.aquanotes.provider.ScheduleContract;
 import com.heneryh.aquanotes.util.ActivityHelper;
 import com.heneryh.aquanotes.util.AnalyticsUtils;
 import com.heneryh.aquanotes.util.NotifyingAsyncQueryHandler;
@@ -44,7 +43,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import static com.heneryh.aquanotes.util.UIUtils.buildStyledSnippet;
-import static com.heneryh.aquanotes.util.UIUtils.formatSessionSubtitle;
 
 /**
  * A {@link ListFragment} showing a list of outlet.

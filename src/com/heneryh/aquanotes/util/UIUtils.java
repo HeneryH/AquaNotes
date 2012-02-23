@@ -17,10 +17,6 @@
 package com.heneryh.aquanotes.util;
 
 import com.heneryh.aquanotes.R;
-import com.heneryh.aquanotes.provider.ScheduleContract.Blocks;
-import com.heneryh.aquanotes.provider.ScheduleContract.Rooms;
-import com.heneryh.aquanotes.ui.phone.MapActivity;
-import com.heneryh.aquanotes.ui.tablet.MapMultiPaneActivity;
 
 import android.content.Context;
 import android.content.Intent;
@@ -59,11 +55,6 @@ public class UIUtils {
      */
     public static final TimeZone CONFERENCE_TIME_ZONE = TimeZone.getTimeZone("America/Los_Angeles");
 
-    public static final long CONFERENCE_START_MILLIS = ParserUtils.parseTime(
-            "2011-05-10T09:00:00.000-07:00");
-    public static final long CONFERENCE_END_MILLIS = ParserUtils.parseTime(
-            "2011-05-11T17:30:00.000-07:00");
-
     public static final Uri CONFERENCE_URL = Uri.parse("http://www.google.com/events/io/2011/");
 
     /** Flags used with {@link DateUtils#formatDateRange}. */
@@ -77,21 +68,6 @@ public class UIUtils {
 
     private static StyleSpan sBoldSpan = new StyleSpan(Typeface.BOLD);
 
-    /**
-     * Format and return the given {@link Blocks} and {@link Rooms} values using
-     * {@link #CONFERENCE_TIME_ZONE}.
-     */
-    public static String formatSessionSubtitle(long blockStart, long blockEnd,
-            String roomName, Context context) {
-        TimeZone.setDefault(CONFERENCE_TIME_ZONE);
-
-        // NOTE: There is an efficient version of formatDateRange in Eclair and
-        // beyond that allows you to recycle a StringBuilder.
-        final CharSequence timeString = DateUtils.formatDateRange(context,
-                blockStart, blockEnd, TIME_FLAGS);
-
-        return context.getString(R.string.session_subtitle, timeString, roomName);
-    }
 
     /**
      * Populate the given {@link TextView} with the requested text, formatting
@@ -111,21 +87,6 @@ public class UIUtils {
         }
     }
 
-    public static void setSessionTitleColor(long blockStart, long blockEnd, TextView title,
-            TextView subtitle) {
-        long currentTimeMillis = System.currentTimeMillis();
-        int colorId = R.color.body_text_1;
-        int subColorId = R.color.body_text_2;
-
-        if (currentTimeMillis > blockEnd &&
-                currentTimeMillis < CONFERENCE_END_MILLIS) {
-            colorId = subColorId = R.color.body_text_disabled;
-        }
-
-        final Resources res = title.getResources();
-        title.setTextColor(res.getColor(colorId));
-        subtitle.setTextColor(res.getColor(subColorId));
-    }
 
     /**
      * Given a snippet string with matching segments surrounded by curly
@@ -151,16 +112,6 @@ public class UIUtils {
         }
 
         return builder;
-    }
-
-    public static String getLastUsedTrackID(Context context) {
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
-        return sp.getString("last_track_id", null);
-    }
-
-    public static void setLastUsedTrackID(Context context, String trackID) {
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
-        sp.edit().putString("last_track_id", trackID).commit();
     }
 
     private static final int BRIGHTNESS_THRESHOLD = 130;
@@ -209,11 +160,4 @@ public class UIUtils {
         return null;
     }
 
-    public static Class getMapActivityClass(Context context) {
-        if (UIUtils.isHoneycombTablet(context)) {
-            return MapMultiPaneActivity.class;
-        }
-
-        return MapActivity.class;
-    }
 }

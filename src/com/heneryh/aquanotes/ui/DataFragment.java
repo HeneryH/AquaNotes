@@ -21,7 +21,6 @@ import java.text.SimpleDateFormat;
 
 import com.heneryh.aquanotes.R;
 import com.heneryh.aquanotes.provider.AquaNotesDbContract;
-import com.heneryh.aquanotes.provider.ScheduleContract;
 import com.heneryh.aquanotes.util.ActivityHelper;
 import com.heneryh.aquanotes.util.AnalyticsUtils;
 import com.heneryh.aquanotes.util.NotifyingAsyncQueryHandler;
@@ -171,7 +170,7 @@ public class DataFragment extends ListFragment implements
     public void onResume() {
         super.onResume();
         getActivity().getContentResolver().registerContentObserver(
-                ScheduleContract.Vendors.CONTENT_URI, true, mProbeDataChangesObserver);
+                AquaNotesDbContract.Data.CONTENT_URI, true, mProbeDataChangesObserver);  // <----- this may be wrong
         if (mCursor != null) {
             mCursor.requery();
         }

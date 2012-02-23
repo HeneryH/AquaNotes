@@ -37,7 +37,7 @@
     <string name="title_data">Data</string>
     <string name="title_probe_detail">Probe information</string>
     <string name="title_map">Map</string>
-    <string name="title_tagstream">Realtime stream</string>
+    <string name="title_tagstream">What is being discussed about Neptune</string>
     <string name="title_prefs">Prefs</string>
 
     <string name="title_outlets_tracks">Outlets</string>
@@ -90,9 +90,11 @@
     <string name="search_sessions">Sessions</string>
     <string name="search_vendors">Sandbox</string>
 
-    <string name="starred_sessions">Outlets</string>
-    <string name="starred_vendors">Probes</string>
-
+    <string name="outlets_tab_title">Outlets</string>
+    <string name="probes_tab_title">Probes</string>
+    <string name="graphs_tab_title">Graphs</string>
+    <string name="notes_tab_title">Notes</string>
+    
     <string name="search_label">Google I/O</string>
     <string name="search_hint">Session keywords</string>
 
@@ -114,18 +116,18 @@
 
     <string name="whats_on_stream_title">Realtime\nstream</string>
     <string name="whats_on_now_playing_title">Now playing</string>
-    <string name="whats_on_thank_you_title">See you next year!</string>
+    <string name="whats_on_thank_you_title">I really need to work on the graphical layout</string>
 
-    <string name="permission_write">Modify Google I/O schedule data</string>
+    <string name="permission_write">Modify AquaNotes data</string>
 
     <string name="toast_now_not_visible">Touch this button during Google I/O to show the current time.</string>
 
     <!-- Notes integration -->
     <string name="notes_catch_powered_by">Notes are powered by <a href="http://www.catch.com/">Catch.com</a>.</string>
     <string name="notes_catch_market_title">Install Catch Notes</string>
-    <string name="notes_catch_market_subtitle">You can take notes for Google I/O sessions using the latest version of Catch Notes, available from Android Market.</string>
+    <string name="notes_catch_market_subtitle">You can take notes for your tank using the latest version of Catch Notes, available from Android Market.</string>
     <string name="notes_catch_new_title">Create a new note</string>
-    <string name="notes_catch_view_title">View track notes</string>
+    <string name="notes_catch_view_title">View tank notes</string>
     <string name="toast_notes_error_invoking">Couldn\'t start Catch Notes.</string>
 
     <string name="note_template">Session: <xliff:g id="title">%1$s</xliff:g>\n\n\n\n__________\nTags: <xliff:g id="hashtags">%2$s</xliff:g></string>
