@@ -32,10 +32,9 @@
         Caused by: java.lang.IllegalStateException: Fragment ....WhatsOnFragment did not
                 create a view.
     -->
-    <fragment android:name="com.heneryh.aquanotes.ui.WhatsOnFragment"
-        android:id="@+id/fragment_now_playing"
+    <fragment android:name="com.heneryh.aquanotes.ui.WebStreamFragment"
+        android:id="@+id/fragment_web_stream"
         android:layout_width="fill_parent"
         android:layout_height="0dp"
         android:visibility="gone" />
-
 </LinearLayout>

@@ -66,7 +66,7 @@ public class CatchNotesHelper {
         intent.setAction(ACTION_ADD);
         intent.putExtra(Intent.EXTRA_TEXT, message);
         intent.putExtra(EXTRA_SOURCE, mContext.getString(R.string.app_name));
-        intent.putExtra(EXTRA_SOURCE_URL, "http://www.google.com/io/");
+        intent.putExtra(EXTRA_SOURCE_URL, "http://www.heneryh.com/aquanotes/");
         intent.putExtra(Intent.EXTRA_TITLE, mContext.getString(R.string.app_name));
         return intent;
     }

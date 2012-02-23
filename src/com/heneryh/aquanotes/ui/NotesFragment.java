@@ -16,95 +16,52 @@
 
 package com.heneryh.aquanotes.ui;
 
-import java.text.DecimalFormat;
-import java.text.FieldPosition;
-import java.text.Format;
-import java.text.ParsePosition;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.Vector;
-
-import android.content.Context;
 import android.content.Intent;
-import android.database.ContentObserver;
-import android.database.Cursor;
-import android.graphics.Color;
-import android.graphics.DashPathEffect;
-import android.graphics.LinearGradient;
-import android.graphics.Paint;
-import android.graphics.PointF;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.provider.BaseColumns;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.app.ListFragment;
-import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
-import android.util.FloatMath;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.TabHost;
 import android.widget.TextView;
 
-import com.androidplot.series.XYSeries;
-import com.androidplot.xy.BoundaryMode;
-import com.androidplot.xy.LineAndPointFormatter;
-import com.androidplot.xy.LineAndPointRenderer;
-import com.androidplot.xy.SimpleXYSeries;
-import com.androidplot.xy.SimpleXYSeries.ArrayFormat;
-import com.androidplot.xy.XYPlot;
-import com.androidplot.xy.XYStepMode;
-import com.androidplot.Plot;
 import com.heneryh.aquanotes.R;
-import com.heneryh.aquanotes.provider.AquaNotesDbContract;
-import com.heneryh.aquanotes.provider.AquaNotesDbContract.Controllers;
-import com.heneryh.aquanotes.provider.AquaNotesDbContract.Data;
-import com.heneryh.aquanotes.provider.AquaNotesDbContract.Probes;
-import com.heneryh.aquanotes.ui.ControllersActivity.TabManager.DummyTabFactory;
-import com.heneryh.aquanotes.ui.ControllersActivity.TabManager.TabInfo;
+import com.heneryh.aquanotes.util.AnalyticsUtils;
 import com.heneryh.aquanotes.util.CatchNotesHelper;
-import com.heneryh.aquanotes.util.NotifyingAsyncQueryHandler;
 import com.heneryh.aquanotes.util.UIUtils;
 
-/**
- * A {@link ListFragment} showing a list of controller probes.
- */
 public class NotesFragment extends Fragment {
 
     private static final String TAG = "NotesFragment";
     
     private ViewGroup mRootView;
-    private String mTitleString;
-    private String mHashtag;
+    private Uri mControllerUri;
+    private String mControllerName;
+    private String mControllerHashTag;
 
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
+        /**
+         * The controller URI will be in the intent plus, depending on the situation
+         * the probe name to graph can be in the extra.  If default, the probe name
+         * will come in as "none" which will signal us to just graph the first one
+         * found.
+         */
+        final Intent intent = BaseActivity.fragmentArgumentsToIntent(getArguments());
+        mControllerUri = intent.getData();
+        mControllerName = intent.getExtras().getString("ControllerName");
+
         setHasOptionsMenu(true);
     }
  
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
     }
 
     @Override
@@ -120,6 +77,7 @@ public class NotesFragment extends Fragment {
         return mRootView;
     }
    
+    
     @Override
     public void onResume() {
         super.onResume();
@@ -131,10 +89,11 @@ public class NotesFragment extends Fragment {
         final boolean notesInstalled = helper.isNotesInstalledAndMinimumVersion();
 
         final Intent marketIntent = helper.notesMarketIntent();
+        mControllerHashTag = "#" + mControllerName;
         final Intent newIntent = helper.createNoteIntent(
-                getString(R.string.note_template, mTitleString, "test"));
+                getString(R.string.note_template_controller, mControllerName, "time here", mControllerHashTag));
         
-        final Intent viewIntent = helper.viewNotesIntent("test");
+        final Intent viewIntent = helper.viewNotesIntent(mControllerHashTag);
 
         // Set icons and click listeners
         ((ImageView) mRootView.findViewById(R.id.notes_catch_market_icon)).setImageDrawable(
@@ -149,7 +108,7 @@ public class NotesFragment extends Fragment {
                 new View.OnClickListener() {
                     public void onClick(View view) {
                         startActivity(marketIntent);
-//                        fireNotesEvent(R.string.notes_catch_market_title);
+                        fireNotesEvent(R.string.notes_catch_market_title);
                     }
                 });
 
@@ -157,7 +116,7 @@ public class NotesFragment extends Fragment {
                 new View.OnClickListener() {
                     public void onClick(View view) {
                         startActivity(newIntent);
-//                        fireNotesEvent(R.string.notes_catch_new_title);
+                        fireNotesEvent(R.string.notes_catch_new_title);
                     }
                 });
 
@@ -165,7 +124,7 @@ public class NotesFragment extends Fragment {
                 new View.OnClickListener() {
                     public void onClick(View view) {
                         startActivity(viewIntent);
-//                        fireNotesEvent(R.string.notes_catch_view_title);
+                        fireNotesEvent(R.string.notes_catch_view_title);
                     }
                 });
 
@@ -185,6 +144,18 @@ public class NotesFragment extends Fragment {
         mRootView.findViewById(R.id.notes_catch_view_separator).setVisibility(
                 !notesInstalled ? View.GONE : View.VISIBLE);
     }
-    
+  
+    /*
+     * Event structure:
+     * Category -> "Session Details"
+     * Action -> "Create Note", "View Note", etc
+     * Label -> Session's Title
+     * Value -> 0.
+     */
+    public void fireNotesEvent(int actionId) {
+        AnalyticsUtils.getInstance(getActivity()).trackEvent(
+                "Notes:", "test"/*getActivity().getString(actionId)*/, mControllerName, 0);
+    }
+
     
 }

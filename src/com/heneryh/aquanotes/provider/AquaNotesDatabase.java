@@ -82,7 +82,8 @@ public class AquaNotesDatabase extends SQLiteOpenHelper {
 //      String LAST_UPDATED = "last_updated";
 //      String UPDATE_INTERVAL = "update_i";
 //      String DB_SAVE_DAYS = "db_save_days";
-//      String CONTROLLER_TYPE = "controller_type";
+//      String MODEL = "controller_type";
+//      String WIDGET = "widget";
       db.execSQL("CREATE TABLE " + Tables.CONTROLLERS + " ("
               + BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," 
               + ControllersColumns.TITLE + " TEXT,"

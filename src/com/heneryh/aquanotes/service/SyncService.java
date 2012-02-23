@@ -322,33 +322,33 @@ public class SyncService extends IntentService {
 							// Process this update through the correct provider
 							AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(mSyncServiceContext);
 
-							//							if(widgetId>0) {
-							//								AppWidgetProviderInfo info = appWidgetManager.getAppWidgetInfo(widgetId);
-							//								String providerName = info.provider.getClassName();   // <--- there are crash reports of null pointer here.  How?
-							//								RemoteViews updateViews = null;
-							//								Log.d(TAG, "Build a graphical update whatever type of widget this is.");
-							//								if (providerName.equals(Widget2x1.class.getName())) {
-							//									Log.d(TAG, "Building a 2x1 widget, ID = " + controllerId + ".");
-							//									Log.d(TAG, "Building a 2x1 widget, Uri = " + controllerUri + ".");
-							//									updateViews = Widget2x1.buildUpdate(mSyncServiceContext, controllerUri);
-							//								} else if (providerName.equals(Widget2x2.class.getName())) {
-							//									Log.d(TAG, "Building a 2x2 widget, ID = " + controllerId + ".");
-							//									Log.d(TAG, "Building a 2x2 widget, Uri = " + controllerUri + ".");
-							//									updateViews = Widget2x2.buildUpdate(mSyncServiceContext, controllerUri);
-							//								} else if (providerName.equals(Widget1x1.class.getName())) {
-							//									Log.d(TAG, "Building a 1x1 widget, ID = " + controllerId + ".");
-							//									Log.d(TAG, "Building a 1x1 widget, Uri = " + controllerUri + ".");
-							//									updateViews = Widget1x1.buildUpdate(mSyncServiceContext, controllerUri);
-							//								}
-							//
-							//								// Push this update to surface
-							//								if (updateViews != null) {
-							//									Log.d(TAG, "Pushing update to the surface, ID = " + controllerId + ".");
-							//									appWidgetManager.updateAppWidget(controllerId, updateViews);
-							//								} else {
-							//									Log.e(TAG, "Some problem building the view, not pushed to the surface.");
-							//								}
-							//						}
+							if(widgetId>0) {
+								AppWidgetProviderInfo info = appWidgetManager.getAppWidgetInfo(widgetId);
+								String providerName = info.provider.getClassName();   // <--- there are crash reports of null pointer here.  How?
+								RemoteViews updateViews = null;
+								Log.d(TAG, "Build a graphical update whatever type of widget this is.");
+								if (providerName.equals(Widget2x1.class.getName())) {
+									Log.d(TAG, "Building a 2x1 widget, ID = " + controllerId + ".");
+									Log.d(TAG, "Building a 2x1 widget, Uri = " + controllerUri + ".");
+									updateViews = Widget2x1.buildUpdate(mSyncServiceContext, controllerUri);
+								} else if (providerName.equals(Widget2x2.class.getName())) {
+									Log.d(TAG, "Building a 2x2 widget, ID = " + controllerId + ".");
+									Log.d(TAG, "Building a 2x2 widget, Uri = " + controllerUri + ".");
+									updateViews = Widget2x2.buildUpdate(mSyncServiceContext, controllerUri);
+								} else if (providerName.equals(Widget1x1.class.getName())) {
+									Log.d(TAG, "Building a 1x1 widget, ID = " + controllerId + ".");
+									Log.d(TAG, "Building a 1x1 widget, Uri = " + controllerUri + ".");
+									updateViews = Widget1x1.buildUpdate(mSyncServiceContext, controllerUri);
+								}
+
+								// Push this update to surface
+								if (updateViews != null) {
+									Log.d(TAG, "Pushing update to the surface, ID = " + controllerId + ".");
+									appWidgetManager.updateAppWidget(widgetId, updateViews);
+								} else {
+									Log.e(TAG, "Some problem building the view, not pushed to the surface.");
+								}
+							}
 					} catch (HandlerException e) {
 						Log.e(TAG, "Problem while syncing", e);
 						resultFailedFlag=true;							

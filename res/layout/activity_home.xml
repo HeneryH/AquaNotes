@@ -23,7 +23,7 @@
     <fragment android:name="com.heneryh.aquanotes.ui.DashboardFragment"
         android:id="@+id/fragment_dashboard"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:layout_height="0dip"
         android:layout_weight="1" />
 
 <!--     <fragment android:name="com.heneryh.aquanotes.ui.WhatsOnFragment"

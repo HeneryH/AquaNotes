@@ -26,7 +26,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:src="@drawable/home_btn_map" />
+        android:src="@drawable/app_icon" />
 
     <TextView
         android:id="@+id/widget_apex_title"

@@ -42,6 +42,7 @@ import java.text.SimpleDateFormat;
 import com.heneryh.aquanotes.R;
 import com.heneryh.aquanotes.provider.AquaNotesDbContract;
 import com.heneryh.aquanotes.provider.AquaNotesDbContract.Controllers;
+import com.heneryh.aquanotes.provider.AquaNotesDbContract.Data;
 import com.heneryh.aquanotes.service.SyncService;
 import com.heneryh.aquanotes.ui.HomeActivity;
 
@@ -50,7 +51,7 @@ import com.heneryh.aquanotes.ui.HomeActivity;
  * an update we spawn a background {@link Service} to perform the API queries.
  */
 public class Widget2x2 extends AppWidgetProvider {
-	private static final String TAG = "ApexWidget2x2";
+	private static final String TAG = "Widget2x2";
 
 	public static final String ACTION_UPDATE_SINGLE = "com.heneryh.aquanotes.UPDATE_SINGLE"; // probably shouldn't repeat this but import it
 	public static final String ACTION_UPDATE_ALL = "com.heneryh.aquanotes.UPDATE_ALL";
@@ -79,12 +80,12 @@ public class Widget2x2 extends AppWidgetProvider {
 	 */
 	@Override
 	public void onDeleted(Context context, int[] appWidgetIds) {
-		ContentResolver resolver = context.getContentResolver();
-		for (int appWidgetId : appWidgetIds) {
-			Log.d(TAG, "Deleting appWidgetId=" + appWidgetId);
-			Uri controllerUri = Controllers.buildQueryControllerXUri(appWidgetId);
-			resolver.delete(controllerUri, null, null);
-		}
+//		ContentResolver resolver = context.getContentResolver();
+//		for (int appWidgetId : appWidgetIds) {
+//			Log.d(TAG, "Deleting appWidgetId=" + appWidgetId);
+//			Uri controllerUri = Controllers.buildQueryControllerXUri(appWidgetId);
+//			resolver.delete(controllerUri, null, null);
+//		}
 	}
 
 	/**
@@ -150,35 +151,34 @@ public class Widget2x2 extends AppWidgetProvider {
 
 			Cursor cursor2 = null;
 
-//			// Get all the data points for the timestamp noted above.
-//			Uri probeDataUri = Uri.withAppendedPath(controllerUri, ProbeData.TWIG_PROBE_DATA_AT);
-//			Uri probeDataAtUri = Uri.withAppendedPath(probeDataUri,timestampL.toString());
-//
-//			try {
-//				cursor = resolver.query(probeDataAtUri, PROJECTION_PROBE_DATA, null, null, null);
-//				String name;
-//				String value;
-//
-//				// Loop through the data points.
-//				if (cursor != null && cursor.moveToFirst()) {
-//					while (!cursor.isAfterLast()) {
-//						// Get the name/value & add to the string.
-//						name = cursor.getString(COL_PRB_DAT_NAME);
-//						value = cursor.getString(COL_PRB_DAT_VALUE);
-//						probesBuffer.append(name).append(" = ").append(value).append("\n");
-//						cursor.moveToNext();
-//					}
-//				}
-//			} catch (SQLException e) {
-//				Log.e(TAG, "getShortXMLStatus: building status string from database records.", e);	
-//			} finally {
-//				if (cursor != null) {
-//					cursor.close();
-//				}
-//			} // end of controller query
-//
-//			views.setTextViewText(R.id.widget_probe_values, probesBuffer.toString().trim());
-			views.setTextViewText(R.id.widget_probe_values, "test");
+			// Get all the data points for the timestamp noted above.
+			Uri probeDataAtUri = Data.buildQueryPDataAtUri(controllerUri, timestampL);
+
+			try {
+				cursor = resolver.query(probeDataAtUri, ProbeDataViewQuery.PROJECTION, null, null, null);
+				String name;
+				String value;
+
+				// Loop through the data points.
+				if (cursor != null && cursor.moveToFirst()) {
+					while (!cursor.isAfterLast()) {
+						// Get the name/value & add to the string.
+						name = cursor.getString(ProbeDataViewQuery.NAME);
+						value = cursor.getString(ProbeDataViewQuery.VALUE);
+						probesBuffer.append(name).append(" = ").append(value).append("\n");
+						cursor.moveToNext();
+					}
+				}
+			} catch (SQLException e) {
+				Log.e(TAG, "getShortXMLStatus: building status string from database records.", e);	
+			} finally {
+				if (cursor != null) {
+					cursor.close();
+				}
+			} // end of controller query
+
+			views.setTextViewText(R.id.widget_probe_values, probesBuffer.toString().trim());
+			//views.setTextViewText(R.id.widget_probe_values, "test");
 		}
 
 		forecastFilled = true; // should make sure we have good data first. ERROR HANDLING!  
@@ -263,24 +263,41 @@ public class Widget2x2 extends AppWidgetProvider {
         int CONTROLLER_ID = 3;
     }
 
-	private interface ProbeDataQuery {
-        String[] PROJECTION = {
-//              String DATA_ID = "_id";
-//              String VALUE = "value";
-//              String TIMESTAMP = "timestamp";
-//              String PROBE_ID = "probe_id";
-                BaseColumns._ID,
-                AquaNotesDbContract.Data.TYPE,
-                AquaNotesDbContract.Data.VALUE,
-                AquaNotesDbContract.Data.TIMESTAMP,
-                AquaNotesDbContract.Data.PARENT_ID,
-        };
+    private interface ProbeDataViewQuery {
+
+        int _TOKEN = 0x1;
         
+        String[] PROJECTION = {
+//                String _ID = "_id";
+//                String TYPE = "type";
+//                String VALUE = "value";
+//                String TIMESTAMP = "timestamp";
+//                String PARENT_ID = "parent_id";   	
+//
+//        		//\\
+//        		Join
+//        		\\//
+//                String NAME = "name";
+//                String RESOURCE_ID = "resource_id";
+//                String CONTROLLER_ID = "controller_id";
+        		BaseColumns._ID,
+        		AquaNotesDbContract.ProbeDataView.TYPE,
+        		AquaNotesDbContract.ProbeDataView.VALUE,
+        		AquaNotesDbContract.ProbeDataView.TIMESTAMP,
+        		AquaNotesDbContract.ProbeDataView.PARENT_ID,
+
+        		AquaNotesDbContract.ProbeDataView.NAME,
+        		AquaNotesDbContract.ProbeDataView.RESOURCE_ID,
+        		AquaNotesDbContract.ProbeDataView.CONTROLLER_ID,
+         };
         int _ID = 0;
         int TYPE = 1;
         int VALUE = 2;
         int TIMESTAMP = 3;
         int PARENT_ID = 4;
-    }
+        int NAME = 5;
+        int RESOURCE_ID = 6;
+        int CONTROLLER_ID = 7;
+     }
 
 }

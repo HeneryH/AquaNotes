@@ -85,16 +85,20 @@ import android.widget.Toast;
 
 /**
  * An activity that shows the user's controllers in left/right swipeable screens, each
- * screen has tabs for probes, outlets and controllers. This activity can be
+ * screen has tabs for probes, outlets, notes and graphs. This activity can be
  * either single or multi-pane, depending on the device configuration. We want the multi-pane
  * support that {@link BaseMultiPaneActivity} offers, so we inherit from it instead of
- * {@link BaseSinglePaneActivity}.
+ * {@link BaseSinglePaneActivity}.  Hmm, which features are those???
  */
 public class ControllersActivity extends BaseMultiPaneActivity implements
 								NotifyingAsyncQueryHandler.AsyncQueryListener,
 								View.OnClickListener  {
 
 	Context controllerActContext;
+	
+	/**
+	 * Receiver for status update broadcasts from the Sync Service
+	 */
     MyIntentReceiver statusIntentReceiver;
 
     /**
@@ -133,10 +137,15 @@ public class ControllersActivity extends BaseMultiPaneActivity implements
 	private View mLeftIndicator;
 	private View mRightIndicator;
 	private Workspace mWorkspace;
+	
+	/**
+	 * Keep the currently displayed controller because when the fragments want us to do something
+	 * we'll want to know which controller is being displayed.
+	 */
 	private int currentCtlrIndex;
 	
 	/**
-	 * A helper class containing object references related to a particular controller tab-view.
+	 * A helper class containing references and data related to a particular controller tab-view.
 	 */
 	private List<Ctlr> mCtlrs = new ArrayList<Ctlr>();
 
@@ -159,28 +168,39 @@ public class ControllersActivity extends BaseMultiPaneActivity implements
 		private CompoundButton mStarredView;
 		private String mSubtitle;
 
+		/**
+		 * The current tab host method reqiures us to track the fragment container at this level
+		 */
 		FrameLayout probesFragmentContainer;
 		FrameLayout outletsFragmentContainer;
 		FrameLayout notesFragmentContainer;
 		FrameLayout graphsFragmentContainer;
-		String graphsTagId;
-		int graphsRid;
-
+	
 		private ProbesFragment mProbesFragment;
 		private OutletsDataFragment mOutletsFragment;
 		private NotesFragment mNotesFragment;
 		private GraphsFragment mGraphsFragment;
 
+
+		/**
+		 * Don't think these are needed anymore...
+		 */
+		String graphsTagId;
+		int graphsRid;
+
 		private Integer mControllerId;
 		private Uri mControllerUri;
 		private Long mTimestamp;
 		
-		CharSequence[] probeList; // dialog for the graphs needs the full probe list.
+		/**
+		 * dialog for the graphs needs the full probe list.
+		 */
+		CharSequence[] probeList; 
 	}
 
-	/**
+	/*****************************  Activity Methods  ********************************
 	 * 
-	 * @param savedInstanceState
+	 *
 	 */
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -307,8 +327,10 @@ public class ControllersActivity extends BaseMultiPaneActivity implements
 	    IntentFilter intentFilter = new IntentFilter(SyncService.STATUS_UPDATE);
 	    registerReceiver(statusIntentReceiver, intentFilter); 
 
-		// Since we build our views manually instead of using an adapter, we
-		// need to manually requery every time launched.
+	    /**
+	     * Since we build our views manually instead of using an adapter, we
+	     * need to manually requery every time launched.
+	     */
 		requery();
 	}
 
@@ -324,8 +346,7 @@ public class ControllersActivity extends BaseMultiPaneActivity implements
 
 	/**
 	 * 
-	 * @param menu
-	 * @return
+	 * 
 	 */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -387,7 +408,7 @@ public class ControllersActivity extends BaseMultiPaneActivity implements
 	 * Prepare the TabHost for this controller and inflate it within a workspace pane.
 	 * This will inflate the below as defined in R.layout.controllers_list_content_tabbed:
 	 *  Header:
-	 *      Star, Title & Subtitle
+	 *      Title & Subtitle
 	 *  TabView:
 	 *      Probes (ListActivity), Outlets (List Activity), Notes (Custom Fragment)
 	 * 
@@ -430,7 +451,9 @@ public class ControllersActivity extends BaseMultiPaneActivity implements
 			ctlr.mControllerUri=null;
 		}
 
-
+		/**
+		 * Skip over the dummy tabhost setup upon create
+		 */
 		if(ctlr.mControllerId>=0) {
 			setupProbesTab(ctlr);
 			setupOutletsTab(ctlr);
@@ -452,8 +475,17 @@ public class ControllersActivity extends BaseMultiPaneActivity implements
 	 * Build and add "probes" tab.
 	 */
 	private void setupProbesTab(Ctlr ctlr) {
+		
+		/**
+		 * The tag we'll use to refer to this particular tab is the preface and the controllerId
+		 */
 		String tagSpec = TAG_PROBES + "_" + ctlr.mControllerId.toString().replace('-', 'n');
 
+		
+		/**
+		 * We need to keep IDs for each tab withing each controller.  I can't think of any way around this.
+		 * I should add error checking in case someone tries to add 11.
+		 */
 		int Rid;
 		switch(ctlr.index){
 		case 0:
@@ -490,19 +522,26 @@ public class ControllersActivity extends BaseMultiPaneActivity implements
 			Rid=0;
 		}
 
-		// This is a unique layout for each probe tab within all of the probes tabs.  Hardcoded must be < 10
+		/**
+		 * This is a unique layout for each probe tab within all of the probes tabs.  Make a new blank
+		 * frame, set its ID and attach it to the tabcontent root.
+		 */
 		ctlr.probesFragmentContainer = new FrameLayout(this);
 		ctlr.probesFragmentContainer.setId(Rid);
 		ctlr.probesFragmentContainer.setLayoutParams(
 										new ViewGroup.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT,
 																	ViewGroup.LayoutParams.FILL_PARENT));
-
-		// Attach the new layout above to the tabcontent anchor
 		ViewGroup tabContentView = (ViewGroup) ctlr.mRootView.findViewById(android.R.id.tabcontent);
 		tabContentView.addView(ctlr.probesFragmentContainer);
 
+		/**
+		 * For the probe fragment, build a Uri pointing to this controller's probe list.
+		 */
 		final Intent intent = new Intent(Intent.ACTION_VIEW, Data.buildQueryPDataAtUri(ctlr.mControllerId, ctlr.mTimestamp));
 
+		/**
+		 * Kickoff the fragment
+		 */
 		final FragmentManager fm = getSupportFragmentManager();
 
 		ctlr.mProbesFragment = (ProbesFragment) fm.findFragmentByTag(tagSpec);
@@ -517,6 +556,9 @@ public class ControllersActivity extends BaseMultiPaneActivity implements
 									.commit();
 		}
 
+		/** 
+		 * Add the tab to the tabhost
+		 */
 		ctlr.mTabHost.addTab(ctlr.mTabHost.newTabSpec(tagSpec)
 											.setIndicator(buildIndicator(ctlr, R.string.probes_tab_title))
 											.setContent(Rid));
@@ -534,6 +576,10 @@ public class ControllersActivity extends BaseMultiPaneActivity implements
 	 * Build and add "sessions" tab.
 	 */
 	private void setupOutletsTab(Ctlr ctlr) {
+
+		/**
+		 * nearly all of the comments here are the same as for the probes.
+		 */
 		String tagSpec = TAG_OUTLETS + "_" + ctlr.mControllerId.toString().replace('-', 'n');
 
 		int Rid;
@@ -572,13 +618,11 @@ public class ControllersActivity extends BaseMultiPaneActivity implements
 			Rid=0;
 		}
 
-		// This is a unique layout for each probe tab within all of the probes tabs.  Hardcoded must be < 10
 		ctlr.outletsFragmentContainer = new FrameLayout(this);
 		ctlr.outletsFragmentContainer.setId(Rid);
 		ctlr.outletsFragmentContainer.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT,
 														ViewGroup.LayoutParams.FILL_PARENT));
 
-		// Attach the new layout above to the tabcontent anchor
 		ViewGroup tabContentView = (ViewGroup) ctlr.mRootView.findViewById(android.R.id.tabcontent);
 		tabContentView.addView(ctlr.outletsFragmentContainer);
 
@@ -607,9 +651,13 @@ public class ControllersActivity extends BaseMultiPaneActivity implements
 	}
 
 	/**
-	 * Build and add "probes" tab.
+	 * Build and add "graphs" tab.
 	 */
 	private void setupGraphsTab(Ctlr ctlr, String probeName) {
+		
+		/**
+		 * nearly all of the comments here are the same as for the probes.
+		 */
 		String tagSpec = TAG_GRAPHS + "_" + ctlr.mControllerId.toString().replace('-', 'n');
 		int Rid;
 		switch(ctlr.index){
@@ -648,7 +696,7 @@ public class ControllersActivity extends BaseMultiPaneActivity implements
 		}
 
 		/** 
-		 * Save these off for an update
+		 * Don't think these are used anymore
 		 */
 		ctlr.graphsTagId = tagSpec;
 		ctlr.graphsRid = Rid;
@@ -663,7 +711,6 @@ public class ControllersActivity extends BaseMultiPaneActivity implements
 		else
 			intent.putExtra("ProbeName", probeName);   // this was an attempt at updating the fragment...
 
-		// This is a unique layout for each probe tab within all of the probes tabs.  Hardcoded must be < 10
 		ctlr.graphsFragmentContainer = new FrameLayout(this);
 		ctlr.graphsFragmentContainer.setId(Rid);
 		ViewGroup tabContentView = (ViewGroup) ctlr.mRootView.findViewById(android.R.id.tabcontent);
@@ -695,6 +742,10 @@ public class ControllersActivity extends BaseMultiPaneActivity implements
      * Build and add "notes" tab.
      */
     private void setupNotesTab(Ctlr ctlr) {
+    	
+		/**
+		 * nearly all of the comments here are the same as for the probes.
+		 */
 		String tagSpec = TAG_NOTES + "_" + ctlr.mControllerId.toString().replace('-', 'n');
 		int Rid;
 		switch(ctlr.index){
@@ -736,12 +787,8 @@ public class ControllersActivity extends BaseMultiPaneActivity implements
 		 * Build the intent that will be sent to the fragment
 		 */
 		final Intent intent = new Intent(Intent.ACTION_VIEW, Controllers.buildQueryControllerXUri(ctlr.mControllerId));
-//		if(probeName==null)
-//			intent.putExtra("ProbeName", "none"); 
-//		else
-//			intent.putExtra("ProbeName", probeName);   // this was an attempt at updating the fragment...
+		intent.putExtra("ControllerName", ctlr.mTitleString); 
 
-		// This is a unique layout for each probe tab within all of the probes tabs.  Hardcoded must be < 10
 		ctlr.notesFragmentContainer = new FrameLayout(this);
 		ctlr.notesFragmentContainer.setId(Rid);
 		ViewGroup tabContentView = (ViewGroup) ctlr.mRootView.findViewById(android.R.id.tabcontent);
@@ -776,7 +823,7 @@ public class ControllersActivity extends BaseMultiPaneActivity implements
 	}
 
 	/**
-	 * Handle {@link SessionsQuery} {@link Cursor}.
+	 * Handle updates to a controller tabhost based on a query result stored in a cursor.
 	 */
 	private void updateAllControllerTabs(Ctlr cntl, Cursor cursor) {
 		try {
@@ -807,9 +854,6 @@ public class ControllersActivity extends BaseMultiPaneActivity implements
 
 			//            AnalyticsUtils.getInstance(this).trackPageView("/Sessions/" + cntl.mTitleString);
 
-			//            updateOutletsTab(cursor);
-			//            updateNotesTab();
-
 			updateWorkspaceHeader(cntl.index);
 
 		} finally {
@@ -817,6 +861,11 @@ public class ControllersActivity extends BaseMultiPaneActivity implements
 		}
 	}
 	
+	/**
+	 * Take notice if a controller has changed which is usually a timestamp change.  We use this timestamp
+	 * as a proxy for all controller data must have changed.  I don't want a bunch of hits based on every
+	 * probe or outlet changing.
+	 */
 	private ContentObserver mControllerChangesObserver = new ContentObserver(new Handler()) {
 		@Override
 		public void onChange(boolean selfChange) {
@@ -1088,7 +1137,7 @@ public class ControllersActivity extends BaseMultiPaneActivity implements
 			Uri controllersQueryUri = Controllers.buildQueryControllerXUri(cid);
 			cursor = dbResolverControllerAct.query(controllersQueryUri, ControllersQuery.PROJECTION, null, null, null);
 			if (cursor != null && cursor.moveToFirst()) {
-				new OutletUpdateThread(this, cursor, name, position).execute();
+				new OutletUpdateThread(cursor, name, position).execute();
 			}
 		} catch (SQLException e) {
 			//Log.e(TAG, "getting controller list", e);	
@@ -1104,11 +1153,9 @@ public class ControllersActivity extends BaseMultiPaneActivity implements
 	private class OutletUpdateThread extends AsyncTask<String, Integer, Boolean> {
 		String outletName;
 		int position;
-		Context context;
 		Cursor cursor;
 
-		OutletUpdateThread(Context cx, Cursor cur, String name, int ps) {
-			context = cx;
+		OutletUpdateThread(Cursor cur, String name, int ps) {
 			cursor = cur;
 			outletName = name;
 			position = ps;
@@ -1136,7 +1183,6 @@ public class ControllersActivity extends BaseMultiPaneActivity implements
 	 * This is an activity method that will get called from the graph tab fragment.  I had to push the functionality
 	 * up here to the activity level for it to work properly.
 	 */
-	
 	void prepProbeListDialog(int ctrlId, List<CharSequence> argProbeList) {
 		
 		/**
@@ -1164,36 +1210,15 @@ public class ControllersActivity extends BaseMultiPaneActivity implements
     @Override
     protected Dialog onCreateDialog(int id) {
     	Ctlr ctlr = mCtlrs.get(currentCtlrIndex);
-        return new AlertDialog.Builder(this)
-        .setTitle("Which probe to graph:")
-        .setItems(ctlr.probeList, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-            	Ctlr ctlr = mCtlrs.get(currentCtlrIndex);
-            	String test = ctlr.probeList[which].toString();
-            	
-            	ctlr.mGraphsFragment.kickoffDataQuery(test);
-
-
-
-//            	FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-//            	ft.detach(ctlr.mGraphsFragment);
-//				ft.attach(ctlr.mGraphsFragment);
-//            	
-////    			ctlr.mGraphsFragment = new GraphsFragment();
-////    			ctlr.mGraphsFragment.setArguments(intentToFragmentArguments(intent));
-////            	ft.add(ctlr.graphsRid, ctlr.mGraphsFragment, ctlr.graphsTagId);
-//            	ft.commit();
-//            	getSupportFragmentManager().executePendingTransactions();
-
-//    			ctlr.mGraphsFragment = new GraphsFragment();
-//    			ctlr.mGraphsFragment.setArguments(intentToFragmentArguments(intent));
-//    			fm.beginTransaction()
-//    			.add(Rid, ctlr.mGraphsFragment, tagSpec)
-//    			.commit();
-
-            }
-        })
-        .create();
+    	return new AlertDialog.Builder(this)
+    	.setTitle("Which probe to graph:")
+    	.setItems(ctlr.probeList, new DialogInterface.OnClickListener() {
+    		public void onClick(DialogInterface dialog, int which) {
+    			Ctlr ctlr = mCtlrs.get(currentCtlrIndex);
+    			ctlr.mGraphsFragment.kickoffDataQuery(ctlr.probeList[which].toString());
+    		}
+    	})
+    	.create();
     }
 
 
@@ -1312,60 +1337,4 @@ public class ControllersActivity extends BaseMultiPaneActivity implements
 			updateRefreshStatus(mSyncing);
 		}
     }
-    
-	
-//    /**
-//     * A non-UI fragment, retained across configuration changes, that updates its activity's UI
-//     * when sync status changes.
-//     */
-//    public static class SyncStatusUpdaterFragment extends Fragment
-//            implements DetachableResultReceiver.Receiver {
-//        public static final String TAG = SyncStatusUpdaterFragment.class.getName()+"_2";
-//
-//        private boolean mSyncing = false;
-//        private DetachableResultReceiver mReceiver;
-//
-//        @Override
-//        public void onCreate(Bundle savedInstanceState) {
-//            super.onCreate(savedInstanceState);
-//            setRetainInstance(true);
-//            mReceiver = new DetachableResultReceiver(new Handler());
-//            mReceiver.setReceiver(this);
-//        }
-//
-//        /** {@inheritDoc} */
-//        public void onReceiveResult(int resultCode, Bundle resultData) {
-//            ControllersActivity activity = (ControllersActivity) getActivity();
-//            if (activity == null) {
-//                return;
-//            }
-//
-//            switch (resultCode) {
-//                case SyncService.STATUS_RUNNING: {
-//                    mSyncing = true;
-//                    break;
-//                }
-//                case SyncService.STATUS_FINISHED: {
-//                    mSyncing = false;
-//                    break;
-//                }
-//                case SyncService.STATUS_ERROR: {
-//                    // Error happened down in SyncService, show as toast.
-//                    mSyncing = false;
-//                    final String errorText = getString(R.string.toast_sync_error, resultData
-//                            .getString(Intent.EXTRA_TEXT));
-//                    Toast.makeText(activity, errorText, Toast.LENGTH_LONG).show();
-//                    break;
-//                }
-//            }
-//            activity.updateRefreshStatus(mSyncing);
-//        }
-//
-//        @Override
-//        public void onActivityCreated(Bundle savedInstanceState) {
-//            super.onActivityCreated(savedInstanceState);
-//            ((ControllersActivity) getActivity()).updateRefreshStatus(mSyncing);
-//        }
-//    }
-
 }

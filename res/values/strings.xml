@@ -130,11 +130,12 @@
     <string name="notes_catch_view_title">View tank notes</string>
     <string name="toast_notes_error_invoking">Couldn\'t start Catch Notes.</string>
 
-    <string name="note_template">Session: <xliff:g id="title">%1$s</xliff:g>\n\n\n\n__________\nTags: <xliff:g id="hashtags">%2$s</xliff:g></string>
-
+    <string name="note_template_controller">Controller: <xliff:g id="title">%1$s</xliff:g>\nTime: <xliff:g id="time">%2$s</xliff:g>\n\n\n\n__________\nTime: <xliff:g id="hashtags">%3$s</xliff:g></string>
+    <string name="note_template_x">Controller: <xliff:g id="title">%1$s</xliff:g>\n\n\n\n__________\nTime: <xliff:g id="hashtags">%2$s</xliff:g></string>
+    
     <!-- EULA -->
-    <string name="eula_title">EULA title.</string>
-    <string name="eula_text">Please use the preferences icon to set your controller credentials before using any of the app features..</string>
+    <string name="eula_title">Please Read.</string>
+    <string name="eula_text">Please use the preferences icon to set your controller credentials before using any of the app features.\n\nFrom a legal point of view, you must agree not to sue me if your tank misbehaves due to use of this app.</string>
     <string name="accept">Accept</string>
     <string name="decline">Decline</string>
     

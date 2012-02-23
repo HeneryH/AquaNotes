@@ -392,7 +392,7 @@ public class AquaNotesDbContract {
         	return buildQueryControllerXUri(controllerId); // same as query
         }
 
-        public static Uri buildUpdateControllerUrlUri(String controllerUrl) {
+        public static Uri buildUpdateControllerXUri(String controllerUrl) {
         	return buildQueryControllerUrlUri(controllerUrl); // same as query
         }
 
@@ -681,6 +681,11 @@ public class AquaNotesDbContract {
         public static Uri buildQueryPDataAtUri(Integer controllerId, Long timestamp) {
             return BASE_CONTENT_URI.buildUpon()
             		.appendPath(PATH_CONTROLLERS).appendPath(controllerId.toString())
+            		.appendPath(PATH_PROBE_DATA_AT).appendPath(timestamp.toString())
+            		.build();
+        }
+        public static Uri buildQueryPDataAtUri(Uri controllerUri, Long timestamp) {
+            return controllerUri.buildUpon()
             		.appendPath(PATH_PROBE_DATA_AT).appendPath(timestamp.toString())
             		.build();
         }

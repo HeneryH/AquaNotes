@@ -36,12 +36,12 @@ import java.net.URLEncoder;
 
 /**
  * A {@link WebView}-based fragment that shows Google Realtime Search results for a given query,
- * provided as the {@link TagStreamFragment#EXTRA_QUERY} extra in the fragment arguments. If no
+ * provided as the {@link WebStreamFragment#EXTRA_QUERY} extra in the fragment arguments. If no
  * search query is provided, the conference hashtag is used as the default query.
  */
-public class TagStreamFragment extends Fragment {
+public class WebStreamFragment extends Fragment {
 
-    private static final String TAG = "TagStreamFragment";
+    private static final String TAG = "WebStreamFragment";
 
     public static final String EXTRA_QUERY = "com.heneryh.aquanotes.extra.QUERY";
 

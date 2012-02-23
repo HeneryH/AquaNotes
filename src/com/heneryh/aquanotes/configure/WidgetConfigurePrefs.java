@@ -67,7 +67,8 @@ public class WidgetConfigurePrefs extends Activity implements View.OnClickListen
 	// Widget ID is used across many methods so make it a class variable.
 	int mAppWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID;
 	int mControllerId = -1;
-	
+	Long lastUpdated;
+
 	ContentResolver dbResolverWConfigAct;
 
 	@Override
@@ -150,7 +151,6 @@ public class WidgetConfigurePrefs extends Activity implements View.OnClickListen
 						ContentResolver dbResolverDialogAct = getContentResolver();
 						cursor2 = dbResolverDialogAct.query(controllerXUri, ControllersQuery.PROJECTION, null, null, null);
 						if (cursor2 != null && cursor2.moveToFirst()) {
-							mControllerId = cursor2.getInt(ControllersQuery._ID);
 							title = cursor2.getString(ControllersQuery.TITLE);
 							username = cursor2.getString(ControllersQuery.USER);
 							password = cursor2.getString(ControllersQuery.PW);
@@ -159,7 +159,7 @@ public class WidgetConfigurePrefs extends Activity implements View.OnClickListen
 							apexWiFiSid = cursor2.getString(ControllersQuery.WIFI_SSID);
 							interval = cursor2.getInt(ControllersQuery.UPDATE_INTERVAL);
 							prune_age = cursor2.getInt(ControllersQuery.DB_SAVE_DAYS);
-							prune_age = cursor2.getInt(ControllersQuery.DB_SAVE_DAYS);
+							lastUpdated = cursor2.getLong(ControllersQuery.LAST_UPDATED);
 							type = cursor2.getString(ControllersQuery.MODEL);
 
 							mTitle.setText(title);
@@ -184,102 +184,6 @@ public class WidgetConfigurePrefs extends Activity implements View.OnClickListen
 		AlertDialog alert = builder.create();
 		alert.show();
 
-//		if (mAppWidgetId == AppWidgetManager.INVALID_APPWIDGET_ID) {
-//			finish();
-//			return;
-//		} else if(mAppWidgetId == 999) {
-//		} else {
-//
-//			// This condition is a regular widget use case
-//
-//			// This is a hack, if the user previously opened the app without a widget, then lets just assume that this widget 
-//			// must be for that previous instance.  Given that assumption, we need to override that instances
-//			// controller ID to make it equal to this widget ID.
-//			Uri controller999Uri = AquaNotesDbContract.Controllers.buildQueryControllerXUri(999);
-//			Cursor cursor1 = null;
-//			try {
-//				cursor1 = dbResolverConfigAct.query(controller999Uri, ControllersQuery.PROJECTION, null, null, null);
-//				if (cursor1 != null && cursor1.moveToFirst()) {
-//					// need to update the controllerID
-//					ContentValues values = new ContentValues();
-//					values.put(BaseColumns._ID, mAppWidgetId);
-//					try {
-//						dbResolverConfigAct.update(controller999Uri, values, null, null);
-//					} catch (SQLiteConstraintException e2 ) {
-//						Log.e(LOG_TAG, "Inserting/updating controller data: ", e2);
-//					}
-//
-//					// Trigger pushing a widget update to surface
-//					SyncService.requestUpdate(new int[] {mAppWidgetId});
-//
-//					Intent updateIntent = new Intent(ACTION_UPDATE_SINGLE);
-//					updateIntent.setClass(this, SyncService.class);
-//
-//					// note that Service() will only really start it if not already running
-//					startService(updateIntent);
-//
-//					setConfigureResult(Activity.RESULT_OK);
-//					finish();
-//					return;
-//				}
-//			} catch (SQLException e) {
-//				Log.e(LOG_TAG, "onCreate: getting controller facts.", e);	
-//			} finally {
-//				if (cursor1 != null) {
-//					cursor1.close();
-//				}
-//			} // end of try special case  where there was a 999 app usage prior to this widget
-//		}
-//		// Now that we've caught the specical case of a 999 then a widget, lets continue...
-//
-//		// This is either a widget_id or a 999 ui 
-//
-//		// Check if previously configured, ie this same activity is called when the
-//		// main application "preferences" menu item is clicked.
-//		Uri controllerXUri = AquaNotesDbContract.Controllers.buildQueryControllerXUri(mAppWidgetId);
-//		Cursor cursor2 = null;
-//
-//		String username = null;
-//		String password = null;
-//		String apexBaseURL = null;
-//		String apexWiFiURL = null;
-//		String apexWiFiSid = null;
-//		String title = null;
-//		Integer interval=0;
-//		Integer prune_age = 0;
-//
-//		// Poll the database for facts about this controller
-//		// If already set in the db, then pre-populate the fields.
-//		try {
-//			cursor2 = dbResolverConfigAct.query(controllerXUri, ControllersQuery.PROJECTION, null, null, null);
-//			if (cursor2 != null && cursor2.moveToFirst()) {
-//				title = cursor2.getString(ControllersQuery.TITLE);
-//				username = cursor2.getString(ControllersQuery.USER);
-//				password = cursor2.getString(ControllersQuery.PW);
-//				apexBaseURL = cursor2.getString(ControllersQuery.WAN_URL);
-//				apexWiFiURL = cursor2.getString(ControllersQuery.WIFI_URL);
-//				apexWiFiSid = cursor2.getString(ControllersQuery.WIFI_SSID);
-//				interval = cursor2.getInt(ControllersQuery.UPDATE_INTERVAL);
-//				prune_age = cursor2.getInt(ControllersQuery.DB_SAVE_DAYS);
-//				prune_age = cursor2.getInt(ControllersQuery.DB_SAVE_DAYS);
-//				type = cursor2.getString(ControllersQuery.MODEL);
-//
-//				mTitle.setText(title);
-//				mWanUrl.setText(apexBaseURL);
-//				mLanUrl.setText(apexWiFiURL);
-//				mWiFiSid.setText(apexWiFiSid);
-//				mUser.setText(username);
-//				mPassword.setText(password);
-//				mUpdateIntervalMins.setText(interval.toString());
-//				mPruneAge.setText(prune_age.toString());
-//			}
-//		} catch (SQLException e) {
-//			Log.e(LOG_TAG, "onCreate: getting controller facts.", e);	
-//		} finally {
-//			if (cursor2 != null) {
-//				cursor2.close();
-//			}
-//		}
 
 		// If restoring, read location and units from bundle
 		// I really need to learn more about this concept.
@@ -342,40 +246,38 @@ public class WidgetConfigurePrefs extends Activity implements View.OnClickListen
 				// How shall we handle this?????
 				// Maybe a toast message?
 			}
-			values.put(AquaNotesDbContract.Controllers.LAST_UPDATED, -1);  /* what about a reset of the preferences?? */
-			//			values.put(ControllersColumns.CONFIGURED, ControllersColumns.CONFIGURED_TRUE);
+			values.put(AquaNotesDbContract.Controllers.LAST_UPDATED, lastUpdated);  
 
 			// I can't figure out why the insert constraint violation is not properly caught
 			// when there is an update needed rather than an insert.
 			// Well, the quick fix is to just try the update first then the insert if needed.
 			// This is only done rarely anyway so it doesn't matter much.
 			ContentResolver resolver = getContentResolver();
-//			Uri controllerXUri = Controllers.buildUpdateControllerXUri(url);
-//			int updateStatus = 0;
-//			try {
-//				updateStatus = resolver.update(controllerXUri, values, null, null);
-//			} catch (SQLiteConstraintException e2 ) {
-//				Log.e(LOG_TAG, "Inserting/updating controller data: ", e2);
-//			}
-//			if(updateStatus==0) {
-			Uri controllerUri=null;
+			Uri controllerXUri = Controllers.buildUpdateControllerXUri(url);
+			int updateStatus = 0;
+			try {
+				updateStatus = resolver.update(controllerXUri, values, null, null);
+			} catch (SQLiteConstraintException e2 ) {
+				Log.e(LOG_TAG, "Inserting/updating controller data: ", e2);
+			}
+			if(updateStatus==0) {
 				try {
-					controllerUri = resolver.insert(Controllers.buildInsertControllerUri(), values);
+					controllerXUri = resolver.insert(Controllers.buildInsertControllerUri(), values);
 				} catch (SQLiteConstraintException e) {
 					Log.w(LOG_TAG, "Inserting controller data, maybe updating: ", e);
 				} catch (SQLException e) {
 					Log.e(LOG_TAG, "Inserting controller data, maybe updating: ", e);
 				} 
-//			}
+			}
 
 				// Trigger an update
-				if(controllerUri!=null) {
-					String controllerId = Controllers.getControllerId(controllerUri);
+				if(controllerXUri!=null) {
+					String controllerId = Controllers.getControllerId(controllerXUri);
 					//SyncService.requestUpdate(new int[] {Integer.valueOf(controllerId)});
 
 					Intent updateIntent = new Intent(ACTION_UPDATE_ALL);
 					updateIntent.setClass(this, SyncService.class);
-
+					
 					// note that startService() will only really start it if not already running
 					startService(updateIntent);
 				}
@@ -409,7 +311,7 @@ public class WidgetConfigurePrefs extends Activity implements View.OnClickListen
 	 */
 	public void setConfigureResult(int resultCode) {
 		final Intent data = new Intent();
-//		data.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mAppWidgetId);
+		data.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mAppWidgetId);
 		setResult(resultCode, data);
 	}
 

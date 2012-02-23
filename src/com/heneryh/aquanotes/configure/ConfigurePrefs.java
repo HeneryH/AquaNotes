@@ -64,6 +64,9 @@ public class ConfigurePrefs extends Activity implements View.OnClickListener {
 	private EditText mUpdateIntervalMins;
 	private EditText mPruneAge;
 
+	Long lastUpdated;
+	Integer widgetId;
+
 	String type = null;
 
 	// Controller/Widget ID is used across many methods so make it a class variable.
@@ -77,8 +80,6 @@ public class ConfigurePrefs extends Activity implements View.OnClickListener {
 		
 		// Read the Controller/AppWidget Id to configure from the incoming intent
 		//mAppWidgetId = getIntent().getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mAppWidgetId);
-
-		setConfigureResult(Activity.RESULT_CANCELED);
 
 		dbResolverConfigAct = getContentResolver();
 
@@ -146,6 +147,7 @@ public class ConfigurePrefs extends Activity implements View.OnClickListener {
 					String title = null;
 					Integer interval=0;
 					Integer prune_age = 0;
+					widgetId = -1;
 
 					// Poll the database for facts about this controller
 					// If already set in the db, then pre-populate the fields.
@@ -161,8 +163,9 @@ public class ConfigurePrefs extends Activity implements View.OnClickListener {
 							apexWiFiSid = cursor2.getString(ControllersQuery.WIFI_SSID);
 							interval = cursor2.getInt(ControllersQuery.UPDATE_INTERVAL);
 							prune_age = cursor2.getInt(ControllersQuery.DB_SAVE_DAYS);
-							prune_age = cursor2.getInt(ControllersQuery.DB_SAVE_DAYS);
+							lastUpdated = cursor2.getLong(ControllersQuery.LAST_UPDATED);
 							type = cursor2.getString(ControllersQuery.MODEL);
+							widgetId = cursor2.getInt(ControllersQuery.WIDGET);
 
 							mTitle.setText(title);
 							mWanUrl.setText(apexBaseURL);
@@ -345,35 +348,34 @@ public class ConfigurePrefs extends Activity implements View.OnClickListener {
 				// How shall we handle this?????
 				// Maybe a toast message?
 			}
-			values.put(AquaNotesDbContract.Controllers.LAST_UPDATED, -1);  /* what about a reset of the preferences?? */
-			//			values.put(ControllersColumns.CONFIGURED, ControllersColumns.CONFIGURED_TRUE);
+			values.put(AquaNotesDbContract.Controllers.LAST_UPDATED, lastUpdated);  
+			values.put(AquaNotesDbContract.Controllers.WIDGET, widgetId);
 
 			// I can't figure out why the insert constraint violation is not properly caught
 			// when there is an update needed rather than an insert.
 			// Well, the quick fix is to just try the update first then the insert if needed.
 			// This is only done rarely anyway so it doesn't matter much.
 			ContentResolver resolver = getContentResolver();
-//			Uri controllerXUri = Controllers.buildUpdateControllerXUri(url);
-//			int updateStatus = 0;
-//			try {
-//				updateStatus = resolver.update(controllerXUri, values, null, null);
-//			} catch (SQLiteConstraintException e2 ) {
-//				Log.e(LOG_TAG, "Inserting/updating controller data: ", e2);
-//			}
-//			if(updateStatus==0) {
-			Uri controllerUri=null;
+			Uri controllerXUri = Controllers.buildUpdateControllerXUri(url);
+			int updateStatus = 0;
+			try {
+				updateStatus = resolver.update(controllerXUri, values, null, null);
+			} catch (SQLiteConstraintException e2 ) {
+				Log.e(LOG_TAG, "Inserting/updating controller data: ", e2);
+			}
+			if(updateStatus==0) {
 				try {
-					controllerUri = resolver.insert(Controllers.buildInsertControllerUri(), values);
+					controllerXUri = resolver.insert(Controllers.buildInsertControllerUri(), values);
 				} catch (SQLiteConstraintException e) {
 					Log.w(LOG_TAG, "Inserting controller data, maybe updating: ", e);
 				} catch (SQLException e) {
 					Log.e(LOG_TAG, "Inserting controller data, maybe updating: ", e);
 				} 
-//			}
+			}
 
 				// Trigger an update
-				if(controllerUri!=null) {
-					String controllerId = Controllers.getControllerId(controllerUri);
+				if(controllerXUri!=null) {
+					String controllerId = Controllers.getControllerId(controllerXUri);
 					//SyncService.requestUpdate(new int[] {Integer.valueOf(controllerId)});
 
 					Intent updateIntent = new Intent(ACTION_UPDATE_ALL);
@@ -383,7 +385,6 @@ public class ConfigurePrefs extends Activity implements View.OnClickListener {
 					startService(updateIntent);
 				}
 
-			setConfigureResult(Activity.RESULT_OK);
 			finish();
 
 			break;
@@ -395,7 +396,6 @@ public class ConfigurePrefs extends Activity implements View.OnClickListener {
 			int ct = resolver.delete(deleteOne, null, null);
 			if(ct!=1)
 				Log.e(LOG_TAG, "error deleting controller");
-			setConfigureResult(Activity.RESULT_OK);
 			finish();
 
 		}// end of case delete:
@@ -417,15 +417,6 @@ public class ConfigurePrefs extends Activity implements View.OnClickListener {
 	}
 
 
-	/**
-	 * Convenience method to always include {@link #mAppWidgetId} when setting
-	 * the result {@link Intent}.
-	 */
-	public void setConfigureResult(int resultCode) {
-		final Intent data = new Intent();
-//		data.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mAppWidgetId);
-		setResult(resultCode, data);
-	}
 
 	private interface ControllersQuery {
 		String[] PROJECTION = {
@@ -451,6 +442,7 @@ public class ConfigurePrefs extends Activity implements View.OnClickListener {
 				AquaNotesDbContract.Controllers.UPDATE_INTERVAL,
 				AquaNotesDbContract.Controllers.DB_SAVE_DAYS,
 				AquaNotesDbContract.Controllers.MODEL,
+				AquaNotesDbContract.Controllers.WIDGET,
 		};
 
 		int _ID = 0;
@@ -464,5 +456,6 @@ public class ConfigurePrefs extends Activity implements View.OnClickListener {
 		int UPDATE_INTERVAL = 8;
 		int DB_SAVE_DAYS = 9;
 		int MODEL = 10;
+		int WIDGET = 11;
 	}
 }  // end of ConfigurePrefs

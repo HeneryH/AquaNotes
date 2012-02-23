@@ -84,8 +84,6 @@ public class GraphsFragment extends Fragment implements
 
     private static final String TAG = "GraphsFragment";
 
-	private static final String STATE_CHECKED_POSITION = "checkedPosition";
-
     private Cursor mCursor;
     private Uri probesUri;
     private String probeName;
@@ -253,6 +251,8 @@ public class GraphsFragment extends Fragment implements
     		} // end of while()
     	} finally {
     		cursor.close();
+    		if (numDataPoints<2)
+    			return;
     	}
     	 // create our series from our array of nums:
     	mySeries = new SimpleXYSeries(vector, ArrayFormat.XY_VALS_INTERLEAVED,  probeName);
@@ -472,7 +472,6 @@ public class GraphsFragment extends Fragment implements
              return null;
 
          }
-
  }
 
 
