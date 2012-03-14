@@ -20,15 +20,16 @@ import com.heneryh.aquanotes.provider.AquaNotesDbContract.Controllers;
 import com.heneryh.aquanotes.provider.AquaNotesDbContract.ControllersColumns;
 import com.heneryh.aquanotes.provider.AquaNotesDbContract.Data;
 import com.heneryh.aquanotes.provider.AquaNotesDbContract.DataColumns;
+import com.heneryh.aquanotes.provider.AquaNotesDbContract.LivestockColumns;
 import com.heneryh.aquanotes.provider.AquaNotesDbContract.Probes;
 import com.heneryh.aquanotes.provider.AquaNotesDbContract.ProbesColumns;
 import com.heneryh.aquanotes.provider.AquaNotesDbContract.Outlets;
 import com.heneryh.aquanotes.provider.AquaNotesDbContract.OutletsColumns;
-import com.heneryh.aquanotes.provider.AquaNotesDbContract.SyncColumns;
 import android.app.SearchManager;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.graphics.Color;
 import android.provider.BaseColumns;
 import android.util.Log;
 
@@ -46,15 +47,17 @@ public class AquaNotesDatabase extends SQLiteOpenHelper {
 
     private static final int VER_LAUNCH = 1;
     private static final int VER_ADD_WIDGET = 2;
-//    private static final int VER_URL_NOW_KEY = 3;
+    private static final int VER_ADD_LIVESTOCK = 3;
+    private static final int VER_ADD_LIVESTOCK_THUMBNAIL = 4;
 
-    private static final int DATABASE_VERSION = VER_ADD_WIDGET;
+    private static final int DATABASE_VERSION = VER_ADD_LIVESTOCK_THUMBNAIL;
 
     interface Tables {
         String CONTROLLERS = "controllers";
         String PROBES = "probes";
         String OUTLETS = "outlets";
         String DATA = "data";
+        String LIVESTOCK = "livestock";
         
         String PROBE_VIEW = "probe_view";
         String OUTLET_VIEW = "outlet_view";
@@ -98,7 +101,6 @@ public class AquaNotesDatabase extends SQLiteOpenHelper {
               + ControllersColumns.MODEL + " TEXT,"    
               + ControllersColumns.WIDGET + " INTEGER,"    
       + "UNIQUE (" + ControllersColumns.WAN_URL + ") ON CONFLICT REPLACE)");
-//    + ")");  // make sure to take this comma out if removing the unique
 
       
 //      String PROBE_ID = "_id";
@@ -201,6 +203,18 @@ public class AquaNotesDatabase extends SQLiteOpenHelper {
         	    " FROM " + Tables.DATA + " JOIN " + Tables.OUTLETS +
         	    " ON " + Tables.DATA + "." + Data.PARENT_ID + " =" + Tables.OUTLETS + "." + BaseColumns._ID
         	    );
+      
+//      String _ID = "_id";
+//      String COMMON_NAME = "common_name";
+//      String TYPE = "type";
+//      String TIMESTAMP = "timestamp";
+      db.execSQL("CREATE TABLE " + Tables.LIVESTOCK + " ("
+              + BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+              + LivestockColumns.COMMON_NAME + " TEXT,"
+              + LivestockColumns.TYPE + " TEXT,"
+              + LivestockColumns.THUMBNAIL + " INTEGER,"
+              + LivestockColumns.TIMESTAMP + " LONG"
+              + ")");
 
     }
 
@@ -217,11 +231,28 @@ public class AquaNotesDatabase extends SQLiteOpenHelper {
 
         switch (version) {
         case VER_LAUNCH:
-        	// Version 2 reworked a lot but not the controllers.
             Log.w(TAG, "Adding widget ID column to controllers table");
             db.execSQL("ALTER TABLE " + Tables.CONTROLLERS + " ADD COLUMN "
             		+ Controllers.WIDGET + " INTEGER");
         	version = VER_ADD_WIDGET;
+        	
+        case VER_ADD_WIDGET:
+            Log.w(TAG, "Adding table for livestock");
+            db.execSQL("CREATE TABLE " + Tables.LIVESTOCK + " ("
+                    + BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                    + LivestockColumns.COMMON_NAME + " TEXT,"
+                    + LivestockColumns.TYPE + " TEXT,"
+                    + LivestockColumns.TIMESTAMP + " LONG"
+                    + ")");
+        	version = VER_ADD_LIVESTOCK;
+        	
+        case VER_ADD_LIVESTOCK:
+            Log.w(TAG, "Adding thumbnail column for livestock");
+          db.execSQL("ALTER TABLE " + Tables.LIVESTOCK + " ADD COLUMN "
+        		  + LivestockColumns.THUMBNAIL + " INTEGER");
+        	version = VER_ADD_LIVESTOCK_THUMBNAIL;
+        	
+ 
         	
 //        case VER_REWORK_ALL_TABLES:
 //        	// Version 3 changed key for controllers, sorry.
@@ -257,6 +288,7 @@ public class AquaNotesDatabase extends SQLiteOpenHelper {
             db.execSQL("DROP TABLE IF EXISTS " + Tables.PROBES);
             db.execSQL("DROP TABLE IF EXISTS " + Tables.OUTLETS);
             db.execSQL("DROP TABLE IF EXISTS " + Tables.DATA);
+            db.execSQL("DROP TABLE IF EXISTS " + Tables.LIVESTOCK);
             
             db.execSQL("DROP VIEW IF EXISTS " + Tables.PROBE_VIEW);
             db.execSQL("DROP VIEW IF EXISTS " + Tables.OUTLET_VIEW);

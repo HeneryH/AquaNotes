@@ -19,6 +19,9 @@ package com.heneryh.aquanotes.ui;
 import com.heneryh.aquanotes.R;
 import com.heneryh.aquanotes.configure.ConfigurePrefs;
 import com.heneryh.aquanotes.provider.AquaNotesDbContract;
+import com.heneryh.aquanotes.ui.controllers.ControllersActivity;
+import com.heneryh.aquanotes.ui.feed.FeedActivity;
+import com.heneryh.aquanotes.ui.livestock.LivestockActivity;
 import com.heneryh.aquanotes.util.AnalyticsUtils;
 import com.heneryh.aquanotes.util.UIUtils;
 
@@ -51,6 +54,23 @@ public class DashboardFragment extends Fragment {
                 startActivity(new Intent(getActivity(), ControllersActivity.class));                
             }
         });
+
+        root.findViewById(R.id.home_btn_livestock).setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                fireTrackerEvent("Livestock");
+                // Launch list of sessions and vendors the user has starred
+                startActivity(new Intent(getActivity(), LivestockActivity.class));                
+            }
+        });
+
+        root.findViewById(R.id.home_btn_feed).setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                fireTrackerEvent("Feed");
+                // Launch list of sessions and vendors the user has starred
+                startActivity(new Intent(getActivity(), FeedActivity.class));                
+            }
+        });
+
 
 
         root.findViewById(R.id.home_btn_prefs).setOnClickListener(

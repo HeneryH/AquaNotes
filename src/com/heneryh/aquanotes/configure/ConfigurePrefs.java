@@ -5,15 +5,12 @@
 package com.heneryh.aquanotes.configure;
 
 /**
- * For each widget instance we assume a new controller.  The controller preferences
- * will save off the URL, Credentials and other misc data items.
+ * This is a hook into the controllers config database.  The user can view, set or edit
+ * the credentials and timing settings for any controller.
  * 
- * Note that since each widget corresponds to a controller we sometimes interchange
- * the terms ControllerId and WidgetId depending on the context.
- * 
- * The widget should have already started the update timer & thread but it should
- * quickly bail-out if these preferences are not yet set.
- * 
+ * This same activity copied and slightly modified exists for the widget preferences.
+ * The only difference is that that one sets the widgetID.  They can probably be combined
+ * with minor effort
  */
 
 import java.util.ArrayList;
@@ -49,10 +46,9 @@ public class ConfigurePrefs extends Activity implements View.OnClickListener {
 	private static final boolean LOGD = true;
 	private static final String LOG_TAG = "ConfigurePrefs";
 
-	public static final String ACTION_UPDATE_SINGLE = "com.heneryh.aquanotes.UPDATE_SINGLE"; // probably shouldn't repeat this but import it
-	public static final String ACTION_UPDATE_ALL = "com.heneryh.aquanotes.UPDATE_ALL"; // probably shouldn't repeat this but import it
-
-	// Graphical elements
+	/**
+	 * Graphical elements
+	 */
 	private Button mSave;
 	private Button mDelete;
 	private EditText mTitle;
@@ -64,28 +60,31 @@ public class ConfigurePrefs extends Activity implements View.OnClickListener {
 	private EditText mUpdateIntervalMins;
 	private EditText mPruneAge;
 
-	Long lastUpdated;
-	Integer widgetId;
-
+	/** 
+	 * These three are not carried over via text field so we need to save them off 
+	 */
+	Long lastUpdated=(long) 0;
 	String type = null;
 
-	// Controller/Widget ID is used across many methods so make it a class variable.
-	//int mAppWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID;
+	/**
+	 * While we are not using the widget id, lets make sure we set it to an invalid value.
+	 */
+	Integer widgetId = AppWidgetManager.INVALID_APPWIDGET_ID;
 
+	/**
+	 * Access to the database
+	 */
 	ContentResolver dbResolverConfigAct;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		// Read the Controller/AppWidget Id to configure from the incoming intent
-		//mAppWidgetId = getIntent().getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mAppWidgetId);
-
 		dbResolverConfigAct = getContentResolver();
 
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 
-		// Connect this activity to the configuration screen
+		// Connect this activity to the configuration layout
 		setContentView(R.layout.activity_prefs);
 
 		// then grab references to the graphical elements
@@ -105,6 +104,7 @@ public class ConfigurePrefs extends Activity implements View.OnClickListener {
 
 		/**
 		 * First lets get a list of all active controllers then present the list to the user in a dialog.
+		 * Should probably move this to the Fragment Dialog model.
 		 */
  		List<String> controllerURLs = new ArrayList<String>();
  		controllerURLs.add("New");
@@ -136,7 +136,7 @@ public class ConfigurePrefs extends Activity implements View.OnClickListener {
 				Toast.makeText(getApplicationContext(), items[item], Toast.LENGTH_SHORT).show();
 				if(item>0) {
 					String Url = items[item].toString();
-					Uri controllerXUri = AquaNotesDbContract.Controllers.buildQueryControllerUrlUri(Url);
+					Uri controllerXUri = AquaNotesDbContract.Controllers.buildQueryControllerByUrlUri(Url);
 					Cursor cursor2 = null;
 
 					String username = null;
@@ -189,105 +189,6 @@ public class ConfigurePrefs extends Activity implements View.OnClickListener {
 		AlertDialog alert = builder.create();
 		alert.show();
 
-
-
-//		if (mAppWidgetId == AppWidgetManager.INVALID_APPWIDGET_ID) {
-//			finish();
-//			return;
-//		} else if(mAppWidgetId == 999) {
-//		} else {
-//
-//			// This condition is a regular widget use case
-//
-//			// This is a hack, if the user previously opened the app without a widget, then lets just assume that this widget 
-//			// must be for that previous instance.  Given that assumption, we need to override that instances
-//			// controller ID to make it equal to this widget ID.
-//			Uri controller999Uri = AquaNotesDbContract.Controllers.buildQueryControllerXUri(999);
-//			Cursor cursor1 = null;
-//			try {
-//				cursor1 = dbResolverConfigAct.query(controller999Uri, ControllersQuery.PROJECTION, null, null, null);
-//				if (cursor1 != null && cursor1.moveToFirst()) {
-//					// need to update the controllerID
-//					ContentValues values = new ContentValues();
-//					values.put(BaseColumns._ID, mAppWidgetId);
-//					try {
-//						dbResolverConfigAct.update(controller999Uri, values, null, null);
-//					} catch (SQLiteConstraintException e2 ) {
-//						Log.e(LOG_TAG, "Inserting/updating controller data: ", e2);
-//					}
-//
-//					// Trigger pushing a widget update to surface
-//					SyncService.requestUpdate(new int[] {mAppWidgetId});
-//
-//					Intent updateIntent = new Intent(ACTION_UPDATE_SINGLE);
-//					updateIntent.setClass(this, SyncService.class);
-//
-//					// note that Service() will only really start it if not already running
-//					startService(updateIntent);
-//
-//					setConfigureResult(Activity.RESULT_OK);
-//					finish();
-//					return;
-//				}
-//			} catch (SQLException e) {
-//				Log.e(LOG_TAG, "onCreate: getting controller facts.", e);	
-//			} finally {
-//				if (cursor1 != null) {
-//					cursor1.close();
-//				}
-//			} // end of try special case  where there was a 999 app usage prior to this widget
-//		}
-//		// Now that we've caught the specical case of a 999 then a widget, lets continue...
-//
-//		// This is either a widget_id or a 999 ui 
-//
-//		// Check if previously configured, ie this same activity is called when the
-//		// main application "preferences" menu item is clicked.
-//		Uri controllerXUri = AquaNotesDbContract.Controllers.buildQueryControllerXUri(mAppWidgetId);
-//		Cursor cursor2 = null;
-//
-//		String username = null;
-//		String password = null;
-//		String apexBaseURL = null;
-//		String apexWiFiURL = null;
-//		String apexWiFiSid = null;
-//		String title = null;
-//		Integer interval=0;
-//		Integer prune_age = 0;
-//
-//		// Poll the database for facts about this controller
-//		// If already set in the db, then pre-populate the fields.
-//		try {
-//			cursor2 = dbResolverConfigAct.query(controllerXUri, ControllersQuery.PROJECTION, null, null, null);
-//			if (cursor2 != null && cursor2.moveToFirst()) {
-//				title = cursor2.getString(ControllersQuery.TITLE);
-//				username = cursor2.getString(ControllersQuery.USER);
-//				password = cursor2.getString(ControllersQuery.PW);
-//				apexBaseURL = cursor2.getString(ControllersQuery.WAN_URL);
-//				apexWiFiURL = cursor2.getString(ControllersQuery.WIFI_URL);
-//				apexWiFiSid = cursor2.getString(ControllersQuery.WIFI_SSID);
-//				interval = cursor2.getInt(ControllersQuery.UPDATE_INTERVAL);
-//				prune_age = cursor2.getInt(ControllersQuery.DB_SAVE_DAYS);
-//				prune_age = cursor2.getInt(ControllersQuery.DB_SAVE_DAYS);
-//				type = cursor2.getString(ControllersQuery.MODEL);
-//
-//				mTitle.setText(title);
-//				mWanUrl.setText(apexBaseURL);
-//				mLanUrl.setText(apexWiFiURL);
-//				mWiFiSid.setText(apexWiFiSid);
-//				mUser.setText(username);
-//				mPassword.setText(password);
-//				mUpdateIntervalMins.setText(interval.toString());
-//				mPruneAge.setText(prune_age.toString());
-//			}
-//		} catch (SQLException e) {
-//			Log.e(LOG_TAG, "onCreate: getting controller facts.", e);	
-//		} finally {
-//			if (cursor2 != null) {
-//				cursor2.close();
-//			}
-//		}
-
 		// If restoring, read location and units from bundle
 		// I really need to learn more about this concept.
 		if (savedInstanceState != null) {
@@ -317,15 +218,6 @@ public class ConfigurePrefs extends Activity implements View.OnClickListener {
 			String pword = mPassword.getText().toString();
 			String updIntervalMins = mUpdateIntervalMins.getText().toString();
 			String pruneAge = mPruneAge.getText().toString();
-
-			//			title = cursor2.getString(ControllersQuery.TITLE);
-			//			username = cursor2.getString(ControllersQuery.USER);
-			//			password = cursor2.getString(ControllersQuery.PW);
-			//			apexBaseURL = cursor2.getString(ControllersQuery.WAN_URL);
-			//			apexWiFiURL = cursor2.getString(ControllersQuery.WIFI_URL);
-			//			apexWiFiSid = cursor2.getString(ControllersQuery.WIFI_SSID);
-			//			interval = cursor2.getInt(ControllersQuery.UPDATE_INTERVAL);
-			//			prune_age = cursor2.getInt(ControllersQuery.DB_SAVE_DAYS);
 
 			// Strings are easily put into the database directly but numbers must
 			// be parsed.  The parsing may throw an exception.
@@ -378,7 +270,7 @@ public class ConfigurePrefs extends Activity implements View.OnClickListener {
 					String controllerId = Controllers.getControllerId(controllerXUri);
 					//SyncService.requestUpdate(new int[] {Integer.valueOf(controllerId)});
 
-					Intent updateIntent = new Intent(ACTION_UPDATE_ALL);
+					Intent updateIntent = new Intent(SyncService.ACTION_UPDATE_ALL);
 					updateIntent.setClass(this, SyncService.class);
 
 					// note that startService() will only really start it if not already running

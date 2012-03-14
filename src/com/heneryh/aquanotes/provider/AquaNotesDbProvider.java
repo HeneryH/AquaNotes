@@ -17,6 +17,7 @@
 package com.heneryh.aquanotes.provider;
 
 import com.heneryh.aquanotes.provider.AquaNotesDbContract.Controllers;
+import com.heneryh.aquanotes.provider.AquaNotesDbContract.Livestock;
 import com.heneryh.aquanotes.provider.AquaNotesDbContract.OutletDataView;
 import com.heneryh.aquanotes.provider.AquaNotesDbContract.Outlets;
 import com.heneryh.aquanotes.provider.AquaNotesDbContract.Data;
@@ -67,6 +68,7 @@ public class AquaNotesDbProvider extends ContentProvider {
 	private static final int CONTROLLERS_ID = 502;
 	private static final int CONTROLLERS_URL = 503;
 	private static final int CONTROLLERS_WID = 504;
+	private static final int CONTROLLERS_TITLE = 505;
 
 	private static final int PROBES = 601;
 	private static final int CONTROLLERS_ID_PROBES = 602;
@@ -91,6 +93,7 @@ public class AquaNotesDbProvider extends ContentProvider {
 	private static final int CONTROLLERS_ID_OUTLETDATA_FOR_ID = 810; 
 	private static final int CONTROLLERS_ID_OUTLETDATA_FOR_DEVICE_ID = 811; 
     
+	private static final int LIVESTOCK = 901;
 
     private static final String MIME_XML = "text/xml";
 
@@ -107,11 +110,15 @@ public class AquaNotesDbProvider extends ContentProvider {
     	 *  notice two possible switch statements for the same twig depending on if something follows
     	 */
 //////////////////////////////////////////////
-//    	private static final int CONTROLLERS = 101;
-//    	private static final int CONTROLLERS_ID = 102;
-//    	private static final int CONTROLLERS_URL = 903;
-//    	private static final int CONTROLLERS_WID = 922;
-//      private static final String PATH_CONTROLLERS = "controllers";
+//    	private static final int CONTROLLERS = 501;
+//    	private static final int CONTROLLERS_ID = 502;
+//    	private static final int CONTROLLERS_URL = 503;
+//    	private static final int CONTROLLERS_WID = 504;
+//    	private static final int CONTROLLERS_TITLE = 505;
+//        private static final String PATH_CONTROLLERS = "controllers";
+//        private static final String PATH_CONTROLLERS_URL = "url";
+//        private static final String PATH_CONTROLLERS_WIDGET = "widget";
+//        private static final String PATH_CONTROLLERS_TITLE = "title";
         matcher.addURI(authority, "controllers", CONTROLLERS);
 		// query = return all controllers 
 		// insert = add the controller defined in the values object, auto-create a controller_id
@@ -120,31 +127,38 @@ public class AquaNotesDbProvider extends ContentProvider {
 		// getType = return type for multiple items
 
         matcher.addURI(authority, "controllers/#", CONTROLLERS_ID);
-		// query = return just one controller
+		// query = return just one controller, by id#
 		// insert = ?
 		// update = Update this one controller with the values object
 		// delete = delete the referenced controller, its probes and all probe data for this controller
 		// getType = return type for single item
 
         matcher.addURI(authority, "controllers/url/*", CONTROLLERS_URL);
-		// query = return just one controller
+		// query = return just one controller, by url
 		// insert = ?
 		// update = Update this one controller with the values object
 		// delete = delete the referenced controller, its probes and all probe data for this controller
 		// getType = return type for single item
 
         matcher.addURI(authority, "controllers/widget/#", CONTROLLERS_WID);
-		// query = return just one controller
+		// query = return just one controller, by widget#
+		// insert = ?
+		// update = Update this one controller with the values object
+		// delete = delete the referenced controller, its probes and all probe data for this controller
+		// getType = return type for single item
+
+        matcher.addURI(authority, "controllers/title/*", CONTROLLERS_TITLE);
+		// query = return just one controller, by widget#
 		// insert = ?
 		// update = Update this one controller with the values object
 		// delete = delete the referenced controller, its probes and all probe data for this controller
 		// getType = return type for single item
 
 //////////////////////////////////////////////
-//    	private static final int PROBES = 903;
-//    	private static final int CONTROLLERS_ID_PROBES = 904;
-//    	private static final int CONTROLLERS_ID_PROBES_ID = 905;
-//    	private static final int CONTROLLERS_ID_PROBES_NAME = 906;
+//    	private static final int PROBES = 601;
+//    	private static final int CONTROLLERS_ID_PROBES = 602;
+//    	private static final int CONTROLLERS_ID_PROBES_ID = 603;
+//    	private static final int CONTROLLERS_ID_PROBES_NAME = 604;
 //        private static final String PATH_PROBES = "probes";
 //        private static final String PATH_PROBES_NAME = "probes_nm";
         matcher.addURI(authority, "probes", PROBES);
@@ -158,33 +172,34 @@ public class AquaNotesDbProvider extends ContentProvider {
 		// query = return all probes for a given controller
 		// insert = add a probe defined by the values object to the referenced controller, auto-create a probe_id 
 		// update = ?
-		// delete = delete ?
+		// delete = delete all probes for a given controller
 		// getType = return type for multiple items
 
 		matcher.addURI(authority, "controllers/#/probes/#", CONTROLLERS_ID_PROBES_ID);
 		// query = return just one probe, by ID
-		// insert = add ?
-		// update = ?
-		// delete = delete ?
+		// insert = insert data into the data table for this probe
+		// update = update just this probe record
+		// delete = delete just this probe
 		// getType = return type for single item
 
 		matcher.addURI(authority, "controllers/#/probes_nm/*", CONTROLLERS_ID_PROBES_NAME);
 		// query = return just one probe, by name
-		// insert = add ?
-		// update = ?
-		// delete = delete ?
+		// insert = ?
+		// update = update just this probe record
+		// delete = delete just this probe record
 		// getType = return type for single item
 
-//		private static final int OUTLETS = 907;
-//		private static final int CONTROLLERS_ID_OUTLETS = 908;
-//		private static final int CONTROLLERS_ID_OUTLETS_ID = 909;
-//		private static final int CONTROLLERS_ID_OUTLETS_DEVICE_ID = 910;
-//		private static final int CONTROLLERS_ID_OUTLETS_RSC = 911; 
+//////////////////////////////////////////////
+//		private static final int OUTLETS = 701;
+//		private static final int CONTROLLERS_ID_OUTLETS = 702;
+//		private static final int CONTROLLERS_ID_OUTLETS_ID = 703;
+//		private static final int CONTROLLERS_ID_OUTLETS_DEVICE_ID = 704;
+//		private static final int CONTROLLERS_ID_OUTLETS_RSC = 705; 
 //	    private static final String PATH_OUTLETS = "outlets";
 //	    private static final String PATH_OUTLETS_RESOURCE_ID = "outlets_rsc";
 //	    private static final String PATH_OUTLETS_DEVICE_ID = "outlets_did";
         matcher.addURI(authority, "outlets", OUTLETS);
-		// query = return all outelts for all controllers, used just in the db maint screen
+		// query = return all outlets for all controllers, used just in the db maint screen
 		// insert = while this might work, use the one with the controller specified 
 		// update = ?
 		// delete = ?
@@ -194,53 +209,74 @@ public class AquaNotesDbProvider extends ContentProvider {
 		// query = return all outlets for a given controller
 		// insert = add a probe defined by the values object to the referenced controller, auto-create a probe_id 
 		// update = ?
-		// delete = delete ?
+		// delete = delete all outlets for this controller
 		// getType = ?
 
 		matcher.addURI(authority, "controllers/#/outlets/#", CONTROLLERS_ID_OUTLETS_ID);
-		// query = return just one outlet, by ID
-		// insert = add ?
-		// update = ?
-		// delete = delete ?
+		// query = return just one outletfor a given controller and ID
+		// insert = insert data into the data table for this outlet
+		// update = update just this outlet
+		// delete = delete just this outlet
 		// getType = ?
 
 		matcher.addURI(authority, "controllers/#/outlets_did/*", CONTROLLERS_ID_OUTLETS_DEVICE_ID);
-		// query = return just one probe, by device id
+		// query = return just one outletfor a given controller and device id
 		// insert = add ?
 		// update = ?
 		// delete = delete ?
 		// getType = ?
 
 		matcher.addURI(authority, "controllers/#/outlets_rsc/#", CONTROLLERS_ID_OUTLETS_RSC);
-		// query = return the probe record for a given controller and outlet name.
+		// query = return just one outlet record for a given controller and outlet name.
 		// insert = N/A
 		// update = N/A
 		// delete = N/A
 		// getType = ?
 
 //////////////////////////////////////////////
-//		private static final int DATA = 912; 
-//		private static final int CONTROLLERS_ID_PROBEDATA_AT = 913; 
-//		private static final int CONTROLLERS_ID_PROBEDATA_FOR_ID = 914; 
-//		private static final int CONTROLLERS_ID_PROBEDATA_FOR_NAME = 915; 
-//		private static final int CONTROLLERS_ID_OUTLETDATA_AT = 916; 
-//		private static final int CONTROLLERS_ID_OUTLETDATA_FOR_ID = 917; 
-//		private static final int CONTROLLERS_ID_OUTLETDATA_FOR_DEVICE_ID = 918; 
+//		private static final int DATA = 801; 
+//		private static final int PDATA = 802; 
+//		private static final int ODATA = 803; 
+//		private static final int CONTROLLERS_ID_PROBEDATA = 804; 
+//		private static final int CONTROLLERS_ID_PROBEDATA_AT = 805; 
+//		private static final int CONTROLLERS_ID_PROBEDATA_FOR_ID = 806; 
+//		private static final int CONTROLLERS_ID_PROBEDATA_FOR_NAME = 807; 
+//		private static final int CONTROLLERS_ID_OUTLETDATA = 808; 
+//		private static final int CONTROLLERS_ID_OUTLETDATA_AT = 809; 
+//		private static final int CONTROLLERS_ID_OUTLETDATA_FOR_ID = 810; 
+//		private static final int CONTROLLERS_ID_OUTLETDATA_FOR_DEVICE_ID = 811; 
 //	    private static final String PATH_DATA = "data";
+//	    private static final String PATH_PDATA = "pdata";
+//	    private static final String PATH_ODATA = "odata";
 //	    private static final String PATH_PROBE_DATA_AT = "pdata_at";
 //	    private static final String PATH_PROBE_DATA_FOR_ID = "pdata_id";
 //	    private static final String PATH_PROBE_DATA_FOR_NAME = "pdata_nm";
 //	    private static final String PATH_OUTLET_DATA_AT = "odata_at";
 //	    private static final String PATH_OUTLET_DATA_FOR_ID = "odata_id";
 //	    private static final String PATH_OUTLET_DATA_FOR_DID = "odata_did";
+		
 		matcher.addURI(authority, "data", DATA);
 		matcher.addURI(authority, "pdata", PDATA);
 		matcher.addURI(authority, "odata", ODATA);
-		// query = return all the probe data records for all controllers, only used in db maint screen.
+		// query = return all the data records (or probe or outlet subsets) for all controllers, only used in db maint screen.
 		// insert = N/A
 		// update = N/A
 		// delete = 
 		// getType = ?
+
+		matcher.addURI(authority, "controllers/#/pdata/", CONTROLLERS_ID_PROBEDATA);
+		// query = return all the probe data records for a given controller.
+		// insert = while this could be used, we use the pattern up inb the outlet section
+		// update = N/A
+		// delete = N/A
+		// getType = ? 
+
+		matcher.addURI(authority, "controllers/#/odata/", CONTROLLERS_ID_OUTLETDATA);
+		// query = return all the outlet data records for a given controller.
+		// insert = while this could be used, we use the pattern up inb the outlet section
+		// update = N/A
+		// delete = N/A
+		// getType = ?  
 
 		matcher.addURI(authority, "controllers/#/pdata_at/*", CONTROLLERS_ID_PROBEDATA_AT);
 		// query = return all the probe data records for a given controller at the timestamp provided.
@@ -255,7 +291,6 @@ public class AquaNotesDbProvider extends ContentProvider {
 		// update = N/A
 		// delete = delete outlet data older than '*'
 		// getType = ?
-
 
 		matcher.addURI(authority, "controllers/#/pdata_id/#", CONTROLLERS_ID_PROBEDATA_FOR_ID);
 		// query = return all the probe data records for a given controller and probe name.
@@ -278,6 +313,7 @@ public class AquaNotesDbProvider extends ContentProvider {
 		// delete = N/A
 		// getType = ?
 
+
 		matcher.addURI(authority, "controllers/#/odata_deviceID/*", CONTROLLERS_ID_OUTLETDATA_FOR_DEVICE_ID);
 		// query = return all the outlet data records for a given controller and outlet device id.
 		// insert = N/A
@@ -285,19 +321,18 @@ public class AquaNotesDbProvider extends ContentProvider {
 		// delete = N/A
 		// getType = ?  
 
-		matcher.addURI(authority, "controllers/#/odata/", CONTROLLERS_ID_OUTLETDATA);
-		// query = return all the outlet data records for a given controller.
-		// insert = N/A
-		// update = N/A
-		// delete = N/A
-		// getType = ?  
+		
+//////////////////////////////////////////////
+//		private static final int LIVESTOCK = 901;
+//	    private static final String PATH_LIVESTOCK = "livestock";
+		matcher.addURI(authority, "livestock", LIVESTOCK);
+		// query = return all livestock 
+		// insert = add the livestock defined in the values object, auto-create a livestock_id
+		// update = ?
+		// delete = delete all livestock
+		// getType = return type for multiple items
 
-		matcher.addURI(authority, "controllers/#/pdata/", CONTROLLERS_ID_PROBEDATA);
-		// query = return all the outlet data records for a given controller.
-		// insert = N/A
-		// update = N/A
-		// delete = N/A
-		// getType = ?  
+
 
         return matcher;
     }
@@ -315,10 +350,14 @@ public class AquaNotesDbProvider extends ContentProvider {
         final int match = sUriMatcher.match(uri);
         switch (match) {
 //////////////////////////////////////////////
-//    	private static final int CONTROLLERS = 901;
-//    	private static final int CONTROLLERS_ID = 902;
-//    	private static final int CONTROLLERS_URL = 903;
-//private static final String PATH_CONTROLLERS = "controllers";
+//    	private static final int CONTROLLERS = 501;
+//    	private static final int CONTROLLERS_ID = 502;
+//    	private static final int CONTROLLERS_URL = 503;
+//    	private static final int CONTROLLERS_WID = 504;
+//        private static final String PATH_CONTROLLERS = "controllers";
+//        private static final String PATH_CONTROLLERS_URL = "url";
+//      private static final String PATH_CONTROLLERS_WIDGET = "widget";
+//      private static final String PATH_CONTROLLERS_TITLE = "title";
         case CONTROLLERS:
         	return Controllers.CONTENT_TYPE;
         	
@@ -331,11 +370,14 @@ public class AquaNotesDbProvider extends ContentProvider {
         case CONTROLLERS_WID:
         	return Controllers.CONTENT_ITEM_TYPE;
 
+        case CONTROLLERS_TITLE:
+        	return Controllers.CONTENT_ITEM_TYPE;
+
 //////////////////////////////////////////////
-//        	private static final int PROBES = 903;
-//        	private static final int CONTROLLERS_ID_PROBES = 904;
-//        	private static final int CONTROLLERS_ID_PROBES_ID = 905;
-//        	private static final int CONTROLLERS_ID_PROBES_NAME = 906;
+//private static final int PROBES = 601;
+//private static final int CONTROLLERS_ID_PROBES = 602;
+//private static final int CONTROLLERS_ID_PROBES_ID = 603;
+//private static final int CONTROLLERS_ID_PROBES_NAME = 604;
 //private static final String PATH_PROBES = "probes";
 //private static final String PATH_PROBES_NAME = "probes_nm";
         case PROBES:
@@ -350,11 +392,12 @@ public class AquaNotesDbProvider extends ContentProvider {
         case CONTROLLERS_ID_PROBES_NAME:
         	return Probes.CONTENT_ITEM_TYPE;
         	
-//        	private static final int OUTLETS = 907;
-//        	private static final int CONTROLLERS_ID_OUTLETS = 908;
-//        	private static final int CONTROLLERS_ID_OUTLETS_ID = 909;
-//        	private static final int CONTROLLERS_ID_OUTLETS_DEVICE_ID = 910;
-//        	private static final int CONTROLLERS_ID_OUTLETS_RSC = 911; 
+//////////////////////////////////////////////
+//private static final int OUTLETS = 701;
+//private static final int CONTROLLERS_ID_OUTLETS = 702;
+//private static final int CONTROLLERS_ID_OUTLETS_ID = 703;
+//private static final int CONTROLLERS_ID_OUTLETS_DEVICE_ID = 704;
+//private static final int CONTROLLERS_ID_OUTLETS_RSC = 705; 
 //private static final String PATH_OUTLETS = "outlets";
 //private static final String PATH_OUTLETS_RESOURCE_ID = "outlets_rsc";
 //private static final String PATH_OUTLETS_DEVICE_ID = "outlets_did";
@@ -374,20 +417,26 @@ public class AquaNotesDbProvider extends ContentProvider {
         	return Outlets.CONTENT_ITEM_TYPE;
 
 //////////////////////////////////////////////
-//        	private static final int DATA = 912; 
-//        	private static final int CONTROLLERS_ID_PROBEDATA_AT = 913; 
-//        	private static final int CONTROLLERS_ID_PROBEDATA_FOR_ID = 914; 
-//        	private static final int CONTROLLERS_ID_PROBEDATA_FOR_NAME = 915; 
-//        	private static final int CONTROLLERS_ID_OUTLETDATA_AT = 916; 
-//        	private static final int CONTROLLERS_ID_OUTLETDATA_FOR_ID = 917; 
-//        	private static final int CONTROLLERS_ID_OUTLETDATA_FOR_DEVICE_ID = 918; 
-//    	    private static final String PATH_DATA = "data";
-//    	    private static final String PATH_PROBE_DATA_AT = "pdata_at";
-//    	    private static final String PATH_PROBE_DATA_FOR_ID = "pdata_id";
-//    	    private static final String PATH_PROBE_DATA_FOR_NAME = "pdata_nm";
-//    	    private static final String PATH_OUTLET_DATA_AT = "odata_at";
-//    	    private static final String PATH_OUTLET_DATA_FOR_ID = "odata_id";
-//    	    private static final String PATH_OUTLET_DATA_FOR_DID = "odata_did";
+//private static final int DATA = 801; 
+//private static final int PDATA = 802; 
+//private static final int ODATA = 803; 
+//private static final int CONTROLLERS_ID_PROBEDATA = 804; 
+//private static final int CONTROLLERS_ID_PROBEDATA_AT = 805; 
+//private static final int CONTROLLERS_ID_PROBEDATA_FOR_ID = 806; 
+//private static final int CONTROLLERS_ID_PROBEDATA_FOR_NAME = 807; 
+//private static final int CONTROLLERS_ID_OUTLETDATA = 808; 
+//private static final int CONTROLLERS_ID_OUTLETDATA_AT = 809; 
+//private static final int CONTROLLERS_ID_OUTLETDATA_FOR_ID = 810; 
+//private static final int CONTROLLERS_ID_OUTLETDATA_FOR_DEVICE_ID = 811; 
+//private static final String PATH_DATA = "data";
+//private static final String PATH_PDATA = "pdata";
+//private static final String PATH_ODATA = "odata";
+//private static final String PATH_PROBE_DATA_AT = "pdata_at";
+//private static final String PATH_PROBE_DATA_FOR_ID = "pdata_id";
+//private static final String PATH_PROBE_DATA_FOR_NAME = "pdata_nm";
+//private static final String PATH_OUTLET_DATA_AT = "odata_at";
+//private static final String PATH_OUTLET_DATA_FOR_ID = "odata_id";
+//private static final String PATH_OUTLET_DATA_FOR_DID = "odata_did";
         case DATA:
         	return Data.CONTENT_TYPE;
         case PDATA:
@@ -418,60 +467,15 @@ public class AquaNotesDbProvider extends ContentProvider {
 
         case CONTROLLERS_ID_PROBEDATA:
         	return Data.CONTENT_TYPE;
-
         	
-//            case BLOCKS:
-//                return Blocks.CONTENT_TYPE;
-//            case BLOCKS_BETWEEN:
-//                return Blocks.CONTENT_TYPE;
-//            case BLOCKS_ID:
-//                return Blocks.CONTENT_ITEM_TYPE;
-//            case BLOCKS_ID_SESSIONS:
-//                return Sessions.CONTENT_TYPE;
-//            case TRACKS:
-//                return Tracks.CONTENT_TYPE;
-//            case TRACKS_ID:
-//                return Tracks.CONTENT_ITEM_TYPE;
-//            case TRACKS_ID_SESSIONS:
-//                return Sessions.CONTENT_TYPE;
-//            case TRACKS_ID_VENDORS:
-//                return Vendors.CONTENT_TYPE;
-//            case ROOMS:
-//                return Rooms.CONTENT_TYPE;
-//            case ROOMS_ID:
-//                return Rooms.CONTENT_ITEM_TYPE;
-//            case ROOMS_ID_SESSIONS:
-//                return Sessions.CONTENT_TYPE;
-//            case SESSIONS:
-//                return Sessions.CONTENT_TYPE;
-//            case SESSIONS_STARRED:
-//                return Sessions.CONTENT_TYPE;
-//            case SESSIONS_SEARCH:
-//                return Sessions.CONTENT_TYPE;
-//            case SESSIONS_AT:
-//                return Sessions.CONTENT_TYPE;
-//            case SESSIONS_ID:
-//                return Sessions.CONTENT_ITEM_TYPE;
-//            case SESSIONS_ID_SPEAKERS:
-//                return Speakers.CONTENT_TYPE;
-//            case SESSIONS_ID_TRACKS:
-//                return Tracks.CONTENT_TYPE;
-//            case SPEAKERS:
-//                return Speakers.CONTENT_TYPE;
-//            case SPEAKERS_ID:
-//                return Speakers.CONTENT_ITEM_TYPE;
-//            case SPEAKERS_ID_SESSIONS:
-//                return Sessions.CONTENT_TYPE;
-//            case VENDORS:
-//                return Vendors.CONTENT_TYPE;
-//            case VENDORS_STARRED:
-//                return Vendors.CONTENT_TYPE;
-//            case VENDORS_SEARCH:
-//                return Vendors.CONTENT_TYPE;
-//            case VENDORS_ID:
-//                return Vendors.CONTENT_ITEM_TYPE;
-            default:
-                throw new UnsupportedOperationException("Unknown uri: " + uri);
+//////////////////////////////////////////////
+//private static final int LIVESTOCK = 901;
+//private static final String PATH_LIVESTOCK = "livestock";
+        case LIVESTOCK:
+        	return Livestock.CONTENT_TYPE;
+
+        default:
+        	throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
     }
 
@@ -487,7 +491,14 @@ public class AquaNotesDbProvider extends ContentProvider {
         default: {
         	// Most cases are handled with simple SelectionBuilder
         	final SelectionBuilder builder = buildExpandedSelection(uri, match);
-        	return builder.where(selection, selectionArgs).query(db, projection, sortOrder);
+        	Cursor cursor = builder.where(selection, selectionArgs).query(db, projection, sortOrder);
+        	
+        	/* seems registering for changes is a two-step process. */
+        	if(uri.compareTo(Livestock.buildQueryLivestockUri())==0 ||
+        	   uri.compareTo(Controllers.buildQueryControllersUri())==0) {
+        		cursor.setNotificationUri(getContext().getContentResolver(), uri);
+        	}
+        	return cursor;
         }
         }
     }
@@ -508,7 +519,7 @@ public class AquaNotesDbProvider extends ContentProvider {
             getContext().getContentResolver().notifyChange(uri, null);
             return ContentUris.withAppendedId(uri, rowId);
 		}
-		
+				
 		// Insert a probe for controller x.
 		case CONTROLLERS_ID_PROBES: {
 			rowId = db.insertOrThrow(Tables.PROBES, Probes.NAME, values);
@@ -536,10 +547,17 @@ public class AquaNotesDbProvider extends ContentProvider {
             getContext().getContentResolver().notifyChange(uri, null);
             return ContentUris.withAppendedId(uri, rowId);
 		}
+		
+        // Insert a single livestock
+		case LIVESTOCK: {
+			rowId = db.insertOrThrow(Tables.LIVESTOCK, Livestock.COMMON_NAME, values);
+            getContext().getContentResolver().notifyChange(uri, null);
+            return ContentUris.withAppendedId(uri, rowId);
+		}
 
-            default: {
-                throw new UnsupportedOperationException("Unknown uri: " + uri);
-            }
+		default: {
+			throw new UnsupportedOperationException("Unknown uri: " + uri);
+		}
         }
     }
 
@@ -564,8 +582,24 @@ public class AquaNotesDbProvider extends ContentProvider {
 		int count = 0;
 
 		switch (sUriMatcher.match(uri)) {
+		case CONTROLLERS_ID: {
+			// Delete all the data associated with this controller
+			String controllerId = uri.getPathSegments().get(1);
+			count += db.delete(Tables.PROBES, 
+					Probes.CONTROLLER_ID + "= ?",
+							new String[]{controllerId});
+			count += db.delete(Tables.OUTLETS, 
+					Outlets.CONTROLLER_ID + "= ?",
+							new String[]{controllerId});
+			count += db.delete(Tables.CONTROLLERS, 
+					BaseColumns._ID + "= ?",
+							new String[]{controllerId});
+			/* TODO: should also delete the data too, but I need to figure in the join. */
+			break;
+		}
 		case CONTROLLERS_ID_PROBEDATA_AT: {
 			// Delete all the probe data older than x (in days)
+			/* TODO: manage different save days for each controller. */
 			String controllerId = uri.getPathSegments().get(1);
 			long ageDays = Long.parseLong(uri.getPathSegments().get(3));
 			long now = System.currentTimeMillis();
@@ -641,19 +675,20 @@ public class AquaNotesDbProvider extends ContentProvider {
         }
         case CONTROLLERS_URL: {
             final String controllerURL = Controllers.getControllerUrl(uri);
-    		/** TODO: I sure hope this is escaped! */
             return builder.table(Tables.CONTROLLERS)
                     .where(Controllers.WAN_URL + "=?", Uri.decode(controllerURL));
         }
         case CONTROLLERS_WID: {
             final String controllerWID = Controllers.getControllerWidget(uri);
-    		/** TODO: I sure hope this is escaped! */
             return builder.table(Tables.CONTROLLERS)
                     .where(Controllers.WIDGET + "=?", controllerWID);
         } 
-            default: {
-                throw new UnsupportedOperationException("Unknown uri: " + uri);
-            }
+        case LIVESTOCK: {
+            return builder.table(Tables.LIVESTOCK);
+        }
+        default: {
+        	throw new UnsupportedOperationException("Unknown uri: " + uri);
+        }
         }
     }
 
@@ -676,15 +711,18 @@ public class AquaNotesDbProvider extends ContentProvider {
         }
         case CONTROLLERS_URL: {
             final String controllerURL = Controllers.getControllerUrl(uri);
-    		/** TODO: I sure hope this is escaped! */
             return builder.table(Tables.CONTROLLERS)
                     .where(Controllers.WAN_URL + "=?", Uri.decode(controllerURL));
         }
         case CONTROLLERS_WID: {
             final String controllerWID = Controllers.getControllerWidget(uri);
-    		/** TODO: I sure hope this is escaped! */
             return builder.table(Tables.CONTROLLERS)
                     .where(Controllers.WIDGET + "=?", controllerWID);
+        }
+        case CONTROLLERS_TITLE: {
+            final String controllerTitle = Controllers.getControllerWidget(uri);
+            return builder.table(Tables.CONTROLLERS)
+                    .where(Controllers.TITLE + "=?", controllerTitle);
         }
 
         case CONTROLLERS_ID_PROBES: {
@@ -737,14 +775,12 @@ public class AquaNotesDbProvider extends ContentProvider {
       
 		case CONTROLLERS_ID_PROBEDATA: {
 			String controllerId = uri.getPathSegments().get(1);
-//			String timestamp = uri.getPathSegments().get(3);
         	return builder.table(Tables.PDATA_VIEW)
         			.where(ProbeDataView.TYPE + "=?", "1")
         			.where(ProbeDataView.CONTROLLER_ID + "=?", controllerId);
 		}
 		case CONTROLLERS_ID_OUTLETDATA: {
 			String controllerId = uri.getPathSegments().get(1);
-//			String timestamp = uri.getPathSegments().get(3);
         	return builder.table(Tables.ODATA_VIEW)
         			.where(OutletDataView.TYPE + "=?", "0")
         			.where(OutletDataView.CONTROLLER_ID + "=?", controllerId);
@@ -773,13 +809,12 @@ public class AquaNotesDbProvider extends ContentProvider {
         			.where(ProbeDataView.NAME + "=?", probeName)
         			.where(ProbeDataView.CONTROLLER_ID + "=?", controllerId);
 		}
-
-		
-		
-
-            default: {
-                throw new UnsupportedOperationException("Unknown uri: " + uri);
-            }
+        case LIVESTOCK: {
+            return builder.table(Tables.LIVESTOCK);
+        }
+		default: {
+			throw new UnsupportedOperationException("Unknown uri: " + uri);
+		}
         }
     }
 

@@ -35,18 +35,6 @@ import java.util.List;
  */
 public class AquaNotesDbContract {
 
-    /**
-     * Special value for {@link SyncColumns#UPDATED} indicating that an entry
-     * has never been updated, or doesn't exist yet.
-     */
-    public static final long UPDATED_NEVER = -2;
-
-    /**
-     * Special value for {@link SyncColumns#UPDATED} indicating that the last
-     * update time is unknown, usually when inserted from a local file source.
-     */
-    public static final long UPDATED_UNKNOWN = -1;
-
     interface ControllersColumns {
         /** Unique string identifying this block of time. */
         String _ID = "_id";
@@ -297,10 +285,23 @@ public class AquaNotesDbContract {
         
     }
 
-    public interface SyncColumns {
-        /** Last time this entry was updated or synchronized. */
-        String UPDATED = "updated";
+    interface LivestockColumns {
+        /** Unique string identifying this livestock. */
+        String _ID = "_id";
+        
+        /** Common name for this type of livestock*/
+        String COMMON_NAME = "common_name";
+        
+        /** Type of livestock this is, ie fish, sps, lps etc. */
+        String TYPE = "type";
+        
+        /** Timestamp of xxx. */
+        String TIMESTAMP = "timestamp";
+        
+        /** Resource ID of the thumbnail image for this item. */
+        String THUMBNAIL = "thumbnail";
     }
+    
 
 
     public static final String CONTENT_AUTHORITY = "com.heneryh.aquanotes";
@@ -309,6 +310,7 @@ public class AquaNotesDbContract {
 
     private static final String PATH_CONTROLLERS = "controllers";
     private static final String PATH_CONTROLLERS_URL = "url";
+    private static final String PATH_CONTROLLERS_TITLE = "title";
     private static final String PATH_CONTROLLERS_WIDGET = "widget";
 
     private static final String PATH_PROBES = "probes";
@@ -328,10 +330,11 @@ public class AquaNotesDbContract {
     private static final String PATH_OUTLET_DATA_FOR_ID = "odata_id";
     private static final String PATH_OUTLET_DATA_FOR_DID = "odata_did";
 
+    private static final String PATH_LIVESTOCK = "livestock";
+
     
     /**
-     * Controllers are xxxxx {@link Sessions} and other related
-     * events fall into.
+     * Controllers are 
      */
     public static class Controllers implements ControllersColumns, BaseColumns {
 
@@ -344,8 +347,7 @@ public class AquaNotesDbContract {
                 BASE_CONTENT_URI.buildUpon().appendPath(PATH_CONTROLLERS).build();
 
         /** Default "ORDER BY" clause. */
-        public static final String DEFAULT_SORT = ControllersColumns.LAST_UPDATED + " DESC "
-              /*  + ControllersColumns.BLOCK_END + " ASC"*/;
+        public static final String DEFAULT_SORT = ControllersColumns.LAST_UPDATED + " DESC ";
 
         //          content://org.dvrc.aquanotes/controllers
         public static Uri buildQueryControllersUri() {
@@ -365,15 +367,23 @@ public class AquaNotesDbContract {
         }
         
         //          content://org.dvrc.aquanotes/controllers/url/nnn
-        public static Uri buildQueryControllerUrlUri(String controllerUrl) {
+        public static Uri buildQueryControllerByUrlUri(String controllerUrl) {
             return BASE_CONTENT_URI.buildUpon()
             		.appendPath(PATH_CONTROLLERS)
             		.appendPath(PATH_CONTROLLERS_URL).appendPath(/*Uri.encode(*/controllerUrl) // appendPath() already encodes
             		.build();
         }
         
+        //          content://org.dvrc.aquanotes/controllers/title/nnn
+        public static Uri buildQueryControllerByTitleUri(String controllerTitle) {
+            return BASE_CONTENT_URI.buildUpon()
+            		.appendPath(PATH_CONTROLLERS)
+            		.appendPath(PATH_CONTROLLERS_TITLE).appendPath(/*Uri.encode(*/controllerTitle) // appendPath() already encodes
+            		.build();
+        }
+        
         //          content://org.dvrc.aquanotes/controllers/widget/nnn
-        public static Uri buildQueryControllerWidgetUri(String controllerWid) {
+        public static Uri buildQueryControllerByWidgetUri(String controllerWid) {
             return BASE_CONTENT_URI.buildUpon()
             		.appendPath(PATH_CONTROLLERS)
             		.appendPath(PATH_CONTROLLERS_WIDGET).appendPath(controllerWid)
@@ -385,7 +395,7 @@ public class AquaNotesDbContract {
         }
 
         public static Uri buildDeleteControllerUrlUri(String controllerUrl) {
-        	return buildQueryControllerUrlUri(controllerUrl); // same as query
+        	return buildQueryControllerByUrlUri(controllerUrl); // same as query
         }
 
         public static Uri buildUpdateControllerXUri(int controllerId) {
@@ -393,7 +403,7 @@ public class AquaNotesDbContract {
         }
 
         public static Uri buildUpdateControllerXUri(String controllerUrl) {
-        	return buildQueryControllerUrlUri(controllerUrl); // same as query
+        	return buildQueryControllerByUrlUri(controllerUrl); // same as query
         }
 
         //          content://org.dvrc.aquanotes/controllers/x
@@ -731,33 +741,6 @@ public class AquaNotesDbContract {
             		.build();
         }
 
-//        /** Build {@link Uri} for requested {@link #DATA_ID}. */
-//        //          content://org.dvrc.aquanotes/controllers/x/probes/y/data
-//        public static Uri buildQueryProbeDataUri(Uri controllerUri, Integer probeId) {
-//            return controllerUri.buildUpon()
-//            		.appendPath(PATH_PROBES).appendPath(probeId.toString())
-//            		.appendPath(PATH_DATA)
-//            		.build();
-//        }
-//
-//        /** Build {@link Uri} for requested {@link #DATA_ID}. */
-//        //          content://org.dvrc.aquanotes/controllers/x/probes/y/data
-//        public static Uri buildQueryOutletDataUri(Integer controllerId, Integer outletId) {
-//            return BASE_CONTENT_URI.buildUpon()
-//            		.appendPath(PATH_CONTROLLERS).appendPath(controllerId.toString())
-//            		.appendPath(PATH_OUTLETS).appendPath(outletId.toString())
-//            		.appendPath(PATH_DATA)
-//            		.build();
-//        }
-
-//        /** Build {@link Uri} for requested {@link #DATA_ID}. */
-//        public static Uri buildQueryOutletXDataUri(Uri controllerUri, Integer outletId) {
-//            return controllerUri.buildUpon()
-//            		.appendPath(PATH_OUTLETS).appendPath(outletId.toString())
-//            		.appendPath(PATH_DATA)
-//            		.build();
-//        }
-//
         /** Build {@link Uri} for requested {@link #DATA_ID}. */
         //          content://org.dvrc.aquanotes/controllers/x/data
         public static Uri buildQueryAllOutletDataUri(Uri controllerUri) {
@@ -772,51 +755,6 @@ public class AquaNotesDbContract {
             		.build();
         }
 
-//        /** Build {@link Uri} for requested {@link #DATA_ID}. */
-//        //          content://org.dvrc.aquanotes/controllers/x/probes/y/data
-//        public static Uri buildQueryProbeDataUri(Uri probeUri) {
-//            return probeUri.buildUpon()
-//            		.appendPath(PATH_PROBE_DATA)
-//            		.build();
-//        }
-//        
-//        /** Build {@link Uri} for requested {@link #DATA_ID}. */
-//        //          content://org.dvrc.aquanotes/controllers/x/probes/y/data
-//        public static Uri buildQueryProbeDataXUri(Integer controllerId, Integer probeId, Integer dataId) {
-//            return BASE_CONTENT_URI.buildUpon()
-//            		.appendPath(PATH_CONTROLLERS).appendPath(controllerId.toString())
-//            		.appendPath(PATH_PROBES).appendPath(probeId.toString())
-//            		.appendPath(PATH_PROBE_DATA).appendPath(dataId.toString())
-//            		.build();
-//        }
-//
-//        /** Build {@link Uri} for requested {@link #DATA_ID}. */
-//        //          content://org.dvrc.aquanotes/controllers/x/probes/y/data
-//        public static Uri buildQueryProbeDataXUri(Uri controllerUri, Integer probeId, Integer dataId) {
-//            return controllerUri.buildUpon()
-//            		.appendPath(PATH_PROBES).appendPath(probeId.toString())
-//            		.appendPath(PATH_PROBE_DATA)
-//            		.appendPath(PATH_PROBE_DATA).appendPath(dataId.toString())
-//            		.build();
-//        }
-//
-//        /** Build {@link Uri} for requested {@link #DATA_ID}. */
-//        //          content://org.dvrc.aquanotes/controllers/x/probes/y/data
-//        public static Uri buildQueryProbeDataXUri(Uri probeUri, Integer dataId) {
-//            return probeUri.buildUpon()
-//            		.appendPath(PATH_PROBE_DATA)
-//            		.appendPath(PATH_PROBE_DATA).appendPath(dataId.toString())
-//            		.build();
-//        }
-//        
-//        /** Build {@link Uri} for requested {@link #DATA_ID}. */
-//        //          content://org.dvrc.aquanotes/controllers/x/probes/y/data
-//        public static Uri buildQueryOutletDataXUri(Uri outletUri, Integer dataId) {
-//            return outletUri.buildUpon()
-//            		.appendPath(PATH_PROBE_DATA)
-//            		.appendPath(PATH_PROBE_DATA).appendPath(dataId.toString())
-//            		.build();
-//        }
         
         /** Build {@link Uri} for requested {@link #DATA_ID}. */
         //          content://org.dvrc.aquanotes/controllers/x/probes/y/data
@@ -866,6 +804,60 @@ public class AquaNotesDbContract {
         /** Default "ORDER BY" clause. */
         public static final String DEFAULT_SORT = ViewOutletDataColumns.TIMESTAMP + " DESC";
     }
+
+     /**
+      * Controllers are 
+      */
+     public static class Livestock implements LivestockColumns, BaseColumns {
+
+         public static final String CONTENT_TYPE =
+                 "vnd.android.cursor.dir/vnd.aquanotes.livestock";
+         public static final String CONTENT_ITEM_TYPE =
+                 "vnd.android.cursor.item/vnd.aquanotes.livestock";
+
+         public static final Uri CONTENT_URI =
+                 BASE_CONTENT_URI.buildUpon().appendPath(PATH_LIVESTOCK).build();
+
+         /** Default "ORDER BY" clause. */
+         public static final String DEFAULT_SORT = LivestockColumns.TIMESTAMP + " DESC ";
+
+         //          content://org.dvrc.aquanotes/livestock
+         public static Uri buildQueryLivestockUri() {
+             return BASE_CONTENT_URI.buildUpon().appendPath(PATH_LIVESTOCK)
+             		.build();
+         }
+         
+         public static Uri buildInsertLivestockUri() { 
+         	return buildQueryLivestockUri();  // same as query
+         }
+
+         //          content://org.dvrc.aquanotes/livestock/x
+         public static Uri buildQueryLivestockXUri(Integer livestockId) {
+             return BASE_CONTENT_URI.buildUpon()
+             		.appendPath(PATH_LIVESTOCK).appendPath(livestockId.toString())
+             		.build();
+         }
+         
+          
+         public static Uri buildDeleteLivestockXUri(int livestockId) {
+         	return buildQueryLivestockXUri(livestockId); // same as query
+         }
+
+         public static Uri buildUpdateControllerXUri(int livestockId) {
+         	return buildQueryLivestockXUri(livestockId); // same as query
+         }
+
+         //          content://org.dvrc.aquanotes/controllers/x
+         public static String getLivestockId(Uri livestockXUri) {
+             return livestockXUri.getPathSegments().get(1);
+         }
+         public static String getControllerWidget(Uri controllerXUri) {
+             return controllerXUri.getPathSegments().get(2);
+         }
+         public static String getControllerUrl(Uri controllerXUri) {
+             return controllerXUri.getPathSegments().get(2);
+         }
+     }
 
 
     private AquaNotesDbContract() {

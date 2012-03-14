@@ -5,15 +5,12 @@
 package com.heneryh.aquanotes.configure;
 
 /**
- * For each widget instance we assume a new controller.  The controller preferences
- * will save off the URL, Credentials and other misc data items.
+ * For each widget instance we present the list of current controllers and an option
+ * to select a new one (pre-populated default values).
  * 
- * Note that since each widget corresponds to a controller we sometimes interchange
- * the terms ControllerId and WidgetId depending on the context.
- * 
- * The widget should have already started the update timer & thread but it should
- * quickly bail-out if these preferences are not yet set.
- * 
+ * This same activity copied and slightly modified exists for the app preferences.
+ * The only difference is that this one sets the widgetID.  They can probably be combined
+ * with minor effort
  */
 
 import java.util.ArrayList;
@@ -49,9 +46,9 @@ public class WidgetConfigurePrefs extends Activity implements View.OnClickListen
 	private static final boolean LOGD = true;
 	private static final String LOG_TAG = "WidgetConfigurePrefs";
 
-	public static final String ACTION_UPDATE_ALL = "com.heneryh.aquanotes.UPDATE_ALL"; // probably shouldn't repeat this but import it
-
-	// Graphical elements
+	/**
+	 * Graphical elements
+	 */
 	private Button mSave;
 	private EditText mTitle;
 	private EditText mWanUrl;
@@ -64,8 +61,15 @@ public class WidgetConfigurePrefs extends Activity implements View.OnClickListen
 
 	String type = null;
 
-	// Widget ID is used across many methods so make it a class variable.
+	/**
+	 * Widget ID is used across many methods so make it a class variable.
+	 */
 	int mAppWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID;
+
+	
+	/** 
+	 * These two are not carried over via text field so we need to save them off 
+	 */
 	int mControllerId = -1;
 	Long lastUpdated;
 
@@ -84,10 +88,14 @@ public class WidgetConfigurePrefs extends Activity implements View.OnClickListen
 
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 
-		// Connect this activity to the configuration screen
+		/**
+		 * Connect this activity to the configuration layout
+		 */
 		setContentView(R.layout.activity_prefs);
 
-		// then grab references to the graphical elements
+		/**
+		 * then grab references to the graphical elements
+		 */
 		mTitle = (EditText)findViewById(R.id.conf_title);
 		mWanUrl = (EditText)findViewById(R.id.conf_url);
 		mLanUrl = (EditText)findViewById(R.id.conf_wifi_url);
@@ -99,6 +107,12 @@ public class WidgetConfigurePrefs extends Activity implements View.OnClickListen
 
 		mSave = (Button)findViewById(R.id.conf_save);
 		mSave.setOnClickListener(this);
+		
+		/**
+		 * Try to pick a word that fits for assiciating this widget to controller x
+		 */
+		mSave.setText("Associate");
+
 
 		/**
 		 * First lets get a list of all active controllers then present the list to the user in a dialog.
@@ -133,7 +147,7 @@ public class WidgetConfigurePrefs extends Activity implements View.OnClickListen
 				Toast.makeText(getApplicationContext(), items[item], Toast.LENGTH_SHORT).show();
 				if(item>0) {
 					String Url = items[item].toString();
-					Uri controllerXUri = AquaNotesDbContract.Controllers.buildQueryControllerUrlUri(Url);
+					Uri controllerXUri = AquaNotesDbContract.Controllers.buildQueryControllerByUrlUri(Url);
 					Cursor cursor2 = null;
 
 					String username = null;
@@ -215,15 +229,6 @@ public class WidgetConfigurePrefs extends Activity implements View.OnClickListen
 			String updIntervalMins = mUpdateIntervalMins.getText().toString();
 			String pruneAge = mPruneAge.getText().toString();
 
-			//			title = cursor2.getString(ControllersQuery.TITLE);
-			//			username = cursor2.getString(ControllersQuery.USER);
-			//			password = cursor2.getString(ControllersQuery.PW);
-			//			apexBaseURL = cursor2.getString(ControllersQuery.WAN_URL);
-			//			apexWiFiURL = cursor2.getString(ControllersQuery.WIFI_URL);
-			//			apexWiFiSid = cursor2.getString(ControllersQuery.WIFI_SSID);
-			//			interval = cursor2.getInt(ControllersQuery.UPDATE_INTERVAL);
-			//			prune_age = cursor2.getInt(ControllersQuery.DB_SAVE_DAYS);
-
 			// Strings are easily put into the database directly but numbers must
 			// be parsed.  The parsing may throw an exception.
 			//values.put(BaseColumns._ID, mAppWidgetId);
@@ -275,7 +280,7 @@ public class WidgetConfigurePrefs extends Activity implements View.OnClickListen
 					String controllerId = Controllers.getControllerId(controllerXUri);
 					//SyncService.requestUpdate(new int[] {Integer.valueOf(controllerId)});
 
-					Intent updateIntent = new Intent(ACTION_UPDATE_ALL);
+					Intent updateIntent = new Intent(SyncService.ACTION_UPDATE_ALL);
 					updateIntent.setClass(this, SyncService.class);
 					
 					// note that startService() will only really start it if not already running
