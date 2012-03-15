@@ -15,9 +15,11 @@
   limitations under the License.
  -->
 
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/menu_add_ls"
-          android:title="@string/add_ls"
-        android:icon="@drawable/ic_action_new_holo_light"
-          android:showAsAction="ifRoom" />
-</menu>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <fragment class="com.heneryh.aquanotes.ui.livestock.ContentFragment"
+            android:id="@+id/content_frag"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+</FrameLayout>

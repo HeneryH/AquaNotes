@@ -14,47 +14,98 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  -->
-
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
     android:orientation="vertical" >
-    <Spinner
-  		android:id="@+id/ctrlr_id"
-  		android:layout_width="wrap_content"
-  		android:layout_height="wrap_content"/>
-    <Button
-	    android:id="@+id/feed_a"
-	    android:layout_height="wrap_content"
-     	android:layout_width="wrap_content"
-     	android:text="Feed-A"
-     	android:onClick="feedA" />
-    <Button
-	    android:id="@+id/feed_b"
-	    android:layout_height="wrap_content"
-     	android:layout_width="wrap_content"
-     	android:text="Feed-B"
-     	android:onClick="feedB" />
-    <Button
-	    android:id="@+id/feed_c"
-	    android:layout_height="wrap_content"
-     	android:layout_width="wrap_content"
-     	android:text="Feed-C"
-     	android:onClick="feedC" />
-   <Button
-	    android:id="@+id/feed_d"
-	    android:layout_height="wrap_content"
-     	android:layout_width="wrap_content"
-     	android:text="Feed-D"
-     	android:onClick="feedD" />
-   <Button
-	    android:id="@+id/feed_cancel"
-	    android:layout_height="wrap_content"
-     	android:layout_width="wrap_content"
-     	android:text="Cancel"
-     	android:onClick="feedCancel" />   
+    
+    <include layout="@layout/actionbar" />
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_marginLeft="20dp" 
+        android:layout_marginRight="20dp" >
+
+        <TextView
+            android:id="@+id/text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Be sure to select the controller you want to target first." 
+            />
+
+        <Spinner
+            android:id="@+id/ctrlr_id"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/text"
+            android:layout_marginTop="10dp"
+ 		/>
+
+        <TextView
+            android:id="@+id/text2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/ctrlr_id"
+            android:text="then tap the desired feed button." 
+            android:layout_marginTop="20dp"
+            />
+
+        <Button
+            android:id="@+id/feed_a"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/text2"
+            android:onClick="feedA"
+            android:text="Feed-A" 
+            android:layout_marginTop="10dp"
+            />
+
+
+        <Button
+            android:id="@+id/feed_b"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/feed_a"
+            android:gravity="center"
+            android:onClick="feedB"
+            android:text="Feed-B" 
+            android:layout_marginTop="10dp"
+            />
+
+
+        <Button
+            android:id="@+id/feed_c"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/feed_b"
+            android:onClick="feedC"
+            android:text="Feed-C"
+            android:layout_marginTop="10dp"
+		 />
+
+
+        <Button
+            android:id="@+id/feed_d"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/feed_c"
+            android:onClick="feedD"
+            android:text="Feed-D" 
+            android:layout_marginTop="10dp"
+		/>
+
+
+        <Button
+            android:id="@+id/feed_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/feed_d"
+            android:gravity="center"
+            android:onClick="feedCancel"
+            android:text="Cancel" 
+            android:layout_marginTop="20dp"
+            />
+    </RelativeLayout>
+
 </LinearLayout>
-</FrameLayout>

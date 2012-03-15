@@ -370,7 +370,7 @@ public class ContentFragment extends Fragment {
             actionMode.setTitle(R.string.photo_selection_cab_title);
 
             MenuInflater inflater = getActivity().getMenuInflater();
-            inflater.inflate(R.menu.photo_context_menu, menu);
+            //inflater.inflate(R.menu.photo_context_menu, menu);
             return true;
         }
 

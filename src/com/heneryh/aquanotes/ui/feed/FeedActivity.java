@@ -49,6 +49,9 @@ import android.os.Bundle;
 import android.provider.BaseColumns;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.text.format.DateUtils;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Spinner;
 
@@ -58,6 +61,7 @@ import com.heneryh.aquanotes.io.NewXmlHandler.HandlerException;
 import com.heneryh.aquanotes.provider.AquaNotesDbContract;
 import com.heneryh.aquanotes.provider.AquaNotesDbContract.Controllers;
 import com.heneryh.aquanotes.ui.BaseMultiPaneActivity;
+import com.heneryh.aquanotes.util.AnalyticsUtils;
 
 /** This is the main "launcher" activity.
  * When running on a "large" or larger screen, this activity displays both the
@@ -77,7 +81,13 @@ public class FeedActivity extends BaseMultiPaneActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        
+        AnalyticsUtils.getInstance(this).trackPageView("/Controllers");
+
         setContentView(R.layout.activity_feed);
+        
+        getActivityHelper().setupActionBar("Feed Cycle", 0);
+
         dbResolverFeedAct = getContentResolver();
         fillSpinner();
         
@@ -94,6 +104,45 @@ public class FeedActivity extends BaseMultiPaneActivity {
 
 
     }
+
+	/**
+	 * 
+	 * @param savedInstanceState
+	 */
+	@Override
+	protected void onPostCreate(Bundle savedInstanceState) {
+		super.onPostCreate(savedInstanceState);
+		
+		/**
+		 * If we are on HC or ICS the actionBar is setup differently for sub-activities
+		 */
+		getActivityHelper().setupSubActivity();
+	}
+
+	/**
+	 * 
+	 * 
+	 */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.feed_menu, menu);
+        return true;
+    }
+
+	/**
+	 * If the user hits the 'Refresh Spinner' kick off a new polling event.
+	 * @param item
+	 * @return
+	 */
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+//		if (item.getItemId() == R.id.menu_refresh) {
+//			triggerRefresh();
+//			return true;
+//		}
+		return super.onOptionsItemSelected(item);
+	}
 
     private void fillSpinner(){
 

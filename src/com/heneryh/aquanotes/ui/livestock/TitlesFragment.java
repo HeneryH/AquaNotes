@@ -36,8 +36,10 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 /**
  * Fragment that shows the list of images
@@ -185,16 +187,25 @@ implements /*ActionBar.TabListener,*/ LoaderManager.LoaderCallbacks<Cursor> {
 
 	    @Override
 	    public void bindView(View view, Context context, Cursor cursor) {
-	        ImageView newView = (ImageView) view;
-	        newView.setLayoutParams(new GridView.LayoutParams(85, 85));
-	        newView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-	        newView.setPadding(8, 8, 8, 8);
-	        int imageRsc = cursor.getInt(LivestockQuery.THUMBNAIL);
-	        if(imageRsc>0) {
-	        	newView.setImageResource(imageRsc);	        	
-	        } else {
-	        	newView.setImageResource(R.drawable.blue_balloon);
-	        }
+	    	ImageView imageView = (ImageView)view.findViewById(R.id.grid_pic);
+	    	TextView textView = (TextView)view.findViewById(R.id.grid_text);
+
+//	    	imageView.setLayoutParams(new GridView.LayoutParams(85, 85));
+	    	imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+	    	imageView.setPadding(8, 8, 8, 8);
+	    	int imageRsc = cursor.getInt(LivestockQuery.THUMBNAIL);
+	    	if(imageRsc>0) {
+	    		imageView.setImageResource(imageRsc);	        	
+	    	} else {
+	    		imageView.setImageResource(R.drawable.blue_balloon);
+	    	}
+
+	    	String commonName = cursor.getString(LivestockQuery.COMMON_NAME);
+	    	if(commonName==null || commonName.isEmpty())
+	    		textView.setText("blank");
+	    	else
+	    		textView.setText(commonName);
+
 	    }
 	    
 	    @Override

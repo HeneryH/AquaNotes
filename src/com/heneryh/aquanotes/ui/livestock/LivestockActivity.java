@@ -21,6 +21,7 @@ import com.heneryh.aquanotes.provider.AquaNotesDbContract;
 import com.heneryh.aquanotes.provider.AquaNotesDbContract.Livestock;
 import com.heneryh.aquanotes.ui.BaseMultiPaneActivity;
 import com.heneryh.aquanotes.ui.livestock.ContentActivity;
+import com.heneryh.aquanotes.util.AnalyticsUtils;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -74,62 +75,52 @@ public class LivestockActivity extends BaseMultiPaneActivity /*implements Titles
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if(savedInstanceState != null) {
-            if (savedInstanceState.getInt("theme", -1) != -1) {
-              mThemeId = savedInstanceState.getInt("theme");
-              this.setTheme(mThemeId);
-            }
-            mTitlesHidden = savedInstanceState.getBoolean("titlesHidden");
-        }
+        AnalyticsUtils.getInstance(this).trackPageView("/Livestock");
 
         setContentView(R.layout.activity_livestock);
 
 //        ActionBar bar = getActionBar();
 //        bar.setDisplayShowTitleEnabled(false);
 
-		final FragmentManager fm = getSupportFragmentManager();
+        getActivityHelper().setupActionBar("Livestock", 0);
+
+        final FragmentManager fm = getSupportFragmentManager();
 
         ContentFragment frag = (ContentFragment) fm.findFragmentById(R.id.content_frag);
         if (frag != null) mDualFragments = true;
         
-        if (mTitlesHidden) {
-//        	fm.beginTransaction()
-//                    .hide(getFragmentManager().findFragmentById(R.id.titles_frag)).commit();
-        }
-    }
+     }
 
+	/**
+	 * 
+	 * @param savedInstanceState
+	 */
+	@Override
+	protected void onPostCreate(Bundle savedInstanceState) {
+		super.onPostCreate(savedInstanceState);
+		
+		/**
+		 * If we are on HC or ICS the actionBar is setup differently for sub-activities
+		 */
+		getActivityHelper().setupSubActivity();
+	}
+
+	/**
+	 * 
+	 * 
+	 */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.livestock_menu, menu);
-        // If the device doesn't support camera, remove the camera menu item
-        if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)) {
-            menu.removeItem(R.id.menu_camera);
-        }
         return true;
     }
 
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        // If not showing both fragments, remove the "toggle titles" menu item
-        if (!mDualFragments) {
-            menu.removeItem(R.id.menu_toggleTitles);
-        } else {
-            menu.findItem(R.id.menu_toggleTitles).setTitle(mToggleLabels[mTitlesHidden ? 0 : 1]);
-        }
-        return super.onPrepareOptionsMenu(menu);
-    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-        case R.id.menu_camera:
-//            Intent intent = new Intent(this, CameraActivity.class);
-//            intent.putExtra("theme", mThemeId);
-//            startActivity(intent);
-            return true;
-
-        case R.id.menu_add_ls:
+         case R.id.menu_add_ls:
         	ContentResolver mResolver = getContentResolver();
     		ContentValues values = new ContentValues();
     		Uri livestockUri = Livestock.buildInsertLivestockUri();
@@ -147,123 +138,11 @@ public class LivestockActivity extends BaseMultiPaneActivity /*implements Titles
         	//Directory.addToCategory(0,new LivestockEntry("Blue Balloon", R.drawable.blue_balloon));
         	return true;
 
-        case R.id.menu_toggleTitles:
-            toggleVisibleTitles();
-            return true;
-
-        case R.id.menu_toggleTheme:
-            if (mThemeId == R.style.AppTheme_Dark) {
-                mThemeId = R.style.AppTheme_Light;
-            } else {
-                mThemeId = R.style.AppTheme_Dark;
-            }
-            this.recreate();
-            return true;
-
-        case R.id.menu_showDialog:
-            showDialog("This is indeed an awesome dialog.");
-            return true;
-
-        case R.id.menu_showStandardNotification:
-            showNotification(false);
-            return true;
-
-        case R.id.menu_showCustomNotification:
-            showNotification(true);
-            return true;
-
         default:
             return super.onOptionsItemSelected(item);
         }
     }
 
-    /** Respond to the "toogle titles" item in the action bar */
-    public void toggleVisibleTitles() {
-        // Use these for custom animations.
-        final FragmentManager fm = getSupportFragmentManager();
-        final TitlesFragment f = (TitlesFragment) fm
-                .findFragmentById(R.id.titles_frag);
-        final View titlesView = f.getView();
-
-        // Determine if we're in portrait, and whether we're showing or hiding the titles
-        // with this toggle.
-        final boolean isPortrait = getResources().getConfiguration().orientation ==
-                Configuration.ORIENTATION_PORTRAIT;
-
-        final boolean shouldShow = f.isHidden() || mCurrentTitlesAnimator != null;
-
-        // Cancel the current titles animation if there is one.
-        if (mCurrentTitlesAnimator != null)
-            mCurrentTitlesAnimator.cancel();
-
-        // Begin setting up the object animator. We'll animate the bottom or right edge of the
-        // titles view, as well as its alpha for a fade effect.
-        ObjectAnimator objectAnimator = ObjectAnimator.ofPropertyValuesHolder(
-                titlesView,
-                PropertyValuesHolder.ofInt(
-                        isPortrait ? "bottom" : "right",
-                        shouldShow ? getResources().getDimensionPixelSize(R.dimen.titles_size)
-                                   : 0),
-                PropertyValuesHolder.ofFloat("alpha", shouldShow ? 1 : 0)
-        );
-
-        // At each step of the animation, we'll perform layout by calling setLayoutParams.
-        final ViewGroup.LayoutParams lp = titlesView.getLayoutParams();
-        objectAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                // *** WARNING ***: triggering layout at each animation frame highly impacts
-                // performance so you should only do this for simple layouts. More complicated
-                // layouts can be better served with individual animations on child views to
-                // avoid the performance penalty of layout.
-                if (isPortrait) {
-                    lp.height = (Integer) valueAnimator.getAnimatedValue();
-                } else {
-                    lp.width = (Integer) valueAnimator.getAnimatedValue();
-                }
-                titlesView.setLayoutParams(lp);
-            }
-        });
-
-        if (shouldShow) {
-            fm.beginTransaction().show(f).commit();
-            objectAnimator.addListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animator) {
-                    mCurrentTitlesAnimator = null;
-                    mTitlesHidden = false;
-                    invalidateOptionsMenu();
-                }
-            });
-
-        } else {
-            objectAnimator.addListener(new AnimatorListenerAdapter() {
-                boolean canceled;
-
-                @Override
-                public void onAnimationCancel(Animator animation) {
-                    canceled = true;
-                    super.onAnimationCancel(animation);
-                }
-
-                @Override
-                public void onAnimationEnd(Animator animator) {
-                    if (canceled)
-                        return;
-                    mCurrentTitlesAnimator = null;
-                    fm.beginTransaction().hide(f).commit();
-                    mTitlesHidden = true;
-                    invalidateOptionsMenu();
-                }
-            });
-        }
-
-        // Start the animation.
-        objectAnimator.start();
-        mCurrentTitlesAnimator = objectAnimator;
-
-        // Manually trigger onNewIntent to check for ACTION_DIALOG.
-        onNewIntent(getIntent());
-    }
 
     @Override
     protected void onNewIntent(Intent intent) {
@@ -284,48 +163,6 @@ public class LivestockActivity extends BaseMultiPaneActivity /*implements Titles
         newFragment.show(ft, "dialog");
     }
 
-    void showNotification(boolean custom) {
-        final Resources res = getResources();
-        final NotificationManager notificationManager = (NotificationManager) getSystemService(
-                NOTIFICATION_SERVICE);
-
-        Notification.Builder builder = new Notification.Builder(this)
-                .setSmallIcon(R.drawable.ic_stat_notify_example)
-                .setAutoCancel(true)
-                .setTicker(getString(R.string.notification_text))
-                .setContentIntent(getDialogPendingIntent("Tapped the notification entry."));
-
-        if (custom) {
-            // Sets a custom content view for the notification, including an image button.
-            RemoteViews layout = new RemoteViews(getPackageName(), R.layout.notification);
-            layout.setTextViewText(R.id.notification_title, getString(R.string.app_name));
-            layout.setOnClickPendingIntent(R.id.notification_button,
-                    getDialogPendingIntent("Tapped the 'dialog' button in the notification."));
-            builder.setContent(layout);
-
-            // Notifications in Android 3.0 now have a standard mechanism for displaying large
-            // bitmaps such as contact avatars. Here, we load an example image and resize it to the
-            // appropriate size for large bitmaps in notifications.
-            Bitmap largeIconTemp = BitmapFactory.decodeResource(res,
-                    R.drawable.notification_default_largeicon);
-            Bitmap largeIcon = Bitmap.createScaledBitmap(
-                    largeIconTemp,
-                    res.getDimensionPixelSize(android.R.dimen.notification_large_icon_width),
-                    res.getDimensionPixelSize(android.R.dimen.notification_large_icon_height),
-                    false);
-            largeIconTemp.recycle();
-
-            builder.setLargeIcon(largeIcon);
-
-        } else {
-            builder
-                    .setNumber(7) // An example number.
-                    .setContentTitle(getString(R.string.app_name))
-                    .setContentText(getString(R.string.notification_text));
-        }
-
-        notificationManager.notify(NOTIFICATION_DEFAULT, builder.getNotification());
-    }
 
     PendingIntent getDialogPendingIntent(String dialogText) {
         return PendingIntent.getActivity(

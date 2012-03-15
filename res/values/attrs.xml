@@ -23,7 +23,9 @@
         <attr name="actionbarCompatTextStyle" format="reference" />
         <attr name="textHeaderMaxLines" format="integer" />
         <attr name="trackAbstractMaxLines" format="integer" />
-    </declare-styleable>
+        <attr name="listDragShadowBackground" format="reference" />
+        <attr name="menuIconAddLS" format="reference" />
+        </declare-styleable>
 
     <declare-styleable name="BlocksLayout">
         <attr name="columns" format="integer" />
@@ -46,36 +48,7 @@
         <attr name="borderDrawable" format="reference" />
     </declare-styleable>
 
-   <!-- Livestock stuff -->
-       <declare-styleable name="AppTheme">
-        <attr name="listDragShadowBackground" format="reference" />
-        <attr name="menuIconCamera" format="reference" />
-        <attr name="menuIconAddLS" format="reference" />
-        <attr name="menuIconToggle" format="reference" />
-        <attr name="menuIconShare" format="reference" />
-    </declare-styleable>
     
-       <!-- Camera -->
-           <declare-styleable name="CameraPreference">
-        <attr name="title" format="string" />
-    </declare-styleable>
-    <declare-styleable name="ListPreference">
-        <attr name="key" format="string" />
-        <attr name="defaultValue" format="string" />
-        <attr name="entryValues" format="reference" />
-        <attr name="entries" format="reference" />
-    </declare-styleable>
-    <declare-styleable name="IconIndicator">
-        <attr name="icons" format="reference" />
-        <attr name="modes" format="reference" />
-    </declare-styleable>
-    <declare-styleable name="IconListPreference">
-        <!-- If a preference does not have individual icons for each entry, it can has a single icon to represent it. -->
-        <attr name="singleIcon" format="reference" />
-        <attr name="icons" />
-        <attr name="largeIcons" format="reference" />
-        <attr name="images" format="reference" />
-    </declare-styleable>
        
    
 </resources>
