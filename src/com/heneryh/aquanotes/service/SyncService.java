@@ -356,6 +356,7 @@ public class SyncService extends IntentService {
 						final Bundle bundle = new Bundle();
 						bundle.putInt(STATUS_RESULT,STATUS_ERROR);
 						bundle.putString(Intent.EXTRA_TEXT, e.toString());
+						result.putExtras(bundle);
 						sendBroadcast(result);
 					} // end of catch
 				} // end of if(should update)

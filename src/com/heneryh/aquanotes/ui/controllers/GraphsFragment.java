@@ -165,9 +165,9 @@ public class GraphsFragment extends Fragment implements
             return;
         }
 
-        if (token == ProbesViewQuery._TOKEN) {
+        if (token == ProbesViewQuery._TOKEN && cursor.getCount()>0) {
             onProbesQueryComplete(cursor);
-        } else if (token == ProbeDataViewQuery._TOKEN) {
+        } else if (token == ProbeDataViewQuery._TOKEN && cursor.getCount()>0) {
         	onProbeDataQueryComplete(cursor);
         } else {
             cursor.close();

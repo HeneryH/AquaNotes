@@ -55,13 +55,13 @@ public class DashboardFragment extends Fragment {
             }
         });
 
-        root.findViewById(R.id.home_btn_livestock).setOnClickListener(new View.OnClickListener() {
-            public void onClick(View view) {
-                fireTrackerEvent("Livestock");
-                // Launch list of sessions and vendors the user has starred
-                startActivity(new Intent(getActivity(), LivestockActivity.class));                
-            }
-        });
+//        root.findViewById(R.id.home_btn_livestock).setOnClickListener(new View.OnClickListener() {
+//            public void onClick(View view) {
+//                fireTrackerEvent("Livestock");
+//                // Launch list of sessions and vendors the user has starred
+//                startActivity(new Intent(getActivity(), LivestockActivity.class));                
+//            }
+//        });
 
         root.findViewById(R.id.home_btn_feed).setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
