@@ -17,6 +17,7 @@
 package com.heneryh.aquanotes.provider;
 
 import com.heneryh.aquanotes.provider.AquaNotesDbContract.Controllers;
+import com.heneryh.aquanotes.provider.AquaNotesDbContract.Genus;
 import com.heneryh.aquanotes.provider.AquaNotesDbContract.Livestock;
 import com.heneryh.aquanotes.provider.AquaNotesDbContract.OutletDataView;
 import com.heneryh.aquanotes.provider.AquaNotesDbContract.Outlets;
@@ -94,6 +95,7 @@ public class AquaNotesDbProvider extends ContentProvider {
 	private static final int CONTROLLERS_ID_OUTLETDATA_FOR_DEVICE_ID = 811; 
     
 	private static final int LIVESTOCK = 901;
+	private static final int GENUS = 902;
 
     private static final String MIME_XML = "text/xml";
 
@@ -332,6 +334,15 @@ public class AquaNotesDbProvider extends ContentProvider {
 		// delete = delete all livestock
 		// getType = return type for multiple items
 
+//////////////////////////////////////////////
+//private static final int GENUS = 902;
+//private static final String PATH_LIVESTOCK = "genus";
+		matcher.addURI(authority, "genus", GENUS);
+		// query = return all genus 
+		// insert = add the genus defined in the values object, auto-create a livestock_id
+		// update = ?
+		// delete = delete all genus
+		// getType = return type for multiple items
 
 
         return matcher;
@@ -354,8 +365,8 @@ public class AquaNotesDbProvider extends ContentProvider {
 //    	private static final int CONTROLLERS_ID = 502;
 //    	private static final int CONTROLLERS_URL = 503;
 //    	private static final int CONTROLLERS_WID = 504;
-//        private static final String PATH_CONTROLLERS = "controllers";
-//        private static final String PATH_CONTROLLERS_URL = "url";
+//      private static final String PATH_CONTROLLERS = "controllers";
+//      private static final String PATH_CONTROLLERS_URL = "url";
 //      private static final String PATH_CONTROLLERS_WIDGET = "widget";
 //      private static final String PATH_CONTROLLERS_TITLE = "title";
         case CONTROLLERS:
@@ -474,6 +485,12 @@ public class AquaNotesDbProvider extends ContentProvider {
         case LIVESTOCK:
         	return Livestock.CONTENT_TYPE;
 
+//////////////////////////////////////////////
+//private static final int GENUS = 902;
+//private static final String PATH_GENUS = "genus";
+        case GENUS:
+        	return Genus.CONTENT_TYPE;
+
         default:
         	throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -551,6 +568,13 @@ public class AquaNotesDbProvider extends ContentProvider {
         // Insert a single livestock
 		case LIVESTOCK: {
 			rowId = db.insertOrThrow(Tables.LIVESTOCK, Livestock.COMMON_NAME, values);
+            getContext().getContentResolver().notifyChange(uri, null);
+            return ContentUris.withAppendedId(uri, rowId);
+		}
+
+        // Insert a single genus
+		case GENUS: {
+			rowId = db.insertOrThrow(Tables.GENUS, Genus.COMMON_NAME, values);
             getContext().getContentResolver().notifyChange(uri, null);
             return ContentUris.withAppendedId(uri, rowId);
 		}
@@ -686,6 +710,9 @@ public class AquaNotesDbProvider extends ContentProvider {
         case LIVESTOCK: {
             return builder.table(Tables.LIVESTOCK);
         }
+        case GENUS: {
+            return builder.table(Tables.GENUS);
+        }
         default: {
         	throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -810,7 +837,10 @@ public class AquaNotesDbProvider extends ContentProvider {
         			.where(ProbeDataView.CONTROLLER_ID + "=?", controllerId);
 		}
         case LIVESTOCK: {
-            return builder.table(Tables.LIVESTOCK);
+            return builder.table(Tables.LIVESTOCK_VIEW);
+        }
+        case GENUS: {
+            return builder.table(Tables.GENUS);
         }
 		default: {
 			throw new UnsupportedOperationException("Unknown uri: " + uri);

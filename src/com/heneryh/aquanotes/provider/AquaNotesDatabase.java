@@ -20,6 +20,9 @@ import com.heneryh.aquanotes.provider.AquaNotesDbContract.Controllers;
 import com.heneryh.aquanotes.provider.AquaNotesDbContract.ControllersColumns;
 import com.heneryh.aquanotes.provider.AquaNotesDbContract.Data;
 import com.heneryh.aquanotes.provider.AquaNotesDbContract.DataColumns;
+import com.heneryh.aquanotes.provider.AquaNotesDbContract.Genus;
+import com.heneryh.aquanotes.provider.AquaNotesDbContract.GenusColumns;
+import com.heneryh.aquanotes.provider.AquaNotesDbContract.Livestock;
 import com.heneryh.aquanotes.provider.AquaNotesDbContract.LivestockColumns;
 import com.heneryh.aquanotes.provider.AquaNotesDbContract.Probes;
 import com.heneryh.aquanotes.provider.AquaNotesDbContract.ProbesColumns;
@@ -49,8 +52,10 @@ public class AquaNotesDatabase extends SQLiteOpenHelper {
     private static final int VER_ADD_WIDGET = 2;
     private static final int VER_ADD_LIVESTOCK = 3;
     private static final int VER_ADD_LIVESTOCK_THUMBNAIL = 4;
+    private static final int VER_ADD_GENUS = 5;
+    private static final int VER_ADD_DEFAULT_GENUS = 6;
 
-    private static final int DATABASE_VERSION = VER_ADD_LIVESTOCK_THUMBNAIL;
+    private static final int DATABASE_VERSION = VER_ADD_GENUS;
 
     interface Tables {
         String CONTROLLERS = "controllers";
@@ -58,11 +63,14 @@ public class AquaNotesDatabase extends SQLiteOpenHelper {
         String OUTLETS = "outlets";
         String DATA = "data";
         String LIVESTOCK = "livestock";
+        String GENUS = "genus";
         
         String PROBE_VIEW = "probe_view";
         String OUTLET_VIEW = "outlet_view";
         String PDATA_VIEW = "pdata_view";
         String ODATA_VIEW = "odata_view";
+
+        String LIVESTOCK_VIEW = "livestock_view";
 
     }
 
@@ -204,17 +212,61 @@ public class AquaNotesDatabase extends SQLiteOpenHelper {
         	    " ON " + Tables.DATA + "." + Data.PARENT_ID + " =" + Tables.OUTLETS + "." + BaseColumns._ID
         	    );
       
-//      String _ID = "_id";
-//      String COMMON_NAME = "common_name";
-//      String TYPE = "type";
-//      String TIMESTAMP = "timestamp";
-      db.execSQL("CREATE TABLE " + Tables.LIVESTOCK + " ("
+//    String _ID = "_id";
+//    String COMMON_NAME = "common_name";
+//    String TIMESTAMP = "timestamp";
+//    String THUMBNAIL = "thumbnail";
+//    String GENUS_ID = "genus";
+    db.execSQL("CREATE TABLE " + Tables.LIVESTOCK + " ("
+            + BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+            + LivestockColumns.COMMON_NAME + " TEXT,"
+            + LivestockColumns.TIMESTAMP + " LONG,"
+            + LivestockColumns.THUMBNAIL + " INTEGER,"
+            + LivestockColumns.GENUS_ID + " TEXT"
+            + ")");
+
+//  String _ID = "_id";
+//  String COMMON_NAME = "common_name";
+//  String SCIENTIFIC_NAME = "scientific_name";
+//  String TIMESTAMP = "timestamp";
+//  String THUMBNAIL = "thumbnail";
+      db.execSQL("CREATE TABLE " + Tables.GENUS + " ("
               + BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-              + LivestockColumns.COMMON_NAME + " TEXT,"
-              + LivestockColumns.TYPE + " TEXT,"
-              + LivestockColumns.THUMBNAIL + " INTEGER,"
-              + LivestockColumns.TIMESTAMP + " LONG"
+              + GenusColumns.COMMON_NAME + " TEXT,"
+              + GenusColumns.SCIENTIFIC_NAME + " TEXT,"
+              + GenusColumns.TIMESTAMP + " LONG,"
+              + GenusColumns.THUMBNAIL + " INTEGER"
               + ")");
+      
+      db.execSQL("INSERT INTO " + Tables.GENUS + 
+    		  " (" + GenusColumns.COMMON_NAME + ", " + GenusColumns.SCIENTIFIC_NAME + ", " + GenusColumns.TIMESTAMP + ", " + GenusColumns.THUMBNAIL + ") " + 
+    		  "VALUES ('New', 'New', 0, 0)");
+
+//  	String _ID = "_id";
+//  	String COMMON_NAME = "common_name";
+//  	String TIMESTAMP = "timestamp";
+//  	String THUMBNAIL = "thumbnail";
+//  	String GENUS_ID = "genus";
+//  			//\\
+//  			Join
+//  			\\//
+//  	String G_COMMON_NAME = "g_common_name";
+//  	String G_SCIENTIFIC_NAME = "g_scientific_name";
+//  	String G_TIMESTAMP = "g_timestamp";
+//  	String G_THUMBNAIL = "g_thumbnail";
+      db.execSQL("CREATE VIEW "+ Tables.LIVESTOCK_VIEW +
+      	    " AS SELECT " + Tables.LIVESTOCK + "." + BaseColumns._ID + " ," +
+        	    " " + Tables.LIVESTOCK + "." + Livestock.COMMON_NAME + "," +
+      	    " " + Tables.LIVESTOCK + "." + Livestock.TIMESTAMP + "," +
+      	    " " + Tables.LIVESTOCK + "." + Livestock.THUMBNAIL + "," +
+      	    " " + Tables.LIVESTOCK + "." + Livestock.GENUS_ID + "," +
+      	    " " + Tables.GENUS + "." + Genus.COMMON_NAME + " AS g_common_name ," +
+      	    " " + Tables.GENUS + "." + Genus.SCIENTIFIC_NAME + " AS g_scientific_name ," +
+      	    " " + Tables.GENUS + "." + Genus.TIMESTAMP + " AS g_timestamp ," +
+      	    " " + Tables.GENUS + "." + Genus.THUMBNAIL + " AS g_thumbnail " +
+      	    " FROM " + Tables.LIVESTOCK + " JOIN " + Tables.GENUS +
+      	    " ON " + Tables.LIVESTOCK + "." + Livestock.GENUS_ID + " =" + Tables.GENUS + "." + BaseColumns._ID
+      	    );
 
     }
 
@@ -223,6 +275,13 @@ public class AquaNotesDatabase extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         Log.d(TAG, "onUpgrade() from " + oldVersion + " to " + newVersion);
 
+//        private static final int VER_LAUNCH = 1;
+//        private static final int VER_ADD_WIDGET = 2;
+//        private static final int VER_ADD_LIVESTOCK = 3;
+//        private static final int VER_ADD_LIVESTOCK_THUMBNAIL = 4;
+//        private static final int VER_ADD_GENUS = 5;
+//        private static final int VER_ADD_DEFAULT_GENUS = 6;
+//
         // NOTE: This switch statement is designed to handle cascading database
         // updates, starting at the current version and falling through to all
         // future upgrade cases. Only use "break;" when you want to drop and
@@ -241,7 +300,7 @@ public class AquaNotesDatabase extends SQLiteOpenHelper {
             db.execSQL("CREATE TABLE " + Tables.LIVESTOCK + " ("
                     + BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
                     + LivestockColumns.COMMON_NAME + " TEXT,"
-                    + LivestockColumns.TYPE + " TEXT,"
+                    + LivestockColumns.GENUS_ID + " TEXT,"
                     + LivestockColumns.TIMESTAMP + " LONG"
                     + ")");
         	version = VER_ADD_LIVESTOCK;
@@ -252,8 +311,32 @@ public class AquaNotesDatabase extends SQLiteOpenHelper {
         		  + LivestockColumns.THUMBNAIL + " INTEGER");
         	version = VER_ADD_LIVESTOCK_THUMBNAIL;
         	
- 
-        	
+        case VER_ADD_LIVESTOCK_THUMBNAIL:
+            Log.w(TAG, "Adding genus table, but also linkages to livestock, just redo it all.");
+            db.execSQL("DROP TABLE IF EXISTS " + Tables.LIVESTOCK);
+            db.execSQL("DROP TABLE IF EXISTS " + Tables.GENUS);
+            db.execSQL("CREATE TABLE " + Tables.LIVESTOCK + " ("
+                    + BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                    + LivestockColumns.COMMON_NAME + " TEXT,"
+                    + LivestockColumns.TIMESTAMP + " LONG,"
+                    + LivestockColumns.THUMBNAIL + " INTEGER,"
+                    + LivestockColumns.GENUS_ID + " TEXT"
+                    + ")");
+              db.execSQL("CREATE TABLE " + Tables.GENUS + " ("
+                      + BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                      + GenusColumns.COMMON_NAME + " TEXT,"
+                      + GenusColumns.SCIENTIFIC_NAME + " TEXT,"
+                      + GenusColumns.TIMESTAMP + " LONG,"
+                      + GenusColumns.THUMBNAIL + " INTEGER"
+                      + ")");
+              
+              db.execSQL("INSERT INTO " + Tables.GENUS + 
+            		  " (" + GenusColumns.COMMON_NAME + ", " + GenusColumns.SCIENTIFIC_NAME + ", " + GenusColumns.TIMESTAMP + ", " + GenusColumns.THUMBNAIL + ") " + 
+            		  "VALUES ('New', 'New', 0, 0)");
+              
+          	version = VER_ADD_GENUS;
+
+
 //        case VER_REWORK_ALL_TABLES:
 //        	// Version 3 changed key for controllers, sorry.
 //            Log.w(TAG, "Destroying old data during upgrade");
@@ -289,11 +372,13 @@ public class AquaNotesDatabase extends SQLiteOpenHelper {
             db.execSQL("DROP TABLE IF EXISTS " + Tables.OUTLETS);
             db.execSQL("DROP TABLE IF EXISTS " + Tables.DATA);
             db.execSQL("DROP TABLE IF EXISTS " + Tables.LIVESTOCK);
+            db.execSQL("DROP TABLE IF EXISTS " + Tables.GENUS);
             
             db.execSQL("DROP VIEW IF EXISTS " + Tables.PROBE_VIEW);
             db.execSQL("DROP VIEW IF EXISTS " + Tables.OUTLET_VIEW);
             db.execSQL("DROP VIEW IF EXISTS " + Tables.PDATA_VIEW);
             db.execSQL("DROP VIEW IF EXISTS " + Tables.ODATA_VIEW);
+            db.execSQL("DROP VIEW IF EXISTS " + Tables.LIVESTOCK_VIEW);
 
             onCreate(db);
         }

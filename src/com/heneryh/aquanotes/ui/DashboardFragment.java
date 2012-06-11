@@ -16,6 +16,7 @@
 
 package com.heneryh.aquanotes.ui;
 
+import com.cooliris.media.Gallery;
 import com.heneryh.aquanotes.R;
 import com.heneryh.aquanotes.configure.ConfigurePrefs;
 import com.heneryh.aquanotes.provider.AquaNotesDbContract;
@@ -59,7 +60,8 @@ public class DashboardFragment extends Fragment {
             public void onClick(View view) {
                 fireTrackerEvent("Livestock");
                 // Launch list of sessions and vendors the user has starred
-                startActivity(new Intent(getActivity(), LivestockActivity.class));                
+                startActivity(new Intent(getActivity(), Gallery.class));
+                //startActivity(new Intent(getActivity(), LivestockActivity.class));                
             }
         });
 

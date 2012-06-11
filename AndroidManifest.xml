@@ -17,8 +17,8 @@
 <manifest
     xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.heneryh.aquanotes"
-    android:versionCode="34"
-    android:versionName="0.34"
+    android:versionCode="35"
+    android:versionName="0.35"
     android:installLocation="auto">
 
     <uses-sdk
@@ -31,12 +31,37 @@
         android:label="@string/permission_write"
         android:description="@string/permission_write" />
 
+    <!-- Basic comm -->
     <uses-permission android:name="android.permission.INTERNET" />
+    
+    <!-- Determine if WiFi is connected to home SSID -->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    
+    <!-- Store database items -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /> 
+    
+<!--     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.USE_CREDENTIALS" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.WRITE_CONTACTS" />
+ -->    
+    <!-- From Gallery -->
+<!--     <uses-permission android:name="android.permission.SET_WALLPAPER" />
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.USE_CREDENTIALS" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /> 
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.READ_SYNC_SETTINGS" />
+    <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
+    <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+ -->    
+    <supports-screens android:smallScreens="false"
+        android:normalScreens="true" android:largeScreens="true"
+        android:anyDensity="true" />
+
     
 
     <application
@@ -78,17 +103,15 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-
+        
+        <activity
+            android:name=".ui.livestock.NewLivestockActivity"
+            android:label="sss"  />
+        
+        
         <!-- Holds the ContentFragment for small/normal screens -->
         <activity android:name=".ui.livestock.ContentActivity" />
 
-        <!-- Camera Sample -->
-        <activity android:name=".ui.livestock.CameraActivity"
-            android:label="@string/camera_sample"
-            android:screenOrientation="landscape" />
-        
-        
-        
         <!-- Broadcast Receiver that will process AppWidget updates -->
 <!--         <receiver
             android:label="@string/widget_name_2x1"
@@ -121,76 +144,10 @@
 
         <!-- Phone-only activities -->
 
-        <activity
-            android:name=".ui.phone.ProbesActivity"
-            android:label="@string/title_probes">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.TAB" />
-                <data android:mimeType="vnd.android.cursor.dir/vnd.aquanotes.probes" />
-            </intent-filter>
-        </activity>
-
-        <activity
-            android:name=".ui.phone.OutletsActivity"
-            android:label="@string/title_outlets">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <data android:mimeType="vnd.android.cursor.dir/vnd.aquanotes.outlets" />
-            </intent-filter>
-        </activity>
-
-        <activity
-            android:name=".ui.phone.DataActivity"
-            android:label="@string/title_data">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <data android:mimeType="vnd.android.cursor.dir/vnd.aquanotes.data" />
-            </intent-filter>
-        </activity>
-
-        <activity
-            android:name=".ui.phone.SessionsActivity"
-            android:label="@string/title_outlets">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.TAB" />
-                <data android:mimeType="vnd.android.cursor.dir/vnd.aquanotes.session" />
-            </intent-filter>
-        </activity>
-
-        <activity android:name=".ui.phone.SessionDetailActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <data android:mimeType="vnd.android.cursor.item/vnd.aquanotes.session" />
-            </intent-filter>
-        </activity>
-
-        <activity android:name=".ui.phone.ProbesDetailActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <data android:mimeType="vnd.android.cursor.item/vnd.aquanotes.probe" />
-            </intent-filter>
-        </activity>
-
-
+ 
+ 
         <!-- Tablet-only activities -->
 
-        <activity
-            android:name=".ui.tablet.OutletsMultiPaneActivity"
-            android:label="@string/title_outlets" />
-        <activity
-            android:name=".ui.tablet.ProbesMultiPaneActivity"
-            android:label="@string/title_probes" />
-        <activity
-            android:name=".ui.tablet.ScheduleMultiPaneActivity"
-            android:label="@string/title_schedule" />
         <activity
             android:name="com.heneryh.aquanotes.ui.tablet.NowPlayingMultiPaneActivity"
             android:label="@string/title_now_playing" />
@@ -233,5 +190,172 @@
             android:authorities="com.heneryh.aquanotes"
             android:writePermission="com.heneryh.aquanotes.permission.WRITE_SCHEDULE" />
 
+        <!-- From Gallery -->
+        <activity android:name="com.cooliris.media.Gallery" android:label="@string/app_name"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+            android:configChanges="keyboardHidden|orientation"
+            android:clearTaskOnLaunch="true" android:noHistory="false"
+            android:stateNotNeeded="true">
+             <intent-filter>
+                <action android:name="android.intent.action.GET_CONTENT" />
+                <category android:name="android.intent.category.OPENABLE" />
+                <data android:mimeType="vnd.android.cursor.dir/image" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.GET_CONTENT" />
+                <category android:name="android.intent.category.OPENABLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="image/*" />
+                <data android:mimeType="video/*" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.PICK" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="image/*" />
+                <data android:mimeType="video/*" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.PICK" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="vnd.android.cursor.dir/image" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="vnd.android.cursor.dir/image" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="image/*" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.cooliris.media.action.REVIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="vnd.android.cursor.dir/image" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.cooliris.media.action.REVIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="image/*" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.cooliris.media.action.REVIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="video/*" />
+             </intent-filter>
+        </activity>
+        <activity android:name="com.cooliris.media.CropImage"
+            android:configChanges="orientation|keyboardHidden" android:label="@string/crop_label">
+            <intent-filter android:label="@string/crop_label">
+                <action android:name="com.android.camera.action.CROP" />
+                <data android:mimeType="image/*" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.ALTERNATIVE" />
+                <category android:name="android.intent.category.SELECTED_ALTERNATIVE" />
+            </intent-filter>
+        </activity>
+        <activity android:name="com.cooliris.media.MovieView"
+            android:label="@string/movie_view_label"
+            android:configChanges="orientation|keyboardHidden"
+            android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="rtsp" />
+             </intent-filter>
+             <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="video/*" />
+                <data android:mimeType="application/sdp" />
+             </intent-filter>
+             <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="http" />
+                <data android:mimeType="video/mpeg4" />
+                <data android:mimeType="video/mp4" />
+                <data android:mimeType="video/3gp" />
+                <data android:mimeType="video/3gpp" />
+                <data android:mimeType="video/3gpp2" />
+             </intent-filter>
+        </activity>
+
+        <activity android:name="com.cooliris.media.Photographs" android:icon="@drawable/icon">
+            <intent-filter android:label="@string/camera_setas_wallpaper">
+                <action android:name="android.intent.action.ATTACH_DATA" />
+                <data android:mimeType="image/*" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <intent-filter android:label="@string/app_name">
+                <action android:name="android.intent.action.SET_WALLPAPER" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+<!--         <provider android:label="Picasa Web Albums" android:name="com.cooliris.picasa.PicasaContentProvider"
+            android:grantUriPermissions="true"
+            android:syncable="true"
+            android:authorities="com.cooliris.picasa.contentprovider">
+        </provider> -->
+        <service android:label="Picasa Sync Service" android:name="com.cooliris.picasa.PicasaService">
+            <intent-filter>
+                <action android:name="android.content.SyncAdapter" />
+            </intent-filter>
+            <meta-data android:name="android.content.SyncAdapter" android:resource="@xml/syncadapter" />
+        </service>
+
+        <service android:label="CacheService" android:name="com.cooliris.cache.CacheService"/>
+
+        <receiver android:label="BootReceiver" android:name="com.cooliris.cache.BootReceiver"
+            android:enabled="true">
+            <intent-filter>
+                <category android:name="android.intent.category.DEFAULT" />
+                <action android:name="android.intent.action.BOOT_COMPLETE" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.MEDIA_SCANNER_FINISHED" />
+                <data android:scheme="file" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.MEDIA_MOUNTED" />
+                <data android:scheme="file" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.MEDIA_EJECT" />
+                <data android:scheme="file" />
+            </intent-filter>
+        </receiver>
+
+        <receiver android:name="com.cooliris.media.PhotoAppWidgetProvider" android:label="@string/gadget_title">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/appwidget_info" />
+        </receiver>
+
+        <!-- We configure a widget by asking to pick a photo, then crop it, and store the config internally-->
+        <activity android:name="com.cooliris.media.PhotoAppWidgetConfigure">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+            </intent-filter>
+        </activity>
+
+        <!-- We also allow direct binding where the caller provides a bitmap and
+             appWidgetId to bind.  We require the permission because this changes our
+             internal database without user confirmation.
+        -->
+        <activity android:name="com.cooliris.media.PhotoAppWidgetBind" android:exported="true"
+                android:theme="@android:style/Theme.NoDisplay"
+                android:permission="android.permission.BIND_APPWIDGET" />
+
+        <receiver android:name="com.cooliris.picasa.PicasaReceiver">
+                <intent-filter>
+                    <action android:name="android.accounts.LOGIN_ACCOUNTS_CHANGED_ACTION"/>
+                </intent-filter>
+        </receiver>
+        
     </application>
 </manifest>

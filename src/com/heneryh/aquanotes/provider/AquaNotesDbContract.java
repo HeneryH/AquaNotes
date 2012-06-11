@@ -285,7 +285,7 @@ public class AquaNotesDbContract {
         
     }
 
-    interface LivestockColumns {
+    interface GenusColumns {
         /** Unique string identifying this livestock. */
         String _ID = "_id";
         
@@ -293,7 +293,7 @@ public class AquaNotesDbContract {
         String COMMON_NAME = "common_name";
         
         /** Type of livestock this is, ie fish, sps, lps etc. */
-        String TYPE = "type";
+        String SCIENTIFIC_NAME = "scientific_name";
         
         /** Timestamp of xxx. */
         String TIMESTAMP = "timestamp";
@@ -302,6 +302,57 @@ public class AquaNotesDbContract {
         String THUMBNAIL = "thumbnail";
     }
     
+    interface LivestockColumns {
+        /** Unique string identifying this livestock. */
+        String _ID = "_id";
+        
+        /** Common name for this type of livestock*/
+        String COMMON_NAME = "common_name";
+        
+        /** Timestamp of xxx. */
+        String TIMESTAMP = "timestamp";
+        
+        /** Resource ID of the thumbnail image for this item. */
+        String THUMBNAIL = "thumbnail";
+        
+        /** Type of livestock this is, ie fish, sps, lps etc. */
+        String GENUS_ID = "genus";
+        
+    }
+    
+    interface ViewLivestockGenusColumns {
+    	/** Unique string identifying this livestock. */
+    	String _ID = "_id";
+
+    	/** Common name for this type of livestock*/
+    	String COMMON_NAME = "common_name";
+
+    	/** Timestamp of xxx. */
+    	String TIMESTAMP = "timestamp";
+
+    	/** Resource ID of the thumbnail image for this item. */
+    	String THUMBNAIL = "thumbnail";
+
+    	/** Type of livestock this is, ie fish, sps, lps etc. */
+    	String GENUS_ID = "genus";
+
+    	//		//\\
+    	//		Join
+    	//		\\//
+
+    	/** Common name for this type of livestock*/
+    	String G_COMMON_NAME = "g_common_name";
+
+    	/** Type of livestock this is, ie fish, sps, lps etc. */
+    	String G_SCIENTIFIC_NAME = "g_scientific_name";
+
+    	/** Timestamp of xxx. */
+    	String G_TIMESTAMP = "g_timestamp";
+
+    	/** Resource ID of the thumbnail image for this item. */
+    	String G_THUMBNAIL = "g_thumbnail";
+
+    }
 
 
     public static final String CONTENT_AUTHORITY = "com.heneryh.aquanotes";
@@ -331,6 +382,7 @@ public class AquaNotesDbContract {
     private static final String PATH_OUTLET_DATA_FOR_DID = "odata_did";
 
     private static final String PATH_LIVESTOCK = "livestock";
+    private static final String PATH_GENUS = "genus";
 
     
     /**
@@ -808,6 +860,13 @@ public class AquaNotesDbContract {
      /**
       * Controllers are 
       */
+//         String _ID = "_id";
+//         String COMMON_NAME = "common_name";
+//         String TIMESTAMP = "timestamp";
+//         String THUMBNAIL = "thumbnail";
+//         String GENUS_ID = "genus";
+//     private static final String PATH_LIVESTOCK = "livestock";
+
      public static class Livestock implements LivestockColumns, BaseColumns {
 
          public static final String CONTENT_TYPE =
@@ -843,22 +902,67 @@ public class AquaNotesDbContract {
          	return buildQueryLivestockXUri(livestockId); // same as query
          }
 
-         public static Uri buildUpdateControllerXUri(int livestockId) {
+         public static Uri buildUpdateLivestockXUri(int livestockId) {
          	return buildQueryLivestockXUri(livestockId); // same as query
          }
 
-         //          content://org.dvrc.aquanotes/controllers/x
+         //          content://org.dvrc.aquanotes/livestock/x
          public static String getLivestockId(Uri livestockXUri) {
              return livestockXUri.getPathSegments().get(1);
          }
-         public static String getControllerWidget(Uri controllerXUri) {
-             return controllerXUri.getPathSegments().get(2);
-         }
-         public static String getControllerUrl(Uri controllerXUri) {
-             return controllerXUri.getPathSegments().get(2);
-         }
      }
 
+//     String _ID = "_id";
+//     String COMMON_NAME = "common_name";
+//     String SCIENTIFIC_NAME = "scientific_name";
+//     String TIMESTAMP = "timestamp";
+//     String THUMBNAIL = "thumbnail";
+//     private static final String PATH_GENUS = "genus";
+
+public static class Genus implements GenusColumns, BaseColumns {
+
+   public static final String CONTENT_TYPE =
+           "vnd.android.cursor.dir/vnd.aquanotes.genus";
+   public static final String CONTENT_ITEM_TYPE =
+           "vnd.android.cursor.item/vnd.aquanotes.genus";
+
+   public static final Uri CONTENT_URI =
+           BASE_CONTENT_URI.buildUpon().appendPath(PATH_GENUS).build();
+
+   /** Default "ORDER BY" clause. */
+   public static final String DEFAULT_SORT = GenusColumns.TIMESTAMP + " DESC ";
+
+   //          content://org.dvrc.aquanotes/genus
+   public static Uri buildQueryGenusUri() {
+       return BASE_CONTENT_URI.buildUpon().appendPath(PATH_GENUS)
+       		.build();
+   }
+   
+   public static Uri buildInsertLivestockUri() { 
+   	return buildQueryGenusUri();  // same as query
+   }
+
+   //          content://org.dvrc.aquanotes/genus/x
+   public static Uri buildQueryGenusXUri(Integer genusId) {
+       return BASE_CONTENT_URI.buildUpon()
+       		.appendPath(PATH_GENUS).appendPath(genusId.toString())
+       		.build();
+   }
+   
+    
+   public static Uri buildDeleteGenusXUri(int genusId) {
+   	return buildQueryGenusXUri(genusId); // same as query
+   }
+
+   public static Uri buildUpdateGenusXUri(int genusId) {
+   	return buildQueryGenusXUri(genusId); // same as query
+   }
+
+   //          content://org.dvrc.aquanotes/genus/x
+   public static String getGenusId(Uri genusXUri) {
+       return genusXUri.getPathSegments().get(1);
+   }
+}
 
     private AquaNotesDbContract() {
     }

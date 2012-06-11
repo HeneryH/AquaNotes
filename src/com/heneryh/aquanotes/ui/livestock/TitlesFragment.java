@@ -223,7 +223,7 @@ implements /*ActionBar.TabListener,*/ LoaderManager.LoaderCallbacks<Cursor> {
 				//		        String TIMESTAMP = "timestamp";
 				BaseColumns._ID,
 				AquaNotesDbContract.Livestock.COMMON_NAME,
-				AquaNotesDbContract.Livestock.TYPE,
+				AquaNotesDbContract.Livestock.GENUS_ID,
 				AquaNotesDbContract.Livestock.TIMESTAMP,
 				AquaNotesDbContract.Livestock.THUMBNAIL,
 		};

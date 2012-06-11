@@ -174,7 +174,7 @@ public class FeedActivity extends BaseMultiPaneActivity {
 			Uri controllersQueryUri = Controllers.buildQueryControllerByTitleUri(title);
 			cursor2 = dbResolverFeedAct.query(controllersQueryUri, ControllersQuery.PROJECTION, null, null, null);
 			if (cursor2 != null && cursor2.moveToFirst()) {
-				new FeedCycleThread(cursor2, 1).execute();
+				new FeedCycleThread(cursor2, 0).execute();
 			}
 		} catch (SQLException e) {
 			//Log.e(TAG, "getting controller list", e);	

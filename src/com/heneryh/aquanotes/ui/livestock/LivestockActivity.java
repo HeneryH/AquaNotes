@@ -126,7 +126,7 @@ public class LivestockActivity extends BaseMultiPaneActivity /*implements Titles
     		Uri livestockUri = Livestock.buildInsertLivestockUri();
             values.clear();
             values.put(AquaNotesDbContract.Livestock.COMMON_NAME, "Red Balloon");
-            values.put(AquaNotesDbContract.Livestock.TYPE, "SPS");
+            values.put(AquaNotesDbContract.Livestock.GENUS_ID, "SPS");
             values.put(AquaNotesDbContract.Livestock.THUMBNAIL, R.drawable.red_balloon);
             values.put(AquaNotesDbContract.Livestock.TIMESTAMP, 0);
             try {
