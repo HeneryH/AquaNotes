@@ -567,6 +567,10 @@ public class AquaNotesDbProvider extends ContentProvider {
         if (LOGV) Log.v(TAG, "update(uri=" + uri + ", values=" + values.toString() + ")");
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         
+    	/** TODO:
+    	 * The update by widget isn't working yet.  Only update by controller id.
+    	 */
+
         final SelectionBuilder builder = buildSimpleSelection(uri);
         int retVal = builder.where(selection, selectionArgs).update(db, values);
         getContext().getContentResolver().notifyChange(uri, null);

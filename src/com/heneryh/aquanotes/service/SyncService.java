@@ -298,6 +298,7 @@ public class SyncService extends IntentService {
 						final Bundle bundle = new Bundle();
 						bundle.putInt(STATUS_RESULT,STATUS_ERROR);
 						bundle.putString(Intent.EXTRA_TEXT, e.toString());
+						result.putExtras(bundle);
 						sendBroadcast(result);
 					} finally {
 						if (cursor != null) {
@@ -423,6 +424,7 @@ public class SyncService extends IntentService {
 		else {
 			bundle.putInt(STATUS_RESULT,STATUS_FINISHED);
 		}
+		result.putExtras(bundle);
 		sendBroadcast(result);
 
 		// No updates remaining, so stop service

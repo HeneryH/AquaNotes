@@ -256,7 +256,7 @@ public class OutletsDataAdapter extends CursorAdapter {
     		name=x;
     		cid=controllerId;
     	}
-    	@Override
+    	//@Override
     	public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
     		// your code here
     		if(!initialDisplay){
@@ -264,7 +264,7 @@ public class OutletsDataAdapter extends CursorAdapter {
     		}
     		initialDisplay=false;
     	}
-    	@Override
+    	//@Override
     	public void onNothingSelected(AdapterView<?> parentView) {
     		// your code here
     	}

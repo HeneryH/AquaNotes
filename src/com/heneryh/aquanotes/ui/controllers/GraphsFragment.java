@@ -349,7 +349,7 @@ public class GraphsFragment extends Fragment implements
 	private float distBetweenFingers;
 	private float lastZooming;
  
-	@Override
+	//@Override
 	public boolean onTouch(View arg0, MotionEvent event) {
 		switch(event.getAction() & MotionEvent.ACTION_MASK) {
 			case MotionEvent.ACTION_DOWN: // Start gesture

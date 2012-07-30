@@ -352,11 +352,14 @@ public class ApexExecutor {
     	String pw = cursor.getString(ControllersQuery.PW);
     	String ssid = cursor.getString(ControllersQuery.WIFI_SSID);
     	String model = cursor.getString(ControllersQuery.MODEL);
+
+    	String apexBaseURL;
+
+    	// Determine if we are on the LAN or WAN and then use appropriate URL
     	
-    	// Uhg, WifiManager stuff below crashes in AVD if wifi not enabled so first we have to check if on wifi
+    	// Uhg, WifiManager stuff below crashes if wifi not enabled so first we have to check if on wifi
     	ConnectivityManager cm  = (ConnectivityManager) mActContext.getSystemService(Context.CONNECTIVITY_SERVICE);
     	NetworkInfo nInfo = cm.getActiveNetworkInfo();
-    	String apexBaseURL;
 
     	if(nInfo.getType()==ConnectivityManager.TYPE_WIFI) {
     		// Get the currently connected SSID, if it matches the 'Home' one then use the local WiFi URL rather than the public one
@@ -388,7 +391,7 @@ public class ApexExecutor {
     		apexBaseURL = tmp;
     	}
 
-    	// oh, we should also check if it ends with an "status.sht" on the end and remove it.
+    	// we should also check if it ends with an "status.sht" on the end and remove it.
 
      	// This used to be common for both the Apex and ACiii but during
     	// the 4.04 beta Apex release it seemed to have broke and forced

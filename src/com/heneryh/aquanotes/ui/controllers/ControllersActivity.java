@@ -328,6 +328,7 @@ public class ControllersActivity extends BaseMultiPaneActivity implements
 
 	    IntentFilter intentFilter = new IntentFilter(SyncService.STATUS_UPDATE);
 	    registerReceiver(statusIntentReceiver, intentFilter); 
+		updateRefreshStatus(false);
 
 	    /**
 	     * Since we build our views manually instead of using an adapter, we
@@ -1008,7 +1009,7 @@ public class ControllersActivity extends BaseMultiPaneActivity implements
 				mContext = context;
 			}
 
-			@Override
+			//@Override
 			public View createTabContent(String tag) {
 				View v = new View(mContext);
 				v.setMinimumWidth(0);
@@ -1042,7 +1043,7 @@ public class ControllersActivity extends BaseMultiPaneActivity implements
 					mTabHost.addTab(tabSpec);
 		}
 
-		@Override
+		//@Override
 		public void onTabChanged(String tabId) {
 			TabInfo newTab = mTabs.get(tabId);
 			if (mLastTab != newTab) {
@@ -1110,7 +1111,7 @@ public class ControllersActivity extends BaseMultiPaneActivity implements
 		int MODEL = 10;
 	}
 
-	@Override
+	//@Override
 	public void onClick(View v) {
 		//		if (v instanceof BlockView) {
 		//          String title = ((BlockView)view).getText().toString();

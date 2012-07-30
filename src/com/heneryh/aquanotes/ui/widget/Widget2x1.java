@@ -25,10 +25,12 @@ import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.SQLException;
+import android.database.sqlite.SQLiteConstraintException;
 import android.net.Uri;
 import android.provider.BaseColumns;
 import android.util.Log;
@@ -44,6 +46,7 @@ import java.text.SimpleDateFormat;
 import com.heneryh.aquanotes.R;
 import com.heneryh.aquanotes.provider.AquaNotesDbContract;
 import com.heneryh.aquanotes.provider.AquaNotesDbContract.Controllers;
+import com.heneryh.aquanotes.provider.AquaNotesDbContract.Data;
 import com.heneryh.aquanotes.service.SyncService;
 import com.heneryh.aquanotes.ui.HomeActivity;
 
@@ -84,8 +87,19 @@ public class Widget2x1 extends AppWidgetProvider {
 		ContentResolver resolver = context.getContentResolver();
 		for (int appWidgetId : appWidgetIds) {
 			Log.d(TAG, "Deleting appWidgetId=" + appWidgetId);
-			Uri controllerUri = Controllers.buildQueryControllerXUri(appWidgetId);
-			resolver.delete(controllerUri, null, null);
+			
+        	/** TODO:
+        	 * The update by widget isn't working yet.
+        	 */
+
+//			Uri controllerXUri = Controllers.buildUpdateControllerXUri(appWidgetId);
+//			try {
+//				ContentValues values = new ContentValues();
+//				values.put(AquaNotesDbContract.Controllers.WIDGET, -1);  
+//				resolver.update(controllerXUri, values, null, null);
+//			} catch (SQLiteConstraintException e2 ) {
+//				Log.e(TAG, "Inserting/updating controller data: ", e2);
+//			}
 		}
 	}
 
@@ -104,6 +118,7 @@ public class Widget2x1 extends AppWidgetProvider {
 
 		Cursor cursor = null;
 		String devType = null;
+		Long timestampL= (long) 0;
 
 		// Pull out controller title and other data for this instance
 		try {
@@ -122,9 +137,10 @@ public class Widget2x1 extends AppWidgetProvider {
 				devType = cursor.getString(ControllersQuery.MODEL);
 
 				// Timestamp
-				Date timestamp = new Date(cursor.getLong(ControllersQuery.LAST_UPDATED));
+				timestampL = cursor.getLong(ControllersQuery.LAST_UPDATED);
+				Date timestampD = new Date(timestampL);
 				SimpleDateFormat formatter = new SimpleDateFormat("M/d/yy h:mm a");
-				String timestampS = formatter.format(timestamp);
+				String timestampS = formatter.format(timestampD);
 				views.setTextViewText(R.id.widget_apex_time,timestampS);
 			} else {
 				Log.e(TAG, "Didn't find a database entry for this controller.");
@@ -143,8 +159,41 @@ public class Widget2x1 extends AppWidgetProvider {
 		} else if(devType.equalsIgnoreCase("AC3")) {
 			views.setTextViewText(R.id.widget_probe_values, "ACiii not supported, search the market for the ACiii version of the app.");
 		} else {
-			String statusText = "test";/*Apex.getShortXMLStatus(context, controllerUri);*/
-			views.setTextViewText(R.id.widget_probe_values, statusText.trim());
+			String statusText;/*Apex.getShortXMLStatus(context, controllerUri);*/
+			// For now, lets assume that there are no more than 20 characters per probe name/value pair
+			// ToDo change to dynamic count THIS REALLY NEEDS TO GET FIXED !!
+			StringBuffer probesBuffer = new StringBuffer(10*20);
+
+			Cursor cursor2 = null;
+
+			// Get all the data points for the timestamp noted above.
+			Uri probeDataAtUri = Data.buildQueryPDataAtUri(controllerUri, timestampL);
+
+			try {
+				cursor = resolver.query(probeDataAtUri, ProbeDataViewQuery.PROJECTION, null, null, null);
+				String name;
+				String value;
+
+				// Loop through the data points.
+				if (cursor != null && cursor.moveToFirst()) {
+					while (!cursor.isAfterLast()) {
+						// Get the name/value & add to the string.
+						name = cursor.getString(ProbeDataViewQuery.NAME);
+						value = cursor.getString(ProbeDataViewQuery.VALUE);
+						probesBuffer.append(name).append(" = ").append(value).append("\n");
+						cursor.moveToNext();
+					}
+				}
+			} catch (SQLException e) {
+				Log.e(TAG, "getShortXMLStatus: building status string from database records.", e);	
+			} finally {
+				if (cursor != null) {
+					cursor.close();
+				}
+			} // end of controller query
+
+			views.setTextViewText(R.id.widget_probe_values, probesBuffer.toString().trim());
+			//views.setTextViewText(R.id.widget_probe_values, "test");
 		}
 
 		forecastFilled = true; // should make sure we have good data first. ERROR HANDLING!
@@ -229,24 +278,41 @@ public class Widget2x1 extends AppWidgetProvider {
         int CONTROLLER_ID = 3;
     }
 
-	private interface ProbeDataQuery {
-        String[] PROJECTION = {
-//              String DATA_ID = "_id";
-//              String VALUE = "value";
-//              String TIMESTAMP = "timestamp";
-//              String PROBE_ID = "probe_id";
-                BaseColumns._ID,
-                AquaNotesDbContract.Data.TYPE,
-                AquaNotesDbContract.Data.VALUE,
-                AquaNotesDbContract.Data.TIMESTAMP,
-                AquaNotesDbContract.Data.PARENT_ID,
-        };
-        
-        int _ID = 0;
-        int TYPE = 1;
-        int VALUE = 2;
-        int TIMESTAMP = 3;
-        int PARENT_ID = 4;
-    }
+	   private interface ProbeDataViewQuery {
+
+	        int _TOKEN = 0x1;
+	        
+	        String[] PROJECTION = {
+//	                String _ID = "_id";
+//	                String TYPE = "type";
+//	                String VALUE = "value";
+//	                String TIMESTAMP = "timestamp";
+//	                String PARENT_ID = "parent_id";   	
+//
+//	        		//\\
+//	        		Join
+//	        		\\//
+//	                String NAME = "name";
+//	                String RESOURCE_ID = "resource_id";
+//	                String CONTROLLER_ID = "controller_id";
+	        		BaseColumns._ID,
+	        		AquaNotesDbContract.ProbeDataView.TYPE,
+	        		AquaNotesDbContract.ProbeDataView.VALUE,
+	        		AquaNotesDbContract.ProbeDataView.TIMESTAMP,
+	        		AquaNotesDbContract.ProbeDataView.PARENT_ID,
+
+	        		AquaNotesDbContract.ProbeDataView.NAME,
+	        		AquaNotesDbContract.ProbeDataView.RESOURCE_ID,
+	        		AquaNotesDbContract.ProbeDataView.CONTROLLER_ID,
+	         };
+	        int _ID = 0;
+	        int TYPE = 1;
+	        int VALUE = 2;
+	        int TIMESTAMP = 3;
+	        int PARENT_ID = 4;
+	        int NAME = 5;
+	        int RESOURCE_ID = 6;
+	        int CONTROLLER_ID = 7;
+	     }
 
 }

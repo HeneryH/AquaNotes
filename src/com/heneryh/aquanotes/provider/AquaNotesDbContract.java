@@ -402,6 +402,14 @@ public class AquaNotesDbContract {
         	return buildQueryControllerXUri(controllerId); // same as query
         }
 
+        public static Uri buildUpdateControllerByWidgetUri(int widgetId) {
+        	return buildQueryControllerByWidgetUri(Integer.toString(widgetId)); // same as query
+        	
+        	/** TODO:
+        	 * The update by widget isn't working yet.
+        	 */
+        }
+
         public static Uri buildUpdateControllerXUri(String controllerUrl) {
         	return buildQueryControllerByUrlUri(controllerUrl); // same as query
         }

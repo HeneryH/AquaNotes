@@ -87,6 +87,7 @@ public class HomeActivity extends BaseActivity {
 	public void onResume() {
 		super.onResume();		
 	    IntentFilter intentFilter = new IntentFilter(SyncService.STATUS_UPDATE);
+	    updateRefreshStatus(false);
 	    registerReceiver(statusIntentReceiver, intentFilter); 
 	}
  

@@ -23,10 +23,12 @@ import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.SQLException;
+import android.database.sqlite.SQLiteConstraintException;
 import android.net.Uri;
 import android.provider.BaseColumns;
 import android.util.Log;
@@ -56,7 +58,6 @@ public class Widget2x2 extends AppWidgetProvider {
 	public static final String ACTION_UPDATE_SINGLE = "com.heneryh.aquanotes.UPDATE_SINGLE"; // probably shouldn't repeat this but import it
 	public static final String ACTION_UPDATE_ALL = "com.heneryh.aquanotes.UPDATE_ALL";
 
-
 	@Override
 	public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
 		// If no specific widgets requested, collect list of all
@@ -80,12 +81,23 @@ public class Widget2x2 extends AppWidgetProvider {
 	 */
 	@Override
 	public void onDeleted(Context context, int[] appWidgetIds) {
-//		ContentResolver resolver = context.getContentResolver();
-//		for (int appWidgetId : appWidgetIds) {
+		ContentResolver resolver = context.getContentResolver();
+		for (int appWidgetId : appWidgetIds) {
+			
+        	/** TODO:
+        	 * The update by widget isn't working yet.
+        	 */
+
 //			Log.d(TAG, "Deleting appWidgetId=" + appWidgetId);
-//			Uri controllerUri = Controllers.buildQueryControllerXUri(appWidgetId);
-//			resolver.delete(controllerUri, null, null);
-//		}
+//			Uri controllerXUri = Controllers.buildUpdateControllerXUri(appWidgetId);
+//			try {
+//				ContentValues values = new ContentValues();
+//				values.put(AquaNotesDbContract.Controllers.WIDGET, -1);  
+//				resolver.update(controllerXUri, values, null, null);
+//			} catch (SQLiteConstraintException e2 ) {
+//				Log.e(TAG, "Inserting/updating controller data: ", e2);
+//			}
+		}
 	}
 
 	/**

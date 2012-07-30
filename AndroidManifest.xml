@@ -17,8 +17,8 @@
 <manifest
     xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.heneryh.aquanotes"
-    android:versionCode="36"
-    android:versionName="0.36"
+    android:versionCode="39"
+    android:versionName="0.39"
     android:installLocation="auto">
 
     <uses-sdk
@@ -90,7 +90,7 @@
         
         
         <!-- Broadcast Receiver that will process AppWidget updates -->
-<!--         <receiver
+         <receiver
             android:label="@string/widget_name_2x1"
             android:name=".ui.widget.Widget2x1" >
             <intent-filter >
@@ -101,7 +101,7 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/widget_2x1" />
         </receiver>
- -->
+
         <!-- Broadcast Receiver that will process AppWidget updates -->
         <receiver
             android:label="@string/widget_name_2x2"
